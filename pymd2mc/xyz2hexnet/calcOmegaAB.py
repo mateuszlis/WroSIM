@@ -49,7 +49,14 @@ def main():
     outFile.close()
     if options.verbose: 
         print "Done. Execution time=%f" % (time() - startTime)    
-    print "Result omegaAB = %f" % (sum(omegas)/len(omegas))
+    midOmega = (sum(omegas)/len(omegas))
+    print "Result omegaAB = %f" % midOmega
+    sd = 0
+    for omega in omegas:
+        sd += (midOmega - omega)**2
+    sd /= len(omegas)
+    sd **= (1./2.)
+    print "Standard deviation = %f" % sd
 def parseCommandLine():
     """
     Sets up command line arguments and parses them
