@@ -21,16 +21,18 @@ class EnergyCalculator(object):
         if self.frame is None:
             raise InputError(xyzFile, "no frames in file")
         self.hexLatticeLoader = HexLatticeLoader(self.frame)
-    def getNextEnergy(self, symbol = 'A', N_A = 51, N_B = 13):
+    def getNextEnergy(self, symbol = 'A'):
         """Returns value of energy for next frame"""
         if self.frame is None:
             self.frame = self.xyzFile.nextFrame()
             
         if self.frame is None:
             return None
-        self.hexLatticeLoader.updateState(self.frame)
+        self.hexLatticeLoader.updateState(self.frame, symbol)
+        
         N_AA, N_BB, N_AB = self.hexLatticeLoader.calcNeighborsCount(symbol)
-
+        N_A = self.hexLatticeLoader.N_A
+        N_B = self.hexLatticeLoader.N_B
         PwAB = float(N_AB) / (N_AA * (N_B/float(N_A)) + N_BB * float(N_A)/N_B) 
         print "PwAB %s sim %s diff %s, %s" % (PwAB, N_AA, N_BB, self.R)
         if PwAB < 0.01:
@@ -47,9 +49,16 @@ class HexLatticeLoader(object):
         self._n = int(len(self._atoms) ** (1/2.))
         self._neighSites =[(-1,-1), (-1, 0), (0,-1), (0, 1), (1, 0), (1, 1)]
         self._createPositionsDict()
-    def updateState(self, frame):
+        self._N_A = 0
+        self._N_B = 0
+        
+    def updateState(self, frame, symbol):
         for atom in frame.atoms:
             self._atoms[self._indexForPosition[(atom.x, atom.y)]] = atom
+            if atom.symbol == symbol:
+                self._N_A += 1
+            else:
+                self._N_B += 1
     
     def getNeighbors(self, atom):
         atomInd = self._indexForPosition[(atom.x, atom.y)]
@@ -78,3 +87,9 @@ class HexLatticeLoader(object):
                     #print neighAtom 
                     N_AB += 1
         return (N_AA / 2, N_BB / 2, N_AB / 2)
+    @property
+    def N_A(self):
+        return self._N_A
+    @property
+    def N_B(self):
+        return self._N_B
