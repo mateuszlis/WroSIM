@@ -31,21 +31,23 @@ class EnergyCalculator(object):
         self.hexLatticeLoader.updateState(self.frame, symbol)
         
         N_AA, N_BB, N_AB = self.hexLatticeLoader.calcNeighborsCount(symbol)
-        N_A = self.hexLatticeLoader.N_A
-        N_B = self.hexLatticeLoader.N_B
-        PwAB = float(N_AB) / (N_AA * (N_B/float(N_A)) + N_BB * float(N_A)/N_B) 
-        print "PwAB %s sim %s diff %s, %s" % (PwAB, N_AA, N_BB, self.R)
+        try:
+            PwAB = float(N_AB**2) / (4 * N_AA * N_BB) 
+        except:
+            PwAB = 0
         if PwAB < 0.01:
             wAB = -10**10
             print '!!"'
         else:
-            wAB =  - self.R * self.T * log(PwAB)
+            wAB =  (self.R * self.T * log(PwAB)) / -2.
         self.frame = None
+        print "PwAB %s NAA %s NBB %s, NAB %s, wAB %s" % (PwAB,
+                                                 N_AA, N_BB, N_AB, wAB)
         return (wAB, N_AA, N_AB)
 
 class HexLatticeLoader(object):
     def __init__(self, frame):
-        self._atoms = sorted(frame.atoms, key=attrgetter('y','x'))
+        self._atoms = sorted(sorted(frame.atoms, key=attrgetter('x')),key=attrgetter('y'), reverse=True)
         self._n = int(len(self._atoms) ** (1/2.))
         self._neighSites =[(-1,-1), (-1, 0), (0,-1), (0, 1), (1, 0), (1, 1)]
         self._createPositionsDict()
