@@ -29,12 +29,12 @@ void printLatt(TriangularLattice *lattice, int lattSize, int rowSize,
 
 int main() {
 	srand((unsigned) time(0));
-	float omega = 540.0;
+	float omega = -1000;
 	int aLipidsNum = 2000;
 
 	ofstream trajFile, neighHistFile;
-	trajFile.open("traj_omega+540.xyz");
-	neighHistFile.open("neigh_hist_omega+540.dat");
+	trajFile.open("traj_omega-1000.xyz");
+	neighHistFile.open("neigh_hist_omega-1000.dat");
 
 	TriangularLattice *lattice = new TriangularLattice(LATT_SIZE, 100,
 			aLipidsNum);
@@ -71,7 +71,8 @@ void metropolisStep(TriangularLattice *latt, double omegaAB) {
 
 void createNeighHist(long long *histArr, TriangularLattice *latt) {
 	for (int i = 0; i < latt->getLatticeSize(); i++) {
-		histArr[latt->simNeighbCount(i)] += 1;
+		if ((*latt)[i])
+			histArr[latt->simNeighbCount(i)] += 1;
 	}
 }
 void metropolis(TriangularLattice *latt, double omegaAB, int stepSize,
