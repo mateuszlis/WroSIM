@@ -47,7 +47,7 @@ class EnergyCalculator(object):
 
 class HexLatticeLoader(object):
     def __init__(self, frame):
-        self._atoms = sorted(sorted(frame.atoms, key=attrgetter('x')),key=attrgetter('y'), reverse=True)
+        self._atoms = sorted(sorted(frame.atoms, key=attrgetter('x')),key=attrgetter('y'))
         self._n = int(len(self._atoms) ** (1/2.))
         self._neighSites =[(-1,-1), (-1, 0), (0,-1), (0, 1), (1, 0), (1, 1)]
         self._createPositionsDict()
