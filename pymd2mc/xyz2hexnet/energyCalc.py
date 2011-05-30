@@ -35,8 +35,8 @@ class EnergyCalculator(object):
             PwAB = float(N_AB**2) / (4 * N_AA * N_BB) 
         except:
             PwAB = 0
-        if PwAB < 0.01:
-            wAB = -10**10
+        if PwAB < 0.0001:
+            wAB = 10**10
             print '!!"'
         else:
             wAB =  (self.R * self.T * log(PwAB)) / -2.
@@ -65,8 +65,8 @@ class HexLatticeLoader(object):
     def getNeighbors(self, atom):
         atomInd = self._indexForPosition[(atom.x, atom.y)]
         for neighbor in self._neighSites:
-            row = (int(atomInd / 3) + neighbor[0]) % self._n
-            col = (int(atomInd % 3) + neighbor[1]) % self._n
+            row = (int(atomInd / self._n) + neighbor[0]) % self._n
+            col = (int(atomInd % self._n) + neighbor[1]) % self._n
             yield self._atoms[int(row * self._n + col)]
     def _createPositionsDict(self):
         self._indexForPosition = {}
