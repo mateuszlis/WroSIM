@@ -10,6 +10,9 @@ foreach (f ${directories})
     add_subdirectory(${f})
 endforeach(f)
 
+add_library(commandLine commandLine.cxx)
 add_library(TriangularLattice TriangularLattice.cpp)
+add_library(Metropolis Metropolis.cpp)
+
 add_executable(mcsim mcsim.cpp)
-target_link_libraries(mcsim TriangularLattice)
+target_link_libraries(mcsim TriangularLattice commandLine Metropolis)

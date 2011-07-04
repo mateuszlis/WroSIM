@@ -1,0 +1,55 @@
+
+include <string>;
+
+class options
+{
+  bool --help {"Display this message"};
+  std::string --sampling = "Kawasaki"
+    {
+        "<Kawasaki/Almeida>",
+        "Use Kawasaki or Almeida (see documentation) sampling method"
+    };
+  std::string -f
+  {
+        "<filename>",
+        "Input filename (point for starting simulation)
+         Currently doesn't work"
+  };
+  int --first-particles-count = 2000
+  {
+        "<num>",
+        "Value describes number of sites of the first of types. 
+        This required to generate lattice if you don't pass the starting point file." 
+  };
+    int --latt-row-size = 100
+  {
+        "<num",
+        "Size of the lattice row (note that lattice size is square of this value
+        This is required if you use lattice generator (not passing start file"
+  };
+  std::string -o = "traj.xyz"
+  {
+        "<filename>",
+        "output filename (warning: it will be overriden)
+        Default: traj.xyz"
+  };
+  int --steps = 10000
+  {
+        "<num>",
+        "Number of steps to be done in simulation"
+  };
+ 
+  int --output-freq = 100
+  {
+        "<num>",
+        "Frequency of making output snapshots (every <num> frame will be
+        written to the output file"
+  };
+
+  float --omega = 0
+  {
+        "<float>",
+        "Value of omega_AB (see documentation)"
+  };
+  
+};
