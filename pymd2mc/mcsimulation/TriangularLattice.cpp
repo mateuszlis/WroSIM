@@ -66,27 +66,30 @@ int TriangularLattice::getRowSize()
 void TriangularLattice::exchangeSites( int pos1, int pos2 )
 {
     // fast variable values exchange trick (pos1 != pos2)
-    mpLattice[pos1] ^= mpLattice[pos2];
+	mpLattice[pos1] ^= mpLattice[pos2];
     mpLattice[pos2] ^= mpLattice[pos1];
     mpLattice[pos1] ^= mpLattice[pos2];
+
 }
 int TriangularLattice::simNeighbCount( int pos )
 {
     int sum = 0;
     for ( int i = 0; i < 6; i++ )
     {
-        int currentNeigh = ( pos + mNeighb[i] );
-        if ( currentNeigh >= mLatticeSize )
-            currentNeigh -= mLatticeSize;
-        if ( currentNeigh < 0 )
-            currentNeigh += mLatticeSize;
+        int currentNeigh = getNeighbIndex(pos, i);
         sum += ( mpLattice[pos] == mpLattice[currentNeigh] ? 1 : 0 );
     }
     return sum;
 }
+
 int TriangularLattice::getNeighbIndex( int pos, int neighborNum )
 {
-    return pos + mNeighb[neighborNum];
+	int neigh = ( pos + mNeighb[neighborNum] );
+	if ( neigh >= mLatticeSize )
+		neigh -= mLatticeSize;
+	if ( neigh < 0 )
+	    neigh += mLatticeSize;
+    return neigh;
 }
 int TriangularLattice::getNeighborsCnt()
 {
