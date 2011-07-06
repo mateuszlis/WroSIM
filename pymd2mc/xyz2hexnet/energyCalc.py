@@ -14,7 +14,7 @@ class EnergyCalculator(object):
     This class calculates energy value from a state of hexagonal lattice.
     Currently it handles only two types of particles in lattice file.
     '''
-    def __init__(self, xyzFile, R = 1.986, T = 310):
+    def __init__(self, xyzFile, R = 1.9859, T = 310):
         self.xyzFile = xyzFile
         self.frame = self.xyzFile.nextFrame()
         self.R, self.T = R, T

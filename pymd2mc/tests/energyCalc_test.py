@@ -14,12 +14,16 @@ class TestEnergyCalculator(unittest.TestCase):
     def setUp(self):
         self.xyzFile = XYZFile('data/smallLattice.xyz')
         self.energyCalc = EnergyCalculator(self.xyzFile)
+        self.xyzFile2 = XYZFile('data/4x4_lattice.xyz')
+        self.energyCalc2 = EnergyCalculator(self.xyzFile2)
     def testGetNextEnergy(self):
         self.energyCalc.getNextEnergy("B")
         self.energyCalc.getNextEnergy("B")
         #self.assertAlmostEqual(self.energyCalc.getNextEnergy('B'), 575.11680054416524)
         #self.assertAlmostEqual(self.energyCalc.getNextEnergy('B'), -191.00144095067344)
-        self.assertAlmostEqual(self.energyCalc.getNextEnergy('B')[0], -191.00144095067344)
+        self.assertAlmostEqual(self.energyCalc.getNextEnergy('B')[0], -246.49103189351013)
+        self.assertAlmostEqual(self.energyCalc2.getNextEnergy('B')[0], 172.25785395544818)
+        
     def tearDown(self):
         del(self.xyzFile)
         
@@ -50,23 +54,26 @@ class TestHexLatticeLoader(unittest.TestCase):
                 for i in range(3):
                     self.assertAlmostEqual(neigh.x0[i],self.firstFrame.atoms[neighbrNum].x0[i])
     def testUpdate(self):
-        self.loader.updateState(self.secondFrame)
+        self.loader.updateState(self.secondFrame, 'B')
         neighList = self.loader.getNeighbors(self.firstFrame.atoms[0])
         for atom in neighList:
             self.assertEqual(atom.symbol, "B")
     def testCalcNeighborsCount(self):
-        similar, different = self.loader.calcNeighborsCount('A')
+        similar, similar2 , different = self.loader.calcNeighborsCount('A')
+        similar += similar2
         self.assertEqual(similar, 27)
         self.assertEqual(different, 0)
         
-        self.loader.updateState(self.secondFrame)
-        similar, different = self.loader.calcNeighborsCount('B')
+        self.loader.updateState(self.secondFrame, 'B')
+        similar, similar2, different = self.loader.calcNeighborsCount('B')
+        similar += similar2
         self.assertEqual(similar, 27)
         self.assertEqual(different, 0)
         
         self.secondFrame.atoms[4].symbol = 'A'
-        self.loader.updateState(self.secondFrame)
-        similar, different = self.loader.calcNeighborsCount('B')
+        self.loader.updateState(self.secondFrame, 'B')
+        similar, similar2, different = self.loader.calcNeighborsCount('B')
+        similar += similar2
         self.assertEqual(different, 6)
         self.assertEqual(similar, 21)
         
