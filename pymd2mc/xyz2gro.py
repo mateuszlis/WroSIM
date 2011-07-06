@@ -20,13 +20,13 @@ def main():
         print len(frame.atoms)
         i = 1
         for atom in frame.atoms:
-            print ("%5d%5s%5s%5d%8.3f%8.3f%8.3f" % (1,'Mol',atom.symbol,i,atom.x, atom.y, atom.z))
+            print ("%5d%5s%5s%5d%8.3f%8.3f%8.3f" % (i,'Mol  ',atom.symbol,i,atom.x, atom.y, atom.z))
             i += 1
 #            if options.verbose:
 #                delLine()
 #                print i, 
         #print '3.061 5.304 0.2'       
-        for size in [6.533,6.533,7.057]: print size,
+        for size in [13.755, 13.755, 6.625]: print size,
         print ''
         
     #with open("x.gro", 'w') as f:
