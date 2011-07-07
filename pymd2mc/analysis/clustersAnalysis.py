@@ -11,8 +11,7 @@ import sys
 from time import time
 
 from myExceptions import InputError
-from utils import bruteForce, delLine, distance, vectorLength
-from structures.xyzfile import XYZFile, XYZFrame, XYZAtom
+from structures.xyzfile import XYZFile
 from xyz2hexnet.energyCalc import HexLatticeLoader
 
 def main(argv=None):
