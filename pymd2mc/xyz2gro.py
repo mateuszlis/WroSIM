@@ -20,7 +20,8 @@ def main():
         print len(frame.atoms)
         i = 1
         for atom in frame.atoms:
-            print ("%5d%5s%5s%5d%8.3f%8.3f%8.3f" % (i,'Mol  ',atom.symbol,i,atom.x, atom.y, atom.z))
+
+            print ("%5d%5s%5s%5d%8.3f%8.3f%8.3f" % (i,'Mol  ',atom.symbol[:5],i,atom.x, atom.y, atom.z))
             i += 1
 #            if options.verbose:
 #                delLine()
