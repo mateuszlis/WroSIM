@@ -27,7 +27,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB ) :
             mIsSetStatusStream( false), mpLatt( latt)
 {
 
-    mStepSize = ( latt->getRowSize() );
+    mStepSize = ( latt->getLatticeSize() );
     setSampler( Kawasaki);
 
 }
