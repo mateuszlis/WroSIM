@@ -109,16 +109,18 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
     for ( int i = 0; i < latt.getLatticeSize(); i++ )
         if ( latt[i] )
         {
-            double y = i / latt.getRowSize();
-            double x = ( i % latt.getRowSize() ) - y;
+	    int line( i / latt.getRowSize() );
+            double y = line * 0.866025;
+            double x = ( i % latt.getRowSize() ) - line * 0.5;
             stream << "A\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
         }
     for ( int i = 0; i < latt.getLatticeSize(); i++ )
     {
         if ( ! ( latt.mpLattice[i] ) )
         {
-            double y = i / latt.getRowSize();
-            double x = ( i % latt.getRowSize() ) - y;
+	    int line( i / latt.getRowSize() );
+            double y = line * 0.866025;
+            double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
             stream << "B\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
         }
     }

@@ -41,11 +41,11 @@ def main():
         omega = calc.getNextEnergy(options.symbol)
         if omega is None:
             break
-        omega, sim, diff = omega
+        omega , sim, diff = omega
         if omega > -10**4: 
             omegas.append(omega)
             outFile.write("%d  %f %f %f \n" % (i, omega, sim, diff))
-        
+
         
     outFile.close()
     if options.verbose: 

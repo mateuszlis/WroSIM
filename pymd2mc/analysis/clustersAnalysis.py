@@ -35,14 +35,16 @@ def main(argv=None):
     for histDict in clusterHists:
         for atomName, hist in histDict.items():
             if atomName == options.name or options.name == "all":
-                for size, count in hist.items():
+                for size, count in hist.items(): 
                     if finalHist.has_key(size):
                         finalHist[size] += count
                     else: 
                         finalHist[size] = count
     for size in finalHist.keys():
-        finalHist[size] /= float(frameCounter)
-    for size, count in finalHist.items():
+        finalHist[size] = (finalHist[size] ) / float(frameCounter)
+    resList = finalHist.items()
+    resList.sort()
+    for size, count in resList:
         datFile.write("%s\t%s\n" % (size, count))
     datFile.close()
     if options.verbose:
@@ -57,10 +59,10 @@ def calcClusterHist(latticeLoader, frame):
             size = checkCluster(latticeLoader, frame, atom, done)
             #print "done", atom, size
             if not atomDict.has_key(atom.symbol):
-                atomDict[atom.symbol] = {size : 1}
+                atomDict[atom.symbol] = {size : size}
             elif atomDict[atom.symbol].has_key(size):
-                atomDict[atom.symbol][size] += 1
-            else: atomDict[atom.symbol][size] = 1
+                atomDict[atom.symbol][size] += size
+            else: atomDict[atom.symbol][size] = size
     return atomDict
 
 def checkCluster(latticeLoader, frame, atom, done):

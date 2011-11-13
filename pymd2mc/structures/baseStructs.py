@@ -61,6 +61,9 @@ class Frame(object):
     def atoms(self):
         """Atoms in the frame"""
         return self._atomsList
+    @atoms.setter
+    def atoms(self, atomsList):
+	    self._atomsList = atomsList
     @property
     def comment(self):
         """Comment String"""

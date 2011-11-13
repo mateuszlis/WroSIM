@@ -18,12 +18,14 @@ class Position(object):
     @x0.setter
     def x0(self, x0):
         self._x0 = x0
+    def __repr__(self):
+	return str(self.x0)
        
         
 class HexLattice(object):
     #FIXME: size!!!!
     def __init__(self, n = 8, x0 = (0,0), dx = (6.5,6.5), 
-                 pbcSites = [[0,0,0], [-1,0,0], [-1,-1,0], [0,-1,0],[0,1,0],[-1,1,0]]):
+                 pbcSites = [[0,0,0], [-1,0,0], [-1,-1,0], [0,-1,0],[0,1,0],[-1,1,0], [1,0,0], [1,1,0], [1,-1,0]]):
         """
         Creates instance of hexagonal lattice class.
         n - denotes number of particles in one line of lattice (it must be equilateral)
@@ -34,7 +36,7 @@ class HexLattice(object):
         self._x0 = x0
         self._n = n
         self._positions = []
-        self._angle = pi/3.
+	self._angle = pi/3. #FIXME: Fixed constant
         self._dx = dx
         self._setPositions()
         self._pbcSites = pbcSites
@@ -86,12 +88,14 @@ class HexLattice(object):
     
     def _setPositions(self):
         """create position field for each particle in lattice and set its position"""
-        xLine0 = self.x0[0] + 0.5 * (self.dx[0] / self.n - cos(self._angle) * self.dx[1] / self.n) 
-        yLine0 = self.x0[1] + 0.5 * self.dx[1] / self.n * sin(self._angle)
-        
+        xLine0 = self.x0[0] #+ 0.5 * (self.dx[0] / self.n - cos(self._angle) * self.dx[1] / self.n) 
+        yLine0 = self.x0[1] #+ 0.5 * self.dx[1] / self.n * sin(self._angle)
+        print sin(self._angle), "sin"
+	print cos(self._angle), "cos"
         for _ in range(self.n):
             for x in range(self.n):
                 self.positions.append(Position([xLine0 + x * self.dx[0] / self.n, yLine0]))
             xLine0 -= cos(self._angle) * self.dx[1] / self.n
             yLine0 += sin(self._angle) * self.dx[1] / self.n
+	print self.positions[0], self.positions[1], "Positions"
     

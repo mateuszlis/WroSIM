@@ -147,7 +147,9 @@ class XYZFile(object):
         if self._frames is None:
             self.load()
         file  = open(self.filename, 'w')
-        file.write(repr(self))
+        for frame in self._frames:
+		file.write(repr(frame))
+		file.write('\n')
         file.close()
         
     def getFrame(self, number):

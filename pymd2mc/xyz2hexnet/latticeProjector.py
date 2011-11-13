@@ -5,7 +5,7 @@ stored in xyzFile, to lattice trajectory (with discrete fields).
 __author__ =  'Mateusz Lis'
 __version__=  '0.1'
 
-from math import sqrt
+from math import sqrt, pi
 
 from utils import distance, posmax, posmin, concatenate
 from structures.xyzfile import XYZAtom
@@ -173,6 +173,79 @@ class LatticeProjectorSimple(object):
         self._distances = [-1000 for _ in range(n)]
         self._places = [-1 for _ in range(n)]
 
-    
-    
+class NearestNeighborLatticeProj(LatticeProjectorSimple):
+    def __init__(self, xyzFile, lattice):
+        '''
+        Constructor
+        '''
+        self._xyzFile = xyzFile
+        self._lattice = lattice
+	apl = ( 0.5 * (lattice.dx[0] * lattice.dx[1]) * (3**(1./2))) / lattice.n**2
+	self._radius = (( apl / pi )**(1./2)) 
+	print self._radius, "radius"
+    def next(self):
+        """
+        Returns lattice containing projection of the next frame of xyzFile.
+        If file has finnished it returns None value
+        """
+        frame = self.xyzFile.nextFrame()
+	if frame is None: return None
         
+        newFrame = XYZFrame()
+        newFrame.boxVectors = self.lattice.boxVectors
+        refFrame = XYZFrame()
+        refFrame.boxVectors = self.lattice.boxVectors
+	atomsLists = self.propagateAtomsThroughPbc(frame.atoms, frame.boxSize)
+
+        allAtoms = concatenate(atomsLists)  
+       
+        #posCount = len(atomsLists[0])
+        errors = []
+	differences = []
+        #match, referenceMatch, errors = self.match(atomsLists)   
+	atoms = []
+#	print self._radius
+	for pos in self.lattice.positions:
+		ACounter = 0
+		BCounter = 0
+		for atom in allAtoms:
+			dist = distance( atom.x0, pos.x0 )
+			atoms.append(atom)
+			if atom.symbol == "DLPC": 
+				try:
+					ACounter += 1. / ( dist**2 )
+				except:
+					ACounter = 1e308
+			else:
+				if atom.symbol == "DOPC": 
+					try:
+						BCounter += 1. / ( dist**2 )
+					except:
+						BCounter = 1e308
+		differences.append( (ACounter - BCounter, pos.x0) )
+#		if ACounter > BCounter: symbol = "DSPC"
+#		else: symbol = "A"
+#		newFrame.atoms.append(XYZAtom(symbol, *pos.x0))
+ 		errors.append(0.0)
+	num = 0
+	for atom in atoms:
+		refFrame.atoms.append(XYZAtom(atom.symbol, *atom.x0))
+		refFrame.atoms[-1].x += 17
+	for atom in allAtoms:
+		refFrame.atoms.append(XYZAtom(atom.symbol, *atom.x0))
+		refFrame.atoms[-1].x += 48
+	
+	for diff, pos in sorted(differences, key = lambda tup: tup[0]):
+		num += 1
+		if num < 129:
+			symbol = "DOPC"
+		else: symbol = "DPPC"
+		newFrame.atoms.append(XYZAtom(symbol, *pos))
+        #for atomIndex in range(posCount):
+        #    newFrame.atoms.append(XYZAtom(atomsLists[0][atomIndex].symbol
+        #                        , *self.lattice.positions[match[atomIndex]].x0))
+        return ProjectedFrame(newFrame, refFrame, errors)
+
+
+
+

@@ -9,7 +9,7 @@ from optparse import OptionParser
 import sys
 from time import time
 
-from pymacs import Model
+from pymacs import Model 
 from pymacs.ndx import IndexFile
 from pymacs import openXTC, readXTCFrame
 
@@ -68,7 +68,7 @@ def createXYZFile(fp, model, atomsIndexes, xyzFile, options):
         
         for atomIndex in atomsIndexes:
                 model.atoms[atomIndex - 1].x[2] = 0.
-                xyzAtom = XYZAtom(model.atoms[atomIndex - 1].name, 
+                xyzAtom = XYZAtom(model.atoms[atomIndex - 1].resname, 
                                     *model.atoms[atomIndex - 1].x)
                 xyzFrame.atoms.append(xyzAtom)
         xyzFile.addFrame(xyzFrame)

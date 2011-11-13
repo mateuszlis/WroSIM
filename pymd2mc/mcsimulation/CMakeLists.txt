@@ -15,4 +15,6 @@ add_library(TriangularLattice TriangularLattice.cpp)
 add_library(Metropolis Metropolis.cpp)
 
 add_executable(mcsim mcsim.cpp)
+add_executable(analyze analyze.cpp)
+
 target_link_libraries(mcsim TriangularLattice commandLine Metropolis)

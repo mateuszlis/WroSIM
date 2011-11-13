@@ -14,7 +14,7 @@ import sys
 from time import time
 
 from utils import delLine, clearFile
-from latticeProjector import LatticeProjectorSimple
+from latticeProjector import *
 from lattices import HexLattice
 from structures.xyzfile import XYZFile
  
@@ -24,32 +24,52 @@ def main():
     
     options = parseCommandLine()
     avgArea = getAvgSize(options.inXyzFilename)
-    lattBoxSize = ((2 * avgArea) / (3**(1/2.)) )**(1/2.)
+    print avgArea
+    lattBoxSize = ((2 * avgArea) / (3**(1/2.)) )**(1/2.) #area of parallelogram
+    print lattBoxSize
     inFile = XYZFile(options.inXyzFilename)
-    
+    latt = HexLattice(int(options.lattSize), (0,0), (lattBoxSize, lattBoxSize))
+
+    lattProj = NearestNeighborLatticeProj(inFile, latt)
     clearFile(options.outXyzFilename)
     outFile = XYZFile(options.outXyzFilename)
     i = 0
     startTime = time()
     errors = []
-    latt = HexLattice(11, (0,0), (lattBoxSize, lattBoxSize))
-    lattProj = LatticeProjectorSimple(inFile, latt)
+    #lattProj = LatticeProjectorSimple(inFile, latt)
     while True:
-        i += 1
         if options.verbose:
-            delLine()
-            print i, 
+	    delLine()
+	    if i > 0: midTime = (time() - startTime) / i
+	    else: midTime = 0
+	    print i, "Avg time per frame: ", midTime,
+	    sys.stdout.flush()
         projLattice = lattProj.next()
         if projLattice is None:
             break
         frame = projLattice.frame
         if options.reference:
             frame.atoms.extend(projLattice.refFrame.atoms)
+	    symb = "DOPC"
+	    length = len(frame.atoms)
+	    num = 0
+	    for atom in frame.atoms:
+                if atom.symbol ==  symb: num += 1
+            for j in range(15000 - num):
+	        frame.atoms.append(XYZAtom("DOPC", -10., 0., 0.))
+	    for j in range(15000 - (length - num)):
+		frame.atoms.append(XYZAtom("DPPC", -10., 0., 0.))
+	    atoms = sorted(frame.atoms, key=lambda w: w.symbol)
+	    frame.atoms = atoms
+	    #frame.atoms = []#sorted(frame.atoms, key=lambda w: w.symbol)
+        i += 1
+
         err = (i, max(projLattice.errors), sum(projLattice.errors) / len(projLattice.errors))
         errors.append("{0} {1} {2}".format(*err))
         
         
         outFile.addFrame(frame)
+ 	if i > 10: break
         
     if not options.errFile is None:
         with open(options.errFile, 'w') as errFile:
@@ -72,8 +92,8 @@ def getAvgSize(xyzFilename):
         i += 1
     
     avgArea /= i
-    print avgArea
-    print "Avg APL = %f" % (avgArea / atomsLength)
+    #print avgArea
+    #print "Avg APL = %f" % (avgArea / atomsLength)
     del(xyzFile)
     return avgArea
     
@@ -94,6 +114,10 @@ def parseCommandLine():
     parser.add_option("-r", "--reference",
     action="store_true", dest="reference", default=False,
     help="write reference frames to xyz output file")
+    parser.add_option( "--lattice-size",
+     dest="lattSize", default=16,
+    help="Number denoting size of the lattice")
+
 
     parser.add_option("-q", "--quiet",
     action="store_false", dest="verbose", default=True,
