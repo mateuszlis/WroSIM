@@ -45,7 +45,8 @@ public:
         this->at2_name = at2_name;
         this->at2_resname = at2_resname;
     }
-    Distance(double d, int at2_ind): at2_ind(at2_ind)
+    Distance(double d, int at2_ind): 
+        at2_ind(at2_ind), d(d)
     {}
     ~Distance() {}
 };
@@ -135,7 +136,7 @@ int main(int argc,char *argv[]) {
 
             double dist2 = dx*dx + dy*dy;
             
-            distances2.push_back(Distance(dist2, atoms[j].name, atoms[j].resname));
+            distances2.push_back(Distance(dist2, j));
 
             
         }
@@ -147,7 +148,7 @@ int main(int argc,char *argv[]) {
         
         for (int n=0; n<N_NEIGHBORS; ++n)
         {
-            if (atoms[i].resname+atoms[i].name == distances2[n].at2_resname+distances2[n].at2_name) {
+            if (atoms[i].resname+atoms[i].name == atoms[distances2[n].at2_ind].resname+atoms[distances2[n].at2_ind].name) {
                 if (atoms[i].resname+atoms[i].name == AT1)
                     ++n_aa;
                 else ++n_bb;
