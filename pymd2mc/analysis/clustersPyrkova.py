@@ -26,7 +26,7 @@ def main(argv=None):
     neighborPairs = {}
     while not frame is None:
         findNeighborPairs( frame, frameCounter, neighborPairs )
-        clustered = findClusteredAtoms( neighborPairs, frameCounter, 60 )
+        clustered = findClusteredAtoms( neighborPairs, frameCounter, int( options.framesThr ) )
         if options.verbose: 
             delLine()
             print frameCounter,
@@ -151,6 +151,8 @@ def parseCommandLine():
     help="xyz trajectory file (default traj.xyz)", metavar="XYZFILE")
     parser.add_option("-d", "--distance", dest="distance", default="1.0",
     help='Threshold distance of the neighboring atoms', metavar="DISTANCE")
+    parser.add_option("-t", "--time", dest="framesThr", default="1",
+    help='Threshold time (frames number) for clusters formation', metavar="TIME")
     parser.add_option("-o", "--output", dest="xyzOutput", default="clustersTraj.xyz",
     help='output xyz file. with "size\t freq " format WARNING: it will be overriden', metavar="OUTPUTFILE")
     parser.add_option("-q", "--quiet",
