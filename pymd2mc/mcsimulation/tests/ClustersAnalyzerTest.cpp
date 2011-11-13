@@ -15,11 +15,13 @@ using namespace std;
 
 void testClustersAnalyzer();
 void testRegisterAtom();
+void testIsClustered();
 
 int main()
 {
     testClustersAnalyzer();
     testRegisterAtom();
+    testIsClustered();
     return 0;
 }
 
@@ -60,5 +62,40 @@ void testRegisterAtom()
     analyzer->registerAtom( 0, v, 4 );
     assert( analyzer->neighborPairs[ ClustersAnalyzer::Pair( 0, 2 )] == ClustersAnalyzer::Pair( 1, 4 ) );
     delete analyzer;
+}
+
+void testIsClustered()
+{
+    ClustersAnalyzer* analyzer = new ClustersAnalyzer( 2, 1. );
+    vector< Distance > v;
+    for ( int i = 1 ; i < 20 ; ++i )
+    {
+        v.push_back( Distance( 0.11 * i, i ) );
+    }
+    analyzer->registerAtom( 0, v, 0 );
+    assert( ! analyzer->isClustered( 0, 0 ) );
+    analyzer->registerAtom( 0, v, 1 );
+    assert( ! analyzer->isClustered( 0, 1 ) );
+    analyzer->registerAtom( 0, v, 2 );
+    assert( analyzer->isClustered( 0, 2 ) );// now it is
+    
+    vector< Distance > v2;
+    v2.push_back( Distance( 0.11, 0 ) );
+    analyzer->registerAtom( 1, v2, 0 ); 
+    assert( !analyzer->isClustered( 1, 0 ) );
+    analyzer->registerAtom( 1, v2, 1 ); 
+    assert( !analyzer->isClustered( 1, 1 ) );
+    analyzer->registerAtom( 1, v2, 2 ); 
+    assert( analyzer->isClustered( 1, 2 ) );
+    v2[0].at2Ind = 1.1;
+    analyzer->registerAtom( 1, v2, 3 ); 
+    assert( !analyzer->isClustered( 1, 3 ) );
+    v2[0].at2Ind = 0.1;
+    analyzer->registerAtom( 1, v2, 4 ); 
+    assert( !analyzer->isClustered( 1, 4 ) );
+    analyzer->registerAtom( 1, v2, 5 ); 
+    assert( !analyzer->isClustered( 1, 5 ) );
+    analyzer->registerAtom( 1, v2, 6 ); 
+    assert( analyzer->isClustered( 1, 6 ) );
 }
 
