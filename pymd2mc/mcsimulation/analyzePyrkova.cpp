@@ -34,7 +34,7 @@ int main(int argc,char *argv[]) {
     ifstream ifile;
     ifile.open(argv[1]);
     string line;
-    
+    ClustersAnalyzer analyzer( 1, 0.6 );
     if (ifile.is_open())
     {
         int frameCounter( 0 );
@@ -74,7 +74,6 @@ int main(int argc,char *argv[]) {
             if ( ! ifile.good() )
                 break;
             //end of processing GRO file
-            ClustersAnalyzer analyzer( 1, 1.0 );
             //analyzing
             double n_aa = 0;
             double n_bb = 0;
@@ -119,7 +118,11 @@ int main(int argc,char *argv[]) {
                 }
                 
             }
-            //cout << analyzer; 
+            for (int i=0; i<n_atoms; ++i)
+            {
+                cout << atoms[i].resname + atoms[i].name <<  analyzer.isInMixedCluster( i, frameCounter ) <<endl;
+                cout << atoms[i].resname + atoms[i].name <<  analyzer.isClustered( i, frameCounter ) << endl;
+            }
             n_aa = 0.5*n_aa; n_ab = 0.5*n_ab; n_bb = 0.5*n_bb; //0.5 since we calculated each neighboring pair twice
 
             //cout << "N: " << n_aa << " " << n_ab << " " << n_bb << endl;
