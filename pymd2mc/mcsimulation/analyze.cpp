@@ -37,14 +37,6 @@ class Distance {
 public:
     double d;
     int at2_ind;
-    string at2_name;
-    string at2_resname;
-    Distance() {}
-    Distance(double d, string at2_name, string at2_resname) {
-        this->d = d;
-        this->at2_name = at2_name;
-        this->at2_resname = at2_resname;
-    }
     Distance(double d, int at2_ind): 
         at2_ind(at2_ind), d(d)
     {}
