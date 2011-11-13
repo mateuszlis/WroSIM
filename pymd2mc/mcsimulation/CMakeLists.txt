@@ -13,9 +13,12 @@ endforeach(f)
 add_library(commandLine commandLine.cxx)
 add_library(TriangularLattice TriangularLattice.cpp)
 add_library(Metropolis Metropolis.cpp)
+add_library(ClustersAnalyzer ClustersAnalyzer.cpp)
+add_library(Atom Atom.cpp)
 
 add_executable(mcsim mcsim.cpp)
 add_executable(analyze analyze.cpp)
 add_executable(analyzePyrkova analyzePyrkova.cpp)
 
 target_link_libraries(mcsim TriangularLattice commandLine Metropolis)
+target_link_libraries(analyzePyrkova ClustersAnalyzer Atom)

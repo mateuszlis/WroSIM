@@ -7,71 +7,14 @@
 #include <map>
 #include <algorithm>
 
+#include "Atom.h"
+#include "ClustersAnalyzer.h"
 using namespace std;
 
 const double TEMPERATURE = 333.0;
 const int N_NEIGHBORS = 6;
 const string AT1 = "DOPCPO4";
 const string AT2 = "DPPCPO4";
-
-class Atom {
-public:
-    string resname;
-    string name;
-    double x;
-    double y;
-    double z;
-    Atom() {}
-    Atom(string resname, string name, double x, double y, double z) {
-        this->resname = resname;
-        this->name = name;
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
-};
-
-        
-        
-class Distance {
-public:
-    double d;
-    int at2_ind;
-    Distance(double d, int at2_ind): 
-        at2_ind(at2_ind), d(d)
-    {}
-    ~Distance() {}
-};
-
-class ClustersAnalyzer
-{
-    public:
-        typedef pair< int, int > Pair;
-        map< Pair, Pair > neighborHist;
-        int frameNumThr;
-        double distThr;
-
-        ClustersAnalyzer( int frameNumThr, double distThr ):
-            frameNumThr(frameNumThr), distThr(distThr)
-        {}
-
-        void registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum )
-        {}
-
-        bool isClustered( int atomInd, int currFrameNum )
-        {}
-
-        bool isInMixedCluster( int atomInd, int currFrameNum )
-        {}
-
-};
-
-bool compareDistances(const Distance& d1, const Distance& d2)
-{
-    if (d1.d < d2.d)
-        return true;
-    else return false;
-}
 
 inline std::string trim(std::string str)
 {
@@ -129,7 +72,7 @@ int main(int argc,char *argv[]) {
     }
     else cout << "Unable to open file!" << endl;
     //end of processing GRO file
-
+    ClustersAnalyzer analyzer( 1, 1.0 );
     //analyzing
     double n_aa = 0;
     double n_bb = 0;
@@ -157,13 +100,14 @@ int main(int argc,char *argv[]) {
         }
         
         sort(distances2.begin(), distances2.end(), compareDistances); //the shortest distances go first
-        
+        analyzer.registerAtom( i, distances2, 5 );
+
         //cout << "AT=" << atoms[i].name << endl;
         
         
         for (int n=0; n<N_NEIGHBORS; ++n)
         {
-            if (atoms[i].resname+atoms[i].name == atoms[distances2[n].at2_ind].resname+atoms[distances2[n].at2_ind].name) {
+            if (atoms[i].resname+atoms[i].name == atoms[distances2[n].at2Ind].resname+atoms[distances2[n].at2Ind].name) {
                 if (atoms[i].resname+atoms[i].name == AT1)
                     ++n_aa;
                 else ++n_bb;
@@ -173,7 +117,7 @@ int main(int argc,char *argv[]) {
         }
         
     }
-    
+    cout << analyzer; 
     n_aa = 0.5*n_aa; n_ab = 0.5*n_ab; n_bb = 0.5*n_bb; //0.5 since we calculated each neighboring pair twice
 
     //cout << "N: " << n_aa << " " << n_ab << " " << n_bb << endl;
