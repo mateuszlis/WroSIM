@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cmath>
 #include <vector>
+#include <map>
 #include <algorithm>
 
 using namespace std;
@@ -30,9 +31,12 @@ public:
     }
 };
 
+        
+        
 class Distance {
 public:
     double d;
+    int at2_ind;
     string at2_name;
     string at2_resname;
     Distance() {}
@@ -41,10 +45,12 @@ public:
         this->at2_name = at2_name;
         this->at2_resname = at2_resname;
     }
+    Distance(double d, int at2_ind): at2_ind(at2_ind)
+    {}
     ~Distance() {}
 };
 
-bool compareDistances(Distance d1, Distance d2)
+bool compareDistances(const Distance& d1, const Distance& d2)
 {
     if (d1.d < d2.d)
         return true;
@@ -112,7 +118,7 @@ int main(int argc,char *argv[]) {
     double n_aa = 0;
     double n_bb = 0;
     double n_ab = 0;
-    
+     
     for (int i=0; i<n_atoms; ++i)
     {
         vector<Distance> distances2; //will collect all distances to j-th atoms
