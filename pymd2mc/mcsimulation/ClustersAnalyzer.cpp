@@ -1,9 +1,13 @@
 #include "ClustersAnalyzer.h"
 
-void ClustersAnalyzer::registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum )
+void ClustersAnalyzer::registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum, Atom* atoms )
 {
     int i( 0 );
-    while ( sortedDistances[i].d < distThr )
+    string symbol;
+    bool isMixed = false;
+    if ( atoms ) 
+        symbol = atoms[atomInd].resname + atoms[atomInd].name;
+    while ( sortedDistances.size() > i && sortedDistances[i].d < distThr )
     {
         NeighbMem::iterator it = neighborPairs.find( Pair( atomInd, sortedDistances[i].at2Ind ) );
         if ( it != neighborPairs.end() )
@@ -16,6 +20,15 @@ void ClustersAnalyzer::registerAtom( int atomInd, vector< Distance > sortedDista
             else
             {
                 neighPair.first++;
+                if ( neighPair.first > frameNumThr )
+                { // at this point we know, that we have close neighbors for long enough
+                    // so we use that to mark it as a clustered atom in current
+                    // frame and if neighbor is different, set clustertype to
+                    // mixed.
+                    isClusteredMap[atomInd] = pair< bool, int >( true, currFrameNum );
+                    if ( atoms && ( symbol != atoms[it->first.second].resname + atoms[it->first.second].name ) )
+                        isMixed = true;
+                }
             }
             neighPair.second = currFrameNum;
         }
@@ -25,5 +38,20 @@ void ClustersAnalyzer::registerAtom( int atomInd, vector< Distance > sortedDista
         }
         ++i;
     }
+    if ( isClustered( atomInd, currFrameNum ) )
+    {
+        isMixedMap[atomInd].first = isMixed;
+        isMixedMap[atomInd].second = currFrameNum;
+    }
 }
 
+bool ClustersAnalyzer::isClustered( int atomInd, int currFrameNum )
+{
+    mapAtomNumClust::iterator it = isClusteredMap.find( atomInd );
+    if ( it != isClusteredMap.end() )
+    {
+        if ( ( it->second.second ) == currFrameNum && it->second.first )
+            return true;
+    }
+    return false;
+}

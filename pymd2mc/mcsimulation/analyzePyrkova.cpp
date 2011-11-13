@@ -100,7 +100,7 @@ int main(int argc,char *argv[]) {
         }
         
         sort(distances2.begin(), distances2.end(), compareDistances); //the shortest distances go first
-        analyzer.registerAtom( i, distances2, 5 );
+        analyzer.registerAtom( i, distances2, 5, atoms );
 
         //cout << "AT=" << atoms[i].name << endl;
         

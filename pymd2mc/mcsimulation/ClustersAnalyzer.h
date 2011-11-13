@@ -23,9 +23,8 @@ class ClustersAnalyzer
             frameNumThr(frameNumThr), distThr(distThr)
         {}
 
-        void registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum );
-        bool isClustered( int atomInd, int currFrameNum )
-        {}
+        void registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum, Atom* atoms = NULL );
+        bool isClustered( int atomInd, int currFrameNum );
 
         bool isInMixedCluster( int atomInd, int currFrameNum )
         {}
@@ -46,6 +45,10 @@ class ClustersAnalyzer
     private:
         int frameNumThr;
         double distThr;
+        typedef pair< bool, int > PairClust;
+        typedef map< int, PairClust > mapAtomNumClust;
+        mapAtomNumClust isClusteredMap;
+        mapAtomNumClust isMixedMap;
 };
 
 
