@@ -1,4 +1,7 @@
 include_directories(${BASE_SRC_DIR})
 add_executable (TriangularLatticeTest TriangularLatticeTest.cpp)
+add_executable (ClustersAnalyzerTest ClustersAnalyzerTest.cpp)
 add_test(TriangularLatticeTest ${EXECUTABLE_OUTPUT_PATH}/TriangularLatticeTest)
+add_test(ClustersAnalyzerTest  ${EXECUTABLE_OUTPUT_PATH}/ClustersAnalyzerTest)
 target_link_libraries(TriangularLatticeTest TriangularLattice)
+target_link_libraries(ClustersAnalyzerTest ClustersAnalyzer)

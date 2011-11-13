@@ -17,7 +17,6 @@ void testExchange();
 int calcSum( TriangularLattice* );
 int main()
 {
-    srand( ( unsigned )time( 0));
     testTriangularLattice();
     testExchange();
 
