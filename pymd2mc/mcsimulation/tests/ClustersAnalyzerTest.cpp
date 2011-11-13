@@ -16,12 +16,17 @@ using namespace std;
 void testClustersAnalyzer();
 void testRegisterAtom();
 void testIsClustered();
+void testIsMixed1();
+void testIsMixed2();
 
 int main()
 {
     testClustersAnalyzer();
     testRegisterAtom();
     testIsClustered();
+    testIsMixed1();
+    testIsMixed2();
+
     return 0;
 }
 
@@ -97,5 +102,71 @@ void testIsClustered()
     assert( !analyzer->isClustered( 1, 5 ) );
     analyzer->registerAtom( 1, v2, 6 ); 
     assert( analyzer->isClustered( 1, 6 ) );
+}
+void testIsMixed1()
+{
+    ClustersAnalyzer* analyzer = new ClustersAnalyzer( 2, 1. );
+    Atom* atoms = new Atom[2];
+    atoms[0] = Atom("A", "A", 0,0,0 );
+    atoms[1] = Atom("A", "A", 0,0,0 ); // consider two same atoms
+
+    vector< Distance > v2;
+    v2.push_back( Distance( 0.11, 0 ) );
+    analyzer->registerAtom( 1, v2, 0, atoms ); 
+    assert( !analyzer->isClustered( 1, 0 ) );
+    assert( !analyzer->isInMixedCluster( 1, 0 ) );
+    analyzer->registerAtom( 1, v2, 1 , atoms); 
+    assert( !analyzer->isClustered( 1, 1 ) );
+    assert( !analyzer->isInMixedCluster( 1, 1 ) );
+    analyzer->registerAtom( 1, v2, 2, atoms ); 
+    assert( analyzer->isClustered( 1, 2 ) );
+    assert( !analyzer->isInMixedCluster( 1, 2 ) );
+    v2[0].at2Ind = 1.1;
+    analyzer->registerAtom( 1, v2, 3, atoms ); 
+    assert( !analyzer->isClustered( 1, 3 ) );
+    assert( !analyzer->isInMixedCluster( 1, 3 ) );
+    v2[0].at2Ind = 0.1;
+    analyzer->registerAtom( 1, v2, 4, atoms ); 
+    assert( !analyzer->isClustered( 1, 4 ) );
+    assert( !analyzer->isInMixedCluster( 1, 4 ) );
+    analyzer->registerAtom( 1, v2, 5, atoms ); 
+    assert( !analyzer->isClustered( 1, 5 ) );
+    assert( !analyzer->isInMixedCluster( 1, 5 ) );
+    analyzer->registerAtom( 1, v2, 6, atoms ); 
+    assert( analyzer->isClustered( 1, 6 ) );
+    assert( !analyzer->isInMixedCluster( 1, 6 ) );
+}
+void testIsMixed2()
+{
+    ClustersAnalyzer* analyzer = new ClustersAnalyzer( 2, 1. );
+    Atom* atoms = new Atom[2];
+    atoms[0] = Atom("A", "A", 0,0,0 );
+    atoms[1] = Atom("B", "A", 0,0,0 ); // consider two same atoms
+
+    vector< Distance > v2;
+    v2.push_back( Distance( 0.11, 0 ) );
+    analyzer->registerAtom( 1, v2, 0, atoms ); 
+    assert( !analyzer->isClustered( 1, 0 ) );
+    assert( !analyzer->isInMixedCluster( 1, 0 ) );
+    analyzer->registerAtom( 1, v2, 1 , atoms); 
+    assert( !analyzer->isClustered( 1, 1 ) );
+    assert( !analyzer->isInMixedCluster( 1, 1 ) );
+    analyzer->registerAtom( 1, v2, 2, atoms ); 
+    assert( analyzer->isClustered( 1, 2 ) );
+    assert( analyzer->isInMixedCluster( 1, 2 ) );
+    v2[0].at2Ind = 1.1;
+    analyzer->registerAtom( 1, v2, 3, atoms ); 
+    assert( !analyzer->isClustered( 1, 3 ) );
+    assert( !analyzer->isInMixedCluster( 1, 3 ) );
+    v2[0].at2Ind = 0.1;
+    analyzer->registerAtom( 1, v2, 4, atoms ); 
+    assert( !analyzer->isClustered( 1, 4 ) );
+    assert( !analyzer->isInMixedCluster( 1, 4 ) );
+    analyzer->registerAtom( 1, v2, 5, atoms ); 
+    assert( !analyzer->isClustered( 1, 5 ) );
+    assert( !analyzer->isInMixedCluster( 1, 5 ) );
+    analyzer->registerAtom( 1, v2, 6, atoms ); 
+    assert( analyzer->isClustered( 1, 6 ) );
+    assert( analyzer->isInMixedCluster( 1, 6 ) );
 }
 

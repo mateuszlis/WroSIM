@@ -55,3 +55,13 @@ bool ClustersAnalyzer::isClustered( int atomInd, int currFrameNum )
     }
     return false;
 }
+bool ClustersAnalyzer::isInMixedCluster( int atomInd, int currFrameNum )
+{
+    mapAtomNumClust::iterator it = isMixedMap.find( atomInd );
+    if ( it != isMixedMap.end() )
+    {
+        if ( ( it->second.second ) == currFrameNum && it->second.first )
+            return true;
+    }
+    return false;
+}

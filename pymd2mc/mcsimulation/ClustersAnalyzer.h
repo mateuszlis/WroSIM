@@ -25,9 +25,7 @@ class ClustersAnalyzer
 
         void registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum, Atom* atoms = NULL );
         bool isClustered( int atomInd, int currFrameNum );
-
-        bool isInMixedCluster( int atomInd, int currFrameNum )
-        {}
+        bool isInMixedCluster( int atomInd, int currFrameNum );
         friend ostream& operator<<( ostream& s, ClustersAnalyzer& an )
         {
             NeighbMem::iterator it = an.neighborPairs.begin();
