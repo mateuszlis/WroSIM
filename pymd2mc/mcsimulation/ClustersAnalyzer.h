@@ -18,13 +18,7 @@ using namespace std;
 
 class ClustersAnalyzer
 {
-    public:
-        typedef pair< int, int > Pair;
-        typedef map< Pair, Pair >  NeighbMem;
-        NeighbMem neighborPairs; // std::pair< atomInd1, atomInd2 > => std::pair< numOfFrames, lastFrameNum >
-        int frameNumThr;
-        double distThr;
-
+    public: 
         ClustersAnalyzer( int frameNumThr, double distThr ):
             frameNumThr(frameNumThr), distThr(distThr)
         {}
@@ -44,6 +38,14 @@ class ClustersAnalyzer
             }
             return s;
         }
+
+        typedef pair< int, int > Pair;
+        typedef map< Pair, Pair >  NeighbMem;
+        NeighbMem neighborPairs; // std::pair< atomInd1, atomInd2 > => std::pair< numOfFrames, lastFrameNum >
+
+    private:
+        int frameNumThr;
+        double distThr;
 };
 
 
