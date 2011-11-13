@@ -159,6 +159,6 @@ int main(int argc,char *argv[]) {
     double omega_ab = -0.5 * 1.9859 * TEMPERATURE * log(K/4.0); //in cal*mol-1*K-1
 
     cout << omega_ab << endl;
-                               
+    delete[] atoms; 
     return 0;
 }
