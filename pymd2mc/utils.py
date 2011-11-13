@@ -64,9 +64,18 @@ def bruteForce(listLength, elements):
         for i in elements:
             yield [i]
 
-def distance(x1, x2):
+def distance(x1, x2, boxSize = 0):
     """Calculates distance between vectors x1 and x2"""
-    return sqrt((x1[0] - x2[0])**2 + (x1[1] - x2[1])**2)
+    if not boxSize:
+        return sqrt((x1[0] - x2[0])**2 + (x1[1] - x2[1])**2)
+    else:
+        dx = abs( x1[0] - x2[0] )
+        dy = abs( x1[1] - x2[1] )
+        if dx > 0.5 * boxSize[0]:
+            dx = boxSize[0] - dx
+        if dy > 0.5 * boxSize[1]:
+            dy = boxSize[1] - dy
+        return sqrt( dx * dx + dy * dy )
         #return sqrt(sum([(x1[i] - x2[i])**2 for i in range(len(x1))]))
 
 def vectorLength(x1):

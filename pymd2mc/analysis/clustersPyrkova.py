@@ -81,7 +81,8 @@ def findNeighborPairs( frame, frameNum, neighborPairs):
                 neighborPairs[ ( atomInd, neigh ) ] = [ 1, frameNum ]
 def getNeighbors( atomInd, frame ):
     for otherAtom in range( len( frame.atoms ) ):
-        if distance( frame.atoms[ atomInd ].x0, frame.atoms[ otherAtom ].x0 ) < float( options.distance ):
+        if distance( frame.atoms[ atomInd ].x0, frame.atoms[ otherAtom ].x0,
+                frame.boxSize ) < float( options.distance ):
            yield otherAtom
 def updateState( state, frameNum ):
     if state[1] + 1 < frameNum: #if atoms were not together in last frame
