@@ -10,7 +10,8 @@ foreach (f ${directories})
     add_subdirectory(${f})
 endforeach(f)
 
-add_library(commandLine commandLine.cxx)
+add_library(mcsimCommandLine mcsimCommandLine.cxx)
+add_library(analyzePyrkovaCommandLine analyzePyrkovaCommandLine.cxx)
 add_library(TriangularLattice TriangularLattice.cpp)
 add_library(Metropolis Metropolis.cpp)
 add_library(ClustersAnalyzer ClustersAnalyzer.cpp)
@@ -20,5 +21,6 @@ add_executable(mcsim mcsim.cpp)
 add_executable(analyze analyze.cpp)
 add_executable(analyzePyrkova analyzePyrkova.cpp)
 
-target_link_libraries(mcsim TriangularLattice commandLine Metropolis)
-target_link_libraries(analyzePyrkova ClustersAnalyzer Atom)
+target_link_libraries(mcsim TriangularLattice mcsimCommandLine Metropolis)
+target_link_libraries(analyzePyrkova ClustersAnalyzer Atom
+    analyzePyrkovaCommandLine)

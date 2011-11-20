@@ -2,8 +2,8 @@
 // compiler for C++.
 //
 
-#ifndef COMMAND_LINE_HXX
-#define COMMAND_LINE_HXX
+#ifndef MCSIM_COMMAND_LINE_HXX
+#define MCSIM_COMMAND_LINE_HXX
 
 #include <iosfwd>
 #include <string>
@@ -283,6 +283,6 @@ class options
   float omega_;
 };
 
-#include "commandLine.ixx"
+#include "mcsimCommandLine.ixx"
 
-#endif // COMMAND_LINE_HXX
+#endif // MCSIM_COMMAND_LINE_HXX

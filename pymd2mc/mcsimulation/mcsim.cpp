@@ -17,13 +17,13 @@
 
 using namespace std;
 
-#include "commandLine.hxx"
+#include "mcsimCommandLine.hxx"
 
 const int LATT_SIZE = 10000;
 
 void usage()
 {
-    cerr << "usage: driver [options] <names>" << endl << "options:" << endl;
+    cerr << "usage: mcsim [options]" << endl << "options:" << endl;
     options::print_usage( cerr);
 }
 

@@ -2,7 +2,7 @@
 // compiler for C++.
 //
 
-#include "commandLine.hxx"
+#include "mcsimCommandLine.hxx"
 
 #include <map>
 #include <set>

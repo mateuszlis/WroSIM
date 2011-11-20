@@ -1,0 +1,23 @@
+include <string>;
+
+class options
+{
+  bool --help {"Display this message"};
+  std::string -f
+  {
+        "<filename>",
+        "Input file [gro]"
+  };
+  int -t = 1
+  {
+        "<num>",
+        "Value describes number of frames that are the threshold for 
+        clusters identification"
+  };
+ float -d = 1
+  {
+        "<float>",
+        "Distance to identify a clusterized atoms"
+  };
+  
+};
