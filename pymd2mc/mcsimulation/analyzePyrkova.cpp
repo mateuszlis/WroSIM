@@ -14,7 +14,6 @@ using namespace std;
 #include "analyzePyrkovaCommandLine.hxx" //command line library
 const double TEMPERATURE = 333.0;
 const double R = 1.985877;
-const int N_NEIGHBORS = 6;
 const string AT1 = "DOPCP8";
 const string AT2 = "DPPCP8";
 
@@ -32,11 +31,10 @@ return str;
 }
 
 int main(int argc,char *argv[]) {
-    //cout << "Starting..." << endl;
     float minDist;
     int minFrames;
     string file;
-    try
+    try // handling command line
     {
         int end;
         options opt( argc, argv, end );
@@ -61,14 +59,14 @@ int main(int argc,char *argv[]) {
     Atom *atoms;
     double box_x, box_y, box_z;
 
-    //processing GRO file (first frame only)
+    //processing GRO file 
     ifstream ifile;
     ifile.open(file.c_str());
     string line;
-    ClustersAnalyzer analyzer( minFrames, minDist );
-    double omega_sumAt1( 0 ), omega_sumAt2( 0 );
+    ClustersAnalyzer analyzer( minFrames, minDist ); // ClustersAnalyzer is heart of algorithm
+    double omega_sumAt1( 0 ), omega_sumAt2( 0 ); // use this to calculate average
     int frameCounter( 0 );
-    //cout << setw(6) << "#Frame" << setw(10) << "omegaDOPC" << setw(10) << "omegaDPPC" <<  "  fraction of lipids clustered" << endl;
+    cout << setw(6) << "#Frame" << setw(10) << "omegaDOPC" << setw(10) << "omegaDPPC" <<  "  fraction of lipids clustered" << endl;
     if (ifile.is_open())
     {
         while (ifile.good() )
@@ -117,7 +115,7 @@ int main(int argc,char *argv[]) {
                     double dx = abs(atoms[i].x - atoms[j].x);
                     double dy = abs(atoms[i].y - atoms[j].y);
                     
-                    if (dx > 0.5*box_x)
+                    if (dx > 0.5*box_x) // fix pbc
                         dx = box_x - dx;
                     if (dy > 0.5*box_y)
                         dy = box_y - dy;
@@ -130,7 +128,8 @@ int main(int argc,char *argv[]) {
                 sort(distances2.begin(), distances2.end(), compareDistances); //the shortest distances go first
                 analyzer.registerAtom( i, distances2, frameCounter, atoms );
             }
-            int nonMixedAt1( 0 ), nonMixedAt2( 0 );
+            int nonMixedAt1( 0 ), nonMixedAt2( 0 ); // store counts of atoms separately to calculate omega_AB
+            // for each lipid
             int mixedAt1( 0 ), mixedAt2( 0 );
             for (int i=0; i<n_atoms; ++i)
             {
@@ -153,7 +152,6 @@ int main(int argc,char *argv[]) {
                 }
             }
 
-            //cout << "N: " << n_aa << " " << n_ab << " " << n_bb << endl;
             double omega_abAt1( 0 ), omega_abAt2;
             double PAt1, PAt2;
             if ( mixedAt1 && frameCounter > minFrames )
@@ -169,8 +167,6 @@ int main(int argc,char *argv[]) {
                 omega_sumAt2 += omega_abAt2;
             }
 
-            //double K = n_ab * n_ab / (n_aa * n_bb);
-            //double omega_ab = -0.5 * 1.9859 * TEMPERATURE * log(K/4.0); //in cal*mol-1*K-1
             float clusteredPercent = static_cast< double > ( nonMixedAt1 + nonMixedAt2 + mixedAt1 + mixedAt2 ) / n_atoms;
             cout << setw(6) << frameCounter <<  setw(10) << omega_abAt1 << setw(10)  << omega_abAt2 << setw(10)  << clusteredPercent << endl;
             delete[] atoms; 
