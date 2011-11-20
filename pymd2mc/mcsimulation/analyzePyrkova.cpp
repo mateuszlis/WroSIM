@@ -6,16 +6,17 @@
 #include <vector>
 #include <map>
 #include <algorithm>
-
+#include <iomanip>
 #include "Atom.h"
 #include "ClustersAnalyzer.h"
 using namespace std;
 
 #include "analyzePyrkovaCommandLine.hxx" //command line library
 const double TEMPERATURE = 333.0;
+const double R = 1.985877;
 const int N_NEIGHBORS = 6;
-const string AT1 = "DOPCPO4";
-const string AT2 = "DPPCPO4";
+const string AT1 = "DOPCP8";
+const string AT2 = "DPPCP8";
 
 void usage()
 {
@@ -65,8 +66,9 @@ int main(int argc,char *argv[]) {
     ifile.open(file.c_str());
     string line;
     ClustersAnalyzer analyzer( minFrames, minDist );
-    double omega_sum = 0;
+    double omega_sumAt1( 0 ), omega_sumAt2( 0 );
     int frameCounter( 0 );
+    //cout << setw(6) << "#Frame" << setw(10) << "omegaDOPC" << setw(10) << "omegaDPPC" <<  "  fraction of lipids clustered" << endl;
     if (ifile.is_open())
     {
         while (ifile.good() )
@@ -106,10 +108,6 @@ int main(int argc,char *argv[]) {
                 break;
             //end of processing GRO file
             //analyzing
-            double n_aa = 0;
-            double n_bb = 0;
-            double n_ab = 0;
-             
             for (int i=0; i<n_atoms; ++i)
             {
                 vector<Distance> distances2; //will collect all distances to j-th atoms
@@ -127,65 +125,60 @@ int main(int argc,char *argv[]) {
                     double dist2 = dx*dx + dy*dy;
                     
                     distances2.push_back(Distance(dist2, j));
-
-                    
                 }
                 
                 sort(distances2.begin(), distances2.end(), compareDistances); //the shortest distances go first
                 analyzer.registerAtom( i, distances2, frameCounter, atoms );
-
-                //cout << "AT=" << atoms[i].name << endl;
-                
-                
-                for (int n=0; n<N_NEIGHBORS; ++n)
-                {
-                    if (atoms[i].resname+atoms[i].name == atoms[distances2[n].at2Ind].resname+atoms[distances2[n].at2Ind].name) {
-                        if (atoms[i].resname+atoms[i].name == AT1)
-                            ++n_aa;
-                        else ++n_bb;
-                    }
-                    else ++n_ab;
-                        
-                }
-                
             }
-            int nonMixed( 0 );
-            int mixed( 0 );
+            int nonMixedAt1( 0 ), nonMixedAt2( 0 );
+            int mixedAt1( 0 ), mixedAt2( 0 );
             for (int i=0; i<n_atoms; ++i)
             {
                 if ( analyzer.isClustered( i, frameCounter ) )
                 {
                     if ( analyzer.isInMixedCluster( i, frameCounter ) )
                     {
-                        mixed++;   
+                        if ( atoms[i].resname + atoms[i].name  == AT1 )
+                            mixedAt1++;
+                        else 
+                            mixedAt2++;
                     }
                     else
                     {
-                        nonMixed++;
+                        if ( atoms[i].resname + atoms[i].name == AT2 )
+                            nonMixedAt1++;
+                        else
+                            nonMixedAt2++;
                     }
                 }
             }
-            n_aa = 0.5*n_aa; n_ab = 0.5*n_ab; n_bb = 0.5*n_bb; //0.5 since we calculated each neighboring pair twice
 
             //cout << "N: " << n_aa << " " << n_ab << " " << n_bb << endl;
-            double omega_ab( 0 );
-            double P;
-            if ( mixed && frameCounter > minFrames )
+            double omega_abAt1( 0 ), omega_abAt2;
+            double PAt1, PAt2;
+            if ( mixedAt1 && frameCounter > minFrames )
             {
-                P = static_cast< double >( mixed ) / nonMixed;
-                omega_ab = - 1.985877 * TEMPERATURE * log(P);
-                omega_sum += omega_ab;
+                PAt1 = static_cast< double >( mixedAt1 ) / nonMixedAt1;
+                omega_abAt1 = - R * TEMPERATURE * log(PAt1);
+                omega_sumAt1 += omega_abAt1;
             }
+            if ( mixedAt2 && frameCounter > minFrames )
+            {
+                PAt2 = static_cast< double >( mixedAt2 ) / nonMixedAt2;
+                omega_abAt2 = - R * TEMPERATURE * log(PAt2);
+                omega_sumAt2 += omega_abAt2;
+            }
+
             //double K = n_ab * n_ab / (n_aa * n_bb);
             //double omega_ab = -0.5 * 1.9859 * TEMPERATURE * log(K/4.0); //in cal*mol-1*K-1
-            float clusteredPercent = static_cast< double > ( nonMixed + mixed ) / n_atoms;
-            cout << frameCounter << "\t" << omega_ab << "\t" << P << "\t" << clusteredPercent << endl;
+            float clusteredPercent = static_cast< double > ( nonMixedAt1 + nonMixedAt2 + mixedAt1 + mixedAt2 ) / n_atoms;
+            cout << setw(6) << frameCounter <<  setw(10) << omega_abAt1 << setw(10)  << omega_abAt2 << setw(10)  << clusteredPercent << endl;
             delete[] atoms; 
             frameCounter++;
         }
     }
     else cout << "Unable to open file!" << endl;
     ifile.close();
-    cout << "#final " << omega_sum / frameCounter << endl;
+    cout << "#final " << omega_sumAt1 / frameCounter << "\t" << omega_sumAt2 / frameCounter << endl;
     return 0;
 }
