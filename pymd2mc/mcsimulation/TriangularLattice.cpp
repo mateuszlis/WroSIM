@@ -99,7 +99,7 @@ int TriangularLattice::getNeighborsCnt()
 TriangularLattice::~TriangularLattice()
 {
 
-    delete this->mpLattice;
+    delete[] this->mpLattice;
 }
 
 ostream &operator<<( ostream &stream, TriangularLattice &latt )

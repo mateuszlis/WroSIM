@@ -102,6 +102,7 @@ void testIsClustered()
     assert( !analyzer->isClustered( 1, 5 ) );
     analyzer->registerAtom( 1, v2, 6 ); 
     assert( analyzer->isClustered( 1, 6 ) );
+    delete analyzer;
 }
 void testIsMixed1()
 {
@@ -135,6 +136,8 @@ void testIsMixed1()
     analyzer->registerAtom( 1, v2, 6, atoms ); 
     assert( analyzer->isClustered( 1, 6 ) );
     assert( !analyzer->isInMixedCluster( 1, 6 ) );
+    delete[] atoms;
+    delete analyzer;
 }
 void testIsMixed2()
 {
@@ -168,5 +171,7 @@ void testIsMixed2()
     analyzer->registerAtom( 1, v2, 6, atoms ); 
     assert( analyzer->isClustered( 1, 6 ) );
     assert( analyzer->isInMixedCluster( 1, 6 ) );
+    delete[] atoms;
+    delete analyzer;
 }
 
