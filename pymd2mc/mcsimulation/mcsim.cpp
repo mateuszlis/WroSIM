@@ -31,6 +31,7 @@ int main( int argc, char* argv[] )
 {
     try
     {
+        srand( ( unsigned )time( 0));
         int end; // End of options.
         options opt( argc, argv, end);
 
@@ -76,6 +77,5 @@ int main( int argc, char* argv[] )
         usage();
         return 1;
     }
-    srand( ( unsigned )time( 0));
 
 }
