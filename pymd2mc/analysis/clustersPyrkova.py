@@ -48,7 +48,7 @@ def main(argv=None):
                 interAtoms.append( XYZAtom( "Inter", *frame.atoms[atomInd].x0 ) )
             else:
                 nonClustAtoms.append( XYZAtom( "NonCl", *frame.atoms[atomInd].x0 ) )
-        maxNum = 64
+        maxNum = 128
         for i in range( maxNum - len( clusteredAtoms ) ):
             clusteredAtoms.append( XYZAtom( "Clustered", 0, 0, 0, ) )
         for i in range( maxNum - len( interAtoms ) ):
