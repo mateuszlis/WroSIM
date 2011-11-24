@@ -41,6 +41,10 @@ def main(argv=None):
         clusteredAtoms = []
         interAtoms = []
         nonClustAtoms = []
+        if ( len(clustered["clustered"]) + len(clustered["interchanging"]) > 0
+                ):
+            print frameCounter,  ( len(clustered["clustered"]) +
+                    len(clustered["interchanging"])) / float(len(frame.atoms))
         for atomInd in range( len( frame.atoms ) ):
             if atomInd in clustered['clustered']:
                 clusteredAtoms.append( XYZAtom( "Clustered", *frame.atoms[atomInd].x0 ) )
