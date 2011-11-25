@@ -45,6 +45,8 @@ int main(int argc,char *argv[]) {
             return 0;
         }
         minDist = opt.d();
+        minDist *= minDist; // we don't calculate square root when calculating distances
+        // so we're interested in square of threshold distance
         minFrames = opt.t();
         file = opt.f();
     }
@@ -55,9 +57,9 @@ int main(int argc,char *argv[]) {
         return 1;
     }
         
-    int n_atoms;
+    int n_atoms, global_n_atoms;
     Atom *atoms;
-    double box_x, box_y, box_z;
+    long double box_x( 0 ), box_y( 0 ), box_z( 0 );
 
     //processing GRO file 
     ifstream ifile;
@@ -86,9 +88,9 @@ int main(int argc,char *argv[]) {
                     continue;
                 if (i == n_atoms+3)
                 {
-                    box_x = atof(trim(line.substr(0,10)).c_str());
-                    box_y = atof(trim(line.substr(10,10)).c_str());
-                    box_z = atof(trim(line.substr(20,10)).c_str());
+                    box_x += atof(trim(line.substr(0,10)).c_str());
+                    box_y += atof(trim(line.substr(10,10)).c_str());
+                    box_z += atof(trim(line.substr(20,10)).c_str());
                     break;
                 }
                 
@@ -106,6 +108,7 @@ int main(int argc,char *argv[]) {
                 break;
             //end of processing GRO file
             //analyzing
+            global_n_atoms = n_atoms;
             for (int i=0; i<n_atoms; ++i)
             {
                 vector<Distance> distances2; //will collect all distances to j-th atoms
@@ -172,9 +175,14 @@ int main(int argc,char *argv[]) {
             delete[] atoms; 
             frameCounter++;
         }
+            cout << "atoms " << n_atoms << endl;
     }
     else cout << "Unable to open file!" << endl;
     ifile.close();
     cout << "#final " << omega_sumAt1 / frameCounter << "\t" << omega_sumAt2 / frameCounter << endl;
+    double avg_box_x( box_x / frameCounter ), avg_box_y( box_y / frameCounter );
+    cout << "#APL " << ( avg_box_x * avg_box_y ) / global_n_atoms << "\t" 
+        << "box size\t" << avg_box_x << " " << avg_box_y <<  endl;
+
     return 0;
 }
