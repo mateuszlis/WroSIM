@@ -14,8 +14,8 @@ using namespace std;
 #include "analyzePyrkovaCommandLine.hxx" //command line library
 const double TEMPERATURE = 333.0;
 const double R = 1.985877;
-const string AT1 = "DOPCP8";
-const string AT2 = "DPPCP8";
+const string AT1 = "DOPCPO4";
+const string AT2 = "DPPCPO4";
 
 void usage()
 {
@@ -57,9 +57,9 @@ int main(int argc,char *argv[]) {
         return 1;
     }
         
-    int n_atoms, global_n_atoms;
+    int global_n_atoms;
     Atom *atoms;
-    long double box_x( 0 ), box_y( 0 ), box_z( 0 );
+    long double box_x( 0 ), box_y( 0 );
 
     //processing GRO file 
     ifstream ifile;
@@ -71,6 +71,8 @@ int main(int argc,char *argv[]) {
     cout << setw(6) << "#Frame" << setw(10) << "omegaDOPC" << setw(10) << "omegaDPPC" <<  "  fraction of lipids clustered" << endl;
     if (ifile.is_open())
     {
+        double box_x, box_y;//, box_z;
+        int n_atoms;
         while (ifile.good() )
         {
             int i = 0;
@@ -90,7 +92,7 @@ int main(int argc,char *argv[]) {
                 {
                     box_x += atof(trim(line.substr(0,10)).c_str());
                     box_y += atof(trim(line.substr(10,10)).c_str());
-                    box_z += atof(trim(line.substr(20,10)).c_str());
+                    //box_z += atof(trim(line.substr(20,10)).c_str());
                     break;
                 }
                 
@@ -156,15 +158,16 @@ int main(int argc,char *argv[]) {
             }
 
             double omega_abAt1( 0 ), omega_abAt2;
-            double PAt1, PAt2;
             if ( mixedAt1 && frameCounter > minFrames )
             {
+                double PAt1;
                 PAt1 = static_cast< double >( mixedAt1 ) / nonMixedAt1;
                 omega_abAt1 = - R * TEMPERATURE * log(PAt1);
                 omega_sumAt1 += omega_abAt1;
             }
             if ( mixedAt2 && frameCounter > minFrames )
             {
+                double PAt2;
                 PAt2 = static_cast< double >( mixedAt2 ) / nonMixedAt2;
                 omega_abAt2 = - R * TEMPERATURE * log(PAt2);
                 omega_sumAt2 += omega_abAt2;

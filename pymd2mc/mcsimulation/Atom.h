@@ -12,7 +12,11 @@ struct Atom
         double x;
         double y;
         double z;
-        Atom() {}
+        Atom()
+            : x( 0 )
+            , y( 0 )
+            , z( 0 )
+            {}
         Atom(string resname, string name, double x, double y, double z):
             resname( resname),
             name( name ),

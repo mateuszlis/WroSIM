@@ -21,14 +21,18 @@ public:
     double x;
     double y;
     double z;
-    Atom() {}
-    Atom(string resname, string name, double x, double y, double z) {
-        this->resname = resname;
-        this->name = name;
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
+    Atom()
+        : x( 0 )
+          , y( 0 )
+          , z( 0 )
+    {}
+    Atom(string resname, string name, double x, double y, double z)
+        : resname( resname ) 
+        , name( name )
+        , x( x ) 
+        , y( y )
+        , z( z )
+    {}
 };
 
         
@@ -62,7 +66,7 @@ int main(int argc,char *argv[]) {
 
     int n_atoms;
     Atom *atoms;
-    double box_x, box_y, box_z;
+    double box_x, box_y; //, box_z;
 
     //processing GRO file (first frame only)
     ifstream ifile;
@@ -89,7 +93,7 @@ int main(int argc,char *argv[]) {
             {
                 box_x = atof(trim(line.substr(0,10)).c_str());
                 box_y = atof(trim(line.substr(10,10)).c_str());
-                box_z = atof(trim(line.substr(20,10)).c_str());
+                //box_z = atof(trim(line.substr(20,10)).c_str());
                 break;
             }
             

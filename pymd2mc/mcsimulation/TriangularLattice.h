@@ -32,16 +32,16 @@ class TriangularLattice
         TriangularLattice( string filename );
         TriangularLattice( int latticeSize, int rowSize, int firstTypeParticlesCnt );
 
-        int operator[]( int index );
+        int operator[]( int index ) const;
 
-        int getLatticeSize();
-        int getRowSize();
+        int getLatticeSize() const;
+        int getRowSize() const;
 
         int simNeighbCount( int pos );
         void exchangeSites( int pos1, int pos2 );
 
-        int getNeighbIndex( int pos, int neighborNum );
-        int getNeighborsCnt();
+        int getNeighbIndex( int pos, int neighborNum ) const;
+        int getNeighborsCnt() const;
 
         virtual ~TriangularLattice();
 

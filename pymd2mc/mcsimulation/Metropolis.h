@@ -24,8 +24,8 @@ enum Sampler
 class Metropolis
 {
     private:
-        int mOutputFreq;
         double mOmegaAB;
+        int mOutputFreq;
 
         ostream* mpNeighOutputFile;
         ostream* mpFrameStream;

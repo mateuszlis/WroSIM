@@ -28,9 +28,15 @@ void TriangularLattice::distributeParticles( int firstTypeParticlesCnt )
 // TODO Copy constructor and assignment operator
 
 TriangularLattice::TriangularLattice( string filename )
+    : mpLattice( NULL )
+      , mLatticeSize( 0 )
+      , mRowSize( 0 )
 {
-    // TODO Auto-generated constructor stub
-    ;
+    for ( int i = 0; i < mNeighbCnt; ++i )
+    {
+        mNeighb[i] = 0;
+    }
+    //mNeighb = { 0, 0, 0, 0, 0, 0 };
 }
 TriangularLattice::TriangularLattice( int latticeSize, int rowSize, int firstTypeParticlesCnt )
 {
@@ -49,17 +55,17 @@ TriangularLattice::TriangularLattice( int latticeSize, int rowSize, int firstTyp
 
 }
 
-int TriangularLattice::operator[]( int index )
+int TriangularLattice::operator[]( int index ) const
 {
     return mpLattice[index];
 }
 
-int TriangularLattice::getLatticeSize()
+int TriangularLattice::getLatticeSize() const
 {
     return mLatticeSize;
 }
 
-int TriangularLattice::getRowSize()
+int TriangularLattice::getRowSize() const
 {
     return mRowSize;
 }
@@ -82,7 +88,7 @@ int TriangularLattice::simNeighbCount( int pos )
     return sum;
 }
 
-int TriangularLattice::getNeighbIndex( int pos, int neighborNum )
+int TriangularLattice::getNeighbIndex( int pos, int neighborNum ) const
 {
 	int neigh = ( pos + mNeighb[neighborNum] );
 	if ( neigh >= mLatticeSize )
@@ -91,7 +97,7 @@ int TriangularLattice::getNeighbIndex( int pos, int neighborNum )
 	    neigh += mLatticeSize;
     return neigh;
 }
-int TriangularLattice::getNeighborsCnt()
+int TriangularLattice::getNeighborsCnt() const
 {
     return mNeighbCnt;
 }
