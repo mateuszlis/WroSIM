@@ -26,8 +26,8 @@ struct Atom
 
 struct Distance {
 public:
-    double d;
     int at2Ind;
+    double d;
     Distance(double d, int at2Ind): 
         at2Ind(at2Ind), d(d)
     {}

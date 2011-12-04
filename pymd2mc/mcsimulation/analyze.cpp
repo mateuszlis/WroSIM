@@ -39,8 +39,8 @@ public:
         
 class Distance {
 public:
-    double d;
     int at2_ind;
+    double d;
     Distance(double d, int at2_ind): 
         at2_ind(at2_ind), d(d)
     {}
@@ -61,7 +61,7 @@ inline std::string trim(std::string str)
 return str;
 }
 
-int main(int argc,char *argv[]) {
+int main(int /*argc*/,char *argv[]) {
     //cout << "Starting..." << endl;
 
     int n_atoms;

@@ -27,7 +27,7 @@ void TriangularLattice::distributeParticles( int firstTypeParticlesCnt )
 }
 // TODO Copy constructor and assignment operator
 
-TriangularLattice::TriangularLattice( string filename )
+TriangularLattice::TriangularLattice( string /*filename*/ )
     : mpLattice( NULL )
       , mLatticeSize( 0 )
       , mRowSize( 0 )

@@ -2,7 +2,7 @@
 
 void ClustersAnalyzer::registerAtom( int atomInd, vector< Distance > sortedDistances, int currFrameNum, Atom* atoms )
 {
-    int i( 0 );
+    unsigned int i( 0 );
     string symbol;
     bool isMixed = false;
     if ( atoms ) 
