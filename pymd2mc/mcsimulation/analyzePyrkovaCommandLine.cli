@@ -8,6 +8,12 @@ class options
         "<filename>",
         "Input file [gro]"
   };
+  std::string -o = "clusteredPyrk.xyz"
+  {
+        "<output filename>",
+        "image output file [xyz]. It creates file, that can be further utilized
+        by interpolate.py script to create set of images."
+  };
   int -t = 1
   {
         "<num>",

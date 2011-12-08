@@ -120,6 +120,12 @@ f () const
   return this->f_;
 }
 
+inline const std::string& options::
+o () const
+{
+  return this->o_;
+}
+
 inline const int& options::
 t () const
 {

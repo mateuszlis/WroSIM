@@ -33,7 +33,7 @@ return str;
 int main(int argc,char *argv[]) {
     float minDist;
     int minFrames;
-    string file;
+    string file, outputFile;
     try // handling command line
     {
         int end;
@@ -49,6 +49,8 @@ int main(int argc,char *argv[]) {
         // so we're interested in square of threshold distance
         minFrames = opt.t();
         file = opt.f();
+        outputFile = opt.o();
+
     }
     catch ( const cli::exception& e )
     {
@@ -59,11 +61,14 @@ int main(int argc,char *argv[]) {
         
     int global_n_atoms;
     Atom *atoms;
-    long double box_x( 0 ), box_y( 0 );
+    long double box_x_sum( 0 ), box_y_sum( 0 );
+
+    ofstream imgOutStream;
+    imgOutStream.open( outputFile.c_str() ); // open file to write image generation data
 
     //processing GRO file 
     ifstream ifile;
-    ifile.open(file.c_str());
+    ifile.open( file.c_str() );
     string line;
     ClustersAnalyzer analyzer( minFrames, minDist ); // ClustersAnalyzer is heart of algorithm
     double omega_sumAt1( 0 ), omega_sumAt2( 0 ); // use this to calculate average
@@ -90,8 +95,12 @@ int main(int argc,char *argv[]) {
                     continue;
                 if (i == n_atoms+3)
                 {
-                    box_x += atof(trim(line.substr(0,10)).c_str());
-                    box_y += atof(trim(line.substr(10,10)).c_str());
+                    size_t firstSep = line.find_first_of( " " );
+                    size_t secondSep = line.substr( firstSep ).find_first_of( " " ) + firstSep;
+                    box_x = atof( trim( line.substr( 0, firstSep ) ).c_str() );
+                    box_y = atof( trim( line.substr( firstSep, secondSep ) ).c_str() );
+                    box_x_sum += box_x;
+                    box_y_sum += box_y;
                     //box_z += atof(trim(line.substr(20,10)).c_str());
                     break;
                 }
@@ -110,6 +119,7 @@ int main(int argc,char *argv[]) {
                 break;
             //end of processing GRO file
             //analyzing
+            imgOutStream << n_atoms << endl << endl; 
             global_n_atoms = n_atoms;
             for (int i=0; i<n_atoms; ++i)
             {
@@ -124,7 +134,6 @@ int main(int argc,char *argv[]) {
                         dx = box_x - dx;
                     if (dy > 0.5*box_y)
                         dy = box_y - dy;
-
                     double dist2 = dx*dx + dy*dy;
                     
                     distances2.push_back(Distance(dist2, j));
@@ -140,6 +149,12 @@ int main(int argc,char *argv[]) {
             {
                 if ( analyzer.isClustered( i, frameCounter ) )
                 {
+                    
+                    imgOutStream << "Clustered" << setw( 15 )
+                        << atoms[i].x << setw( 10 )
+                        << atoms[i].y << setw( 10 ) 
+                        << atoms[i].z 
+                        << endl;
                     if ( analyzer.isInMixedCluster( i, frameCounter ) )
                     {
                         if ( atoms[i].resname + atoms[i].name  == AT1 )
@@ -154,6 +169,14 @@ int main(int argc,char *argv[]) {
                         else
                             nonMixedAt2++;
                     }
+                }
+                else
+                {
+                    imgOutStream << "NonCl" << setw( 15 )
+                        << atoms[i].x << setw( 10 )
+                        << atoms[i].y << setw( 10 ) 
+                        << atoms[i].z 
+                        << endl;
                 }
             }
 
@@ -178,14 +201,13 @@ int main(int argc,char *argv[]) {
             delete[] atoms; 
             frameCounter++;
         }
-            cout << "atoms " << n_atoms << endl;
     }
     else cout << "Unable to open file!" << endl;
     ifile.close();
     cout << "#final " << omega_sumAt1 / frameCounter << "\t" << omega_sumAt2 / frameCounter << endl;
-    double avg_box_x( box_x / frameCounter ), avg_box_y( box_y / frameCounter );
+    double avg_box_x( box_x_sum / frameCounter ), avg_box_y( box_y_sum / frameCounter );
     cout << "#APL " << ( avg_box_x * avg_box_y ) / global_n_atoms << "\t" 
         << "box size\t" << avg_box_x << " " << avg_box_y <<  endl;
-
+    imgOutStream.close();
     return 0;
 }

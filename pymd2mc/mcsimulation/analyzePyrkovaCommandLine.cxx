@@ -311,6 +311,7 @@ options (int& argc,
          ::cli::unknown_mode arg)
 : help_ (),
   f_ (),
+  o_ ("clusteredPyrk.xyz"),
   t_ (1),
   d_ (1)
 {
@@ -327,6 +328,7 @@ options (int start,
          ::cli::unknown_mode arg)
 : help_ (),
   f_ (),
+  o_ ("clusteredPyrk.xyz"),
   t_ (1),
   d_ (1)
 {
@@ -343,6 +345,7 @@ options (int& argc,
          ::cli::unknown_mode arg)
 : help_ (),
   f_ (),
+  o_ ("clusteredPyrk.xyz"),
   t_ (1),
   d_ (1)
 {
@@ -361,6 +364,7 @@ options (int start,
          ::cli::unknown_mode arg)
 : help_ (),
   f_ (),
+  o_ ("clusteredPyrk.xyz"),
   t_ (1),
   d_ (1)
 {
@@ -375,6 +379,7 @@ options (::cli::scanner& s,
          ::cli::unknown_mode arg)
 : help_ (),
   f_ (),
+  o_ ("clusteredPyrk.xyz"),
   t_ (1),
   d_ (1)
 {
@@ -384,15 +389,17 @@ options (::cli::scanner& s,
 void options::
 print_usage (::std::ostream& os)
 {
-  os << "--help        Display this message" << ::std::endl;
+  os << "--help               Display this message" << ::std::endl;
 
-  os << "-f <filename> Input file [gro]" << ::std::endl;
+  os << "-f <filename>        Input file [gro]" << ::std::endl;
 
-  os << "-t <num>      Value describes number of frames that are the threshold for" << ::std::endl
+  os << "-o <output filename> image output file [xyz]." << ::std::endl;
+
+  os << "-t <num>             Value describes number of frames that are the threshold for" << ::std::endl
      << ::std::endl
-     << "              clusters identification" << ::std::endl;
+     << "                     clusters identification" << ::std::endl;
 
-  os << "-d <float>    Distance to identify a clusterized atoms" << ::std::endl;
+  os << "-d <float>           Distance to identify a clusterized atoms" << ::std::endl;
 }
 
 typedef
@@ -409,6 +416,8 @@ struct _cli_options_map_init
     &::cli::thunk< options, bool, &options::help_ >;
     _cli_options_map_["-f"] = 
     &::cli::thunk< options, std::string, &options::f_ >;
+    _cli_options_map_["-o"] = 
+    &::cli::thunk< options, std::string, &options::o_ >;
     _cli_options_map_["-t"] = 
     &::cli::thunk< options, int, &options::t_ >;
     _cli_options_map_["-d"] = 

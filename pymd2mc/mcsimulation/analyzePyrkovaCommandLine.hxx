@@ -239,6 +239,9 @@ class options
   const std::string&
   f () const;
 
+  const std::string&
+  o () const;
+
   const int&
   t () const;
 
@@ -259,6 +262,7 @@ class options
   public:
   bool help_;
   std::string f_;
+  std::string o_;
   int t_;
   float d_;
 };

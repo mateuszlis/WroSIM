@@ -51,7 +51,9 @@ bool ClustersAnalyzer::isClustered( int atomInd, int currFrameNum )
     if ( it != isClusteredMap.end() )
     {
         if ( ( it->second.second ) == currFrameNum && it->second.first )
+        {
             return true;
+        }
     }
     return false;
 }
