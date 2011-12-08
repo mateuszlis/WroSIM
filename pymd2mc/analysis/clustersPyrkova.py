@@ -52,7 +52,7 @@ def main(argv=None):
                 interAtoms.append( XYZAtom( "Inter", *frame.atoms[atomInd].x0 ) )
             else:
                 nonClustAtoms.append( XYZAtom( "NonCl", *frame.atoms[atomInd].x0 ) )
-        maxNum = 128
+        maxNum = 0
         for i in range( maxNum - len( clusteredAtoms ) ):
             clusteredAtoms.append( XYZAtom( "Clustered", 0, 0, 0, ) )
         for i in range( maxNum - len( interAtoms ) ):
@@ -83,8 +83,11 @@ def findNeighborPairs( frame, frameNum, neighborPairs):
                 updateState( neighborPairs[ ( atomInd, neigh ) ], frameNum )
             elif not neigh in doneInd:
                 neighborPairs[ ( atomInd, neigh ) ] = [ 1, frameNum ]
+        
 def getNeighbors( atomInd, frame ):
-    for otherAtom in range( len( frame.atoms ) ):
+    atomIndices = range( len( frame.atoms ) )
+    atomIndices.remove( atomInd )
+    for otherAtom in  atomIndices:
         if distance( frame.atoms[ atomInd ].x0, frame.atoms[ otherAtom ].x0,
                 frame.boxSize ) < float( options.distance ):
            yield otherAtom
