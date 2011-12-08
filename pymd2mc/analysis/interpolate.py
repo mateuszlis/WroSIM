@@ -59,7 +59,8 @@ def main():
 
         im = im.resize( ( sizeX, sizeY ), Image.ANTIALIAS )
         im = im.transpose( Image.FLIP_TOP_BOTTOM )
-        im.show()
+        #im.show()
+        im.save( options.outPngFileTemp + str(i) + ".png" )
         frame = inFile.nextFrame()
         
         
