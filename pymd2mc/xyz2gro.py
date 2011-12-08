@@ -27,7 +27,7 @@ def main():
 #                delLine()
 #                print i, 
         #print '3.061 5.304 0.2'       
-        for size in [13.755, 13.755, 6.625]: print size,
+        for size in frame.boxSize: print size,
         print ''
         
     #with open("x.gro", 'w') as f:
