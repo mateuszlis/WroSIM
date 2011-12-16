@@ -38,8 +38,8 @@ def main():
             , ( 150, 0, 0) # blue
             , ( 0, 150, 0 ) # green
             ]
-    sizeX, sizeY = 300, 300
-    countX, countY = 25, 25
+    sizeX, sizeY = 500, 500
+    countX, countY = 100, 100
     while not frame is None:
         stdoutStep( options, i )
         i += 1
@@ -53,9 +53,9 @@ def main():
             pix[coords[0], coords[1]] =  colours[symbols.index( findClosestAtom( frame,
                 coords ) )]
             #print findClosestAtom( frame, coords), coords
-        for atom in frame.atoms:
-            print atom.x, atom.y
-            pix[ int( atom.x ), int( atom.y )] = colours[-1]
+        #for atom in frame.atoms:
+        #    print atom.x, atom.y
+        #    pix[ int( atom.x ), int( atom.y )] = colours[-1]
 
         im = im.resize( ( sizeX, sizeY ), Image.ANTIALIAS )
         im = im.transpose( Image.FLIP_TOP_BOTTOM )

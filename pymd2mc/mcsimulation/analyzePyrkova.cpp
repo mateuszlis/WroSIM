@@ -14,8 +14,8 @@ using namespace std;
 #include "analyzePyrkovaCommandLine.hxx" //command line library
 const double TEMPERATURE = 333.0;
 const double R = 1.985877;
-const string AT1 = "DOPCPO4";
-const string AT2 = "DPPCPO4";
+const string AT1 = "DOPCP8";
+const string AT2 = "DMPCP8";
 
 void usage()
 {
@@ -95,6 +95,7 @@ int main(int argc,char *argv[]) {
                     continue;
                 if (i == n_atoms+3)
                 {
+                    line = trim( line );
                     size_t firstSep = line.find_first_of( " " );
                     size_t secondSep = line.substr( firstSep ).find_first_of( " " ) + firstSep;
                     box_x = atof( trim( line.substr( 0, firstSep ) ).c_str() );
