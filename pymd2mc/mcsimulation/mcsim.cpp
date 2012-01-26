@@ -47,6 +47,7 @@ int main( int argc, char* argv[] )
         int lattRowSize = opt.latt_row_size();
         int steps = opt.steps();
         int outputFreq = opt.output_freq();
+        int outputTemperature = opt.T();
         string sampler = opt.sampling();
         string outputFilename = opt.o();
         ofstream outputFile, neighHistFile;
@@ -55,7 +56,7 @@ int main( int argc, char* argv[] )
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum);
 
-        Metropolis *simulation = new Metropolis( lattice, omega);
+        Metropolis *simulation = new Metropolis( lattice, omega, outputTemperature );
 
         simulation->setOutput( outputFile);
         simulation->setOutputFreq( outputFreq);

@@ -315,6 +315,7 @@ options (int& argc,
   first_particles_count_ (2000),
   latt_row_size_ (100),
   o_ ("traj.xyz"),
+  T_ (325),
   steps_ (10000),
   output_freq_ (100),
   omega_ (0)
@@ -336,6 +337,7 @@ options (int start,
   first_particles_count_ (2000),
   latt_row_size_ (100),
   o_ ("traj.xyz"),
+  T_ (325),
   steps_ (10000),
   output_freq_ (100),
   omega_ (0)
@@ -357,6 +359,7 @@ options (int& argc,
   first_particles_count_ (2000),
   latt_row_size_ (100),
   o_ ("traj.xyz"),
+  T_ (325),
   steps_ (10000),
   output_freq_ (100),
   omega_ (0)
@@ -380,6 +383,7 @@ options (int start,
   first_particles_count_ (2000),
   latt_row_size_ (100),
   o_ ("traj.xyz"),
+  T_ (325),
   steps_ (10000),
   output_freq_ (100),
   omega_ (0)
@@ -399,6 +403,7 @@ options (::cli::scanner& s,
   first_particles_count_ (2000),
   latt_row_size_ (100),
   o_ ("traj.xyz"),
+  T_ (325),
   steps_ (10000),
   output_freq_ (100),
   omega_ (0)
@@ -426,6 +431,8 @@ print_usage (::std::ostream& os)
 
   os << "-o <filename>                 output filename (warning: it will be overriden)" << ::std::endl
      << "                              Default: traj.xyz" << ::std::endl;
+
+  os << "-T <num>>                     Temperature of system Default: 325" << ::std::endl;
 
   os << "--steps <num>                 Number of steps to be done in simulation" << ::std::endl;
 
@@ -457,6 +464,8 @@ struct _cli_options_map_init
     &::cli::thunk< options, int, &options::latt_row_size_ >;
     _cli_options_map_["-o"] = 
     &::cli::thunk< options, std::string, &options::o_ >;
+    _cli_options_map_["-T"] = 
+    &::cli::thunk< options, int, &options::T_ >;
     _cli_options_map_["--steps"] = 
     &::cli::thunk< options, int, &options::steps_ >;
     _cli_options_map_["--output-freq"] = 

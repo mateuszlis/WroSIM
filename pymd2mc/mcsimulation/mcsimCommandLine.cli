@@ -33,6 +33,12 @@ class options
         "output filename (warning: it will be overriden)
         Default: traj.xyz"
   };
+  int -T = 325
+  {
+        "<num>>",
+        "Temperature of system
+        Default: 325"
+  };
   int --steps = 10000
   {
         "<num>",

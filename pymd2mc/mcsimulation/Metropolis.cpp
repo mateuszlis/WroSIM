@@ -22,7 +22,7 @@ void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
 
 //Metropolis public functions
 
-Metropolis::Metropolis( TriangularLattice* latt, double omegaAB ) 
+Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T ) 
     : mOmegaAB( omegaAB )
       , mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
@@ -33,6 +33,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB )
       , mIsSetStatusStream( false )
       , mpLatt( latt )
       , mpHistArr( NULL )
+      , T( T )
 
 {
 

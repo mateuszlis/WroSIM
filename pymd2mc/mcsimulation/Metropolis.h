@@ -48,10 +48,10 @@ class Metropolis
 
     public:
         static const double R = 1.986;
-        static const int T = 310;
         static const int EQUIB_STEPS = 1000;
+        const int T;
 
-        Metropolis( TriangularLattice* latt, double omegaAB = 0.0 );
+        Metropolis( TriangularLattice* latt, double omegaAB = 0.0, int T = 325 );
         void setOutputFreq( int freq );
         void setOmegaAB( double omegaAB );
         void setNeighOutput( ostream &neighOutputFile );

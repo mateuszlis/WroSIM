@@ -252,6 +252,9 @@ class options
   o () const;
 
   const int&
+  T () const;
+
+  const int&
   steps () const;
 
   const int&
@@ -278,6 +281,7 @@ class options
   int first_particles_count_;
   int latt_row_size_;
   std::string o_;
+  int T_;
   int steps_;
   int output_freq_;
   float omega_;

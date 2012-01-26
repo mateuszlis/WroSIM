@@ -145,6 +145,12 @@ o () const
 }
 
 inline const int& options::
+T () const
+{
+  return this->T_;
+}
+
+inline const int& options::
 steps () const
 {
   return this->steps_;

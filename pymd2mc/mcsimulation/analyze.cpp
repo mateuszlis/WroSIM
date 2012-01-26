@@ -12,8 +12,8 @@ using namespace std;
 
 const double TEMPERATURE = 333.0;
 const int N_NEIGHBORS = 6;
-const string AT1 = "DOPCP8";
-const string AT2 = "DMPCP8";
+const string AT1 = "DMPCP8";
+const string AT2 = "POPCP8";
 
 class Atom {
 public:
@@ -63,7 +63,7 @@ return str;
 }
 
 int main(int /*argc*/,char *argv[]) {
-    //cout << "Starting..." << endl;
+    cout << "Starting..." << endl;
 
     Atom *atoms;
 
@@ -163,7 +163,7 @@ int main(int /*argc*/,char *argv[]) {
             double K = n_ab * n_ab / (n_aa * n_bb);
             double omega_ab = -0.5 * 1.9859 * TEMPERATURE * log(K/4.0); //in cal*mol-1*K-1
 
-            cout << omega_ab << endl;
+            cout << setw(15) << frameCounter << setw(15) <<  omega_ab << endl;
             omega_sum += omega_ab;
             delete[] atoms; 
             frameCounter++; 
