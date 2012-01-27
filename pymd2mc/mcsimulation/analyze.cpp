@@ -12,8 +12,8 @@ using namespace std;
 
 const double TEMPERATURE = 333.0;
 const int N_NEIGHBORS = 6;
-const string AT1 = "DMPCP8";
-const string AT2 = "POPCP8";
+const string AT1 = "DPPCP8";
+const string AT2 = "DOPCP8";
 
 class Atom {
 public:
@@ -63,9 +63,9 @@ return str;
 }
 
 int main(int /*argc*/,char *argv[]) {
-    cout << "Starting..." << endl;
 
     Atom *atoms;
+    int global_n_atoms = 0;
 
     //processing GRO file (first frame only)
     ifstream ifile;
@@ -73,6 +73,10 @@ int main(int /*argc*/,char *argv[]) {
     string line;
     double omega_sum( 0 );
     int frameCounter( 0 );
+    // this will be utilized to calc neighbors histogram
+    double neighHist[] = { 0, 0, 0, 0, 0 ,0, 0 };
+    int neighHistCalc[] = { 0, 0, 0, 0, 0, 0, 0 };
+
     cout << setw(10) << "#Frame" << setw(10) << "omega_AB" << endl;
     
     if (ifile.is_open())
@@ -117,6 +121,7 @@ int main(int /*argc*/,char *argv[]) {
             double n_aa = 0;
             double n_bb = 0;
             double n_ab = 0;
+            global_n_atoms = n_atoms;
             for (int i=0; i<n_atoms; ++i)
             {
                 vector<Distance> distances2; //will collect all distances to j-th atoms
@@ -143,9 +148,13 @@ int main(int /*argc*/,char *argv[]) {
                 //cout << "AT=" << atoms[i].name << endl;
                 
                 
+                int simNeighbors( 0 );
+
                 for (int n=0; n<N_NEIGHBORS; ++n)
                 {
-                    if (atoms[i].resname+atoms[i].name == atoms[distances2[n].at2_ind].resname+atoms[distances2[n].at2_ind].name) {
+                    if (atoms[i].resname+atoms[i].name == atoms[distances2[n].at2_ind].resname+atoms[distances2[n].at2_ind].name) 
+                    {
+                        ++simNeighbors;
                         if (atoms[i].resname+atoms[i].name == AT1)
                             ++n_aa;
                         else ++n_bb;
@@ -153,6 +162,7 @@ int main(int /*argc*/,char *argv[]) {
                     else ++n_ab;
                         
                 }
+                ++neighHistCalc[ simNeighbors ];
                 
             }
             
@@ -171,5 +181,14 @@ int main(int /*argc*/,char *argv[]) {
     }
     double finalOmega( omega_sum / frameCounter );
     cout << setw(10) << "Final" << setw(10) <<  finalOmega << endl;
+    
+    ofstream neighFile;
+    neighFile.open( "neighbHist.dat" );
+    for ( int i = 0 ; i < 7 ; ++i )
+    {
+        neighHist[ i ] = neighHistCalc[ i ] / ( static_cast< double >( frameCounter * global_n_atoms ) );
+        neighFile <<  i << "\t" << neighHist[ i ] << endl;
+    }
+    cout << endl;
     return 0;
 }
