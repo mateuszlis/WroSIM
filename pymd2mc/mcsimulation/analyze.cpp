@@ -214,9 +214,9 @@ int main(int /*argc*/,char *argv[]) {
     cout << setw(10) << "Final" << setw(10) <<  finalOmega << endl;
     
     ofstream neighFileAT1;
-    neighFileAT1.open( "neighbHistAT1.dat" );
+    neighFileAT1.open( string( "neighbHist" + AT1 + ".dat").c_str() );
     ofstream neighFileAT2;
-    neighFileAT2.open( "neighbHistAT2.dat" );
+    neighFileAT2.open( string( "neighbHist" + AT2 + ".dat" ).c_str() );
     for ( int i = 0 ; i < 7 ; ++i )
     {
         neighHistAT1[ i ] = neighHistCalcAT1[ i ] / ( static_cast< double >( global_n_atomsAT1 ) );
