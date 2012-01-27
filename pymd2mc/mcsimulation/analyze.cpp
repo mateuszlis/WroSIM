@@ -12,7 +12,7 @@ using namespace std;
 
 const double TEMPERATURE = 333.0;
 const int N_NEIGHBORS = 6;
-const string AT1 = "DMPCP8";
+const string AT1 = "DOPCP8";
 const string AT2 = "POPCP8";
 
 class Atom {
@@ -80,6 +80,8 @@ int main(int /*argc*/,char *argv[]) {
     int neighHistCalcAT1[] = { 0, 0, 0, 0, 0, 0, 0 };
     double neighHistAT2[] = { 0, 0, 0, 0, 0 ,0, 0 };
     int neighHistCalcAT2[] = { 0, 0, 0, 0, 0, 0, 0 };
+    // fraction of first neighbors
+    vector< double > firstNeighFr;
 
     cout << setw(10) << "#Frame" << setw(10) << "omega_AB" << endl;
     
@@ -126,6 +128,7 @@ int main(int /*argc*/,char *argv[]) {
             double n_bb = 0;
             double n_ab = 0;
             global_n_atoms = n_atoms;
+            int firstSimNeigh = 0;
             for (int i=0; i<n_atoms; ++i)
             {
                 if ( atoms[i].resname + atoms[i].name == AT1 )
@@ -157,7 +160,6 @@ int main(int /*argc*/,char *argv[]) {
                 
                 sort(distances2.begin(), distances2.end(), compareDistances); //the shortest distances go first
                 
-                //cout << "AT=" << atoms[i].name << endl;
                 
                 
                 int simNeighbors( 0 );
@@ -170,6 +172,11 @@ int main(int /*argc*/,char *argv[]) {
                 {
                     neighHistCalc = neighHistCalcAT2;
                 }
+                if ( atoms[i].resname + atoms[i].name == atoms[distances2[0].at2_ind].resname + atoms[distances2[0].at2_ind].name )
+                {
+                    ++firstSimNeigh;
+                }
+
 
                 for (int n=0; n<N_NEIGHBORS; ++n)
                 {
@@ -186,6 +193,9 @@ int main(int /*argc*/,char *argv[]) {
                 ++neighHistCalc[ simNeighbors ];
                 
             }
+            firstNeighFr.push_back( static_cast< double >( firstSimNeigh ) / ( n_atoms ) );
+            
+
             
             n_aa = 0.5*n_aa; n_ab = 0.5*n_ab; n_bb = 0.5*n_bb; //0.5 since we calculated each neighboring pair twice
 
@@ -213,8 +223,14 @@ int main(int /*argc*/,char *argv[]) {
         neighFileAT1 <<  i << "\t" << neighHistAT1[ i ] << endl;
         neighHistAT2[ i ] = neighHistCalcAT2[ i ] / ( static_cast< double >( global_n_atomsAT2 ) );
         neighFileAT2 <<  i << "\t" << neighHistAT2[ i ] << endl;
-        cout << global_n_atomsAT1 << " " << global_n_atomsAT2 << endl;
     }
-    cout << endl;
+    // write firction of first neighbors
+    ofstream fraction;
+    fraction.open( "firstNeighbFr.dat" );
+    int i = 0;
+    for ( vector< double >::const_iterator it = firstNeighFr.begin() ; it != firstNeighFr.end() ; ++it, ++i )
+    {
+        fraction << i << "\t" << ( *it ) << endl;
+    }
     return 0;
 }
