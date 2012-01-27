@@ -12,8 +12,8 @@ using namespace std;
 
 const double TEMPERATURE = 333.0;
 const int N_NEIGHBORS = 6;
-const string AT1 = "DPPCP8";
-const string AT2 = "DOPCP8";
+const string AT1 = "DMPCP8";
+const string AT2 = "POPCP8";
 
 class Atom {
 public:
@@ -66,6 +66,8 @@ int main(int /*argc*/,char *argv[]) {
 
     Atom *atoms;
     int global_n_atoms = 0;
+    int global_n_atomsAT1 = 0;
+    int global_n_atomsAT2 = 0;
 
     //processing GRO file (first frame only)
     ifstream ifile;
@@ -74,8 +76,10 @@ int main(int /*argc*/,char *argv[]) {
     double omega_sum( 0 );
     int frameCounter( 0 );
     // this will be utilized to calc neighbors histogram
-    double neighHist[] = { 0, 0, 0, 0, 0 ,0, 0 };
-    int neighHistCalc[] = { 0, 0, 0, 0, 0, 0, 0 };
+    double neighHistAT1[] = { 0, 0, 0, 0, 0 ,0, 0 };
+    int neighHistCalcAT1[] = { 0, 0, 0, 0, 0, 0, 0 };
+    double neighHistAT2[] = { 0, 0, 0, 0, 0 ,0, 0 };
+    int neighHistCalcAT2[] = { 0, 0, 0, 0, 0, 0, 0 };
 
     cout << setw(10) << "#Frame" << setw(10) << "omega_AB" << endl;
     
@@ -124,6 +128,14 @@ int main(int /*argc*/,char *argv[]) {
             global_n_atoms = n_atoms;
             for (int i=0; i<n_atoms; ++i)
             {
+                if ( atoms[i].resname + atoms[i].name == AT1 )
+                {
+                    ++global_n_atomsAT1;
+                }
+                else
+                {
+                    ++global_n_atomsAT2;
+                }
                 vector<Distance> distances2; //will collect all distances to j-th atoms
                 for (int j=0; j<n_atoms; ++j)
                 {
@@ -149,6 +161,15 @@ int main(int /*argc*/,char *argv[]) {
                 
                 
                 int simNeighbors( 0 );
+                int* neighHistCalc;
+                if ( atoms[i].resname + atoms[i].name == AT1 )
+                {
+                    neighHistCalc = neighHistCalcAT1;
+                }
+                else 
+                {
+                    neighHistCalc = neighHistCalcAT2;
+                }
 
                 for (int n=0; n<N_NEIGHBORS; ++n)
                 {
@@ -182,12 +203,17 @@ int main(int /*argc*/,char *argv[]) {
     double finalOmega( omega_sum / frameCounter );
     cout << setw(10) << "Final" << setw(10) <<  finalOmega << endl;
     
-    ofstream neighFile;
-    neighFile.open( "neighbHist.dat" );
+    ofstream neighFileAT1;
+    neighFileAT1.open( "neighbHistAT1.dat" );
+    ofstream neighFileAT2;
+    neighFileAT2.open( "neighbHistAT2.dat" );
     for ( int i = 0 ; i < 7 ; ++i )
     {
-        neighHist[ i ] = neighHistCalc[ i ] / ( static_cast< double >( frameCounter * global_n_atoms ) );
-        neighFile <<  i << "\t" << neighHist[ i ] << endl;
+        neighHistAT1[ i ] = neighHistCalcAT1[ i ] / ( static_cast< double >( global_n_atomsAT1 ) );
+        neighFileAT1 <<  i << "\t" << neighHistAT1[ i ] << endl;
+        neighHistAT2[ i ] = neighHistCalcAT2[ i ] / ( static_cast< double >( global_n_atomsAT2 ) );
+        neighFileAT2 <<  i << "\t" << neighHistAT2[ i ] << endl;
+        cout << global_n_atomsAT1 << " " << global_n_atomsAT2 << endl;
     }
     cout << endl;
     return 0;
