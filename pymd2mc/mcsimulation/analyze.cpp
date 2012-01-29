@@ -65,7 +65,6 @@ return str;
 int main(int /*argc*/,char *argv[]) {
 
     Atom *atoms;
-    int global_n_atoms = 0;
     int global_n_atomsAT1 = 0;
     int global_n_atomsAT2 = 0;
 
@@ -127,7 +126,6 @@ int main(int /*argc*/,char *argv[]) {
             double n_aa = 0;
             double n_bb = 0;
             double n_ab = 0;
-            global_n_atoms = n_atoms;
             int firstSimNeigh = 0;
             for (int i=0; i<n_atoms; ++i)
             {
