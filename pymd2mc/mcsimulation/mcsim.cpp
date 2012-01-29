@@ -58,6 +58,8 @@ int main( int argc, char* argv[] )
 
         Metropolis *simulation = new Metropolis( lattice, omega, outputTemperature );
 
+        simulation->setNeighOutput( neighHistFile );
+
         simulation->setOutput( outputFile);
         simulation->setOutputFreq( outputFreq);
         simulation->setStatus( cout);

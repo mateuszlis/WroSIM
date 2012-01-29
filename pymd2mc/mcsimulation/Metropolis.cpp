@@ -85,7 +85,7 @@ void Metropolis::run( int steps )
         }
         if ( mIsSetNeighOutputFile && i > EQUIB_STEPS )
         {
-            createNeighHist( neighHist);
+            createNeighHist( neighHist );
         }
         if ( mIsSetStatusStream )
         {
@@ -96,7 +96,12 @@ void Metropolis::run( int steps )
     if ( mIsSetNeighOutputFile )
         for ( int i = 0; i < 7; i++ )
         {
-            ( *mpNeighOutputFile ) << i << " " << neighHist[i] / ( steps - EQUIB_STEPS ) << endl;
+            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - EQUIB_STEPS ) );
+            ( *mpNeighOutputFile ) << i 
+                << " " 
+                <<  ( neighHist[ i ] ) 
+                << "\t" << freq 
+                << endl;
         }
 
 }
@@ -150,8 +155,7 @@ void Metropolis::createNeighHist( long long *histArr )
 {
     for ( int i = 0; i < mpLatt->getLatticeSize(); i++ )
     {
-        if ( ( *mpLatt )[i] )
-            histArr[mpLatt->simNeighbCount( i)] += 1;
+        histArr[ mpLatt->simNeighbCount( i ) ] += 1;
     }
 }
 Metropolis::~Metropolis()
