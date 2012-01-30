@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
         {
             int i = 0;
             int n_atoms = 0;
-            double box_x( 0 ), box_y( 0 );
+            double box_x( 0 ), box_y( 0 ), box_z( 0 );
             while ( ( i - 3 ) <= n_atoms && ifile.good() )
             {
                 getline(ifile, line);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
                 {
                     box_x = atof(trim(line.substr(0,10)).c_str());
                     box_y = atof(trim(line.substr(10,10)).c_str());
-                    //box_z = atof(trim(line.substr(20,10)).c_str());
+                    box_z = atof(trim(line.substr(20,10)).c_str());
                     break;
                 }
                 
@@ -148,13 +148,16 @@ int main(int argc, char *argv[]) {
                     if (i==j) continue;
                     double dx = abs(atoms[i].x - atoms[j].x);
                     double dy = abs(atoms[i].y - atoms[j].y);
+                    double dz = abs(atoms[i].z - atoms[j].z);
                     
                     if (dx > 0.5*box_x)
                         dx = box_x - dx;
                     if (dy > 0.5*box_y)
                         dy = box_y - dy;
+                    if (dz > 0.5*box_z)
+                        dz = box_z - dz;
 
-                    double dist2 = dx*dx + dy*dy;
+                    double dist2 = dx*dx + dy*dy + dz*dz;
                     
                     distances2.push_back(Distance(dist2, j));
 
