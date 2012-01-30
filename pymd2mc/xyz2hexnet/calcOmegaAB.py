@@ -31,6 +31,8 @@ def main():
     i = 0
     startTime = time()
     omegas = []
+
+    sumOmegas = 0L
     calc = EnergyCalculator(inFile, R, T)
     
     while True:
@@ -42,14 +44,17 @@ def main():
         if omega is None:
             break
         omega , sim, diff = omega
-        if omega > -10**4: 
+        if omega > -10**4 and omega < 10**10: 
             omegas.append(omega)
+            sumOmegas += omega
             outFile.write("%d  %f %f %f \n" % (i, omega, sim, diff))
 
         
     outFile.close()
     if options.verbose: 
         print "Done. Execution time=%f" % (time() - startTime)    
+    print "omegas" ,sumOmegas, (sum(omegas))
+    lenOmegas = len(omegas)
     midOmega = (sum(omegas)/len(omegas))
     print "Result omegaAB = %f" % midOmega
     sd = 0
