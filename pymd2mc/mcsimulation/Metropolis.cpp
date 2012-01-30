@@ -99,8 +99,8 @@ void Metropolis::run( int steps )
             double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - EQUIB_STEPS ) );
             ( *mpNeighOutputFile ) << i 
                 << " " 
-                <<  ( neighHist[ i ] ) 
-                << "\t" << freq 
+                <<  freq 
+                << "\t" << ( neighHist[ i ] ) 
                 << endl;
         }
 

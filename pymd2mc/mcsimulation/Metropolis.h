@@ -39,7 +39,8 @@ class Metropolis
         long long *mpHistArr;
         int mStepSize;
 
-        void (*mpSampler)( TriangularLattice *latt, int &, int & );
+        void (*mpSampler)( TriangularLattice *latt, int &, int & ); 
+        // we use raw pointers instead of std::tr1::function because we are extremely concerned about the performance
 
         double prob( double dG );
         double calcEnergyDiff( int pos1, int pos2 );
