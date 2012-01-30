@@ -12,8 +12,8 @@ using namespace std;
 
 const double TEMPERATURE = 333.0;
 const int N_NEIGHBORS = 6;
-const string AT1 = "DOPCP8";
-const string AT2 = "POPCP8";
+string AT1 = "DOPCP8";
+string AT2 = "POPCP8";
 
 class Atom {
 public:
@@ -62,7 +62,7 @@ inline std::string trim(std::string str)
 return str;
 }
 
-int main(int /*argc*/,char *argv[]) {
+int main(int argc, char *argv[]) {
 
     Atom *atoms;
     int global_n_atomsAT1 = 0;
@@ -72,6 +72,11 @@ int main(int /*argc*/,char *argv[]) {
     ifstream ifile;
     ifile.open(argv[1]);
     string line;
+    if ( argc > 3 )
+    {
+        AT1 = argv[2];
+        AT2 = argv[3];
+    }
     double omega_sum( 0 );
     int frameCounter( 0 );
     // this will be utilized to calc neighbors histogram
