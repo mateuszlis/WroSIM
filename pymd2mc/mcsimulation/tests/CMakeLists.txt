@@ -15,5 +15,6 @@ add_test(cppcheckInfo  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=info
 add_test(cppcheckUnusedFunctions  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=unusedFunction -q )
 add_test(cppcheckStyle  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=style -q )
 
-target_link_libraries(TriangularLatticeTest TriangularLattice)
-target_link_libraries(ClustersAnalyzerTest ClustersAnalyzer)
+target_link_libraries(TriangularLatticeTest TriangularLattice gtest gtest_main
+    gmock)
+target_link_libraries(ClustersAnalyzerTest ClustersAnalyzer gtest gtest_main)

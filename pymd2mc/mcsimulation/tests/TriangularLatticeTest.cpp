@@ -12,51 +12,41 @@
 // stl
 #include <set>
 
+// Google test tools
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+
 // project-local
 #include "TriangularLattice.h"
-
-void testTriangularLattice();
-void testExchange();
-void testCalcNeigh();
-void testGetNeighbIndex();
 
 // helpers
 int calcSum( TriangularLattice* );
 std::set< int > getNeighborsOf( int site, TriangularLattice* latt );
 bool checkIfIsNeighborOf( const int& neighbor, const std::set< int >& elements, TriangularLattice* latt );
 
-int main()
-{
-    testTriangularLattice();
-    testGetNeighbIndex();
-    testExchange();
-    testCalcNeigh();
 
-    return 0;
-}
-
-void testTriangularLattice()
+TEST( TriangularLattice, Construct )
 {
     TriangularLattice *latt = new TriangularLattice( 100, 10, 20);
-    assert(calcSum(latt) == 20);
+    EXPECT_EQ( calcSum( latt ), 20 );
     delete latt;
 }
 
-void testGetNeighbIndex()
+TEST( TriangularLatticeTest, GetNeighborIndex )
 {
     TriangularLattice *latt = new TriangularLattice( 9, 3, 3 );
     for( int currentSite = 0 ; currentSite < 9 ; ++currentSite )
     {
         std::set< int > neighbors = getNeighborsOf( currentSite, latt );
-        assert( neighbors.size() == 6 ); // check that there are no duplicate entries
-        assert( checkIfIsNeighborOf( currentSite, neighbors, latt ) ); // check if neighbor relation is reflexive
+        EXPECT_EQ( neighbors.size(), 6 ); // check that there are no duplicate entries
+        EXPECT_TRUE( checkIfIsNeighborOf( currentSite, neighbors, latt ) ); // check if neighbor relation is reflexive
     }    
     delete latt;
 }
 
 
 
-void testCalcNeigh()
+TEST( TriangularLatticeTest, CalcNeighbors )
 {
     TriangularLattice *latt = new TriangularLattice( 100, 10, 1);
     long sum = 0;
@@ -64,12 +54,12 @@ void testCalcNeigh()
     {
         sum += latt->simNeighbCount( i );
     }
-    assert( sum == 6 * 100 - 12 );
-    assert(calcSum(latt) == 1);
+    EXPECT_EQ( sum, 6 * 100 - 12 );
+    EXPECT_EQ( calcSum( latt ), 1);
     delete latt;
 }
 
-void testExchange()
+TEST( TriangularLatticeTest, ExchangeSites )
 {
     TriangularLattice *latt = new TriangularLattice( 100, 10, 20);
 
@@ -80,7 +70,7 @@ void testExchange()
         if ( pos1 != pos2 )
             latt->exchangeSites( pos1, pos2);
     }
-    assert(calcSum(latt) == 20);
+    EXPECT_EQ( calcSum(latt), 20 );
     delete latt;
 }
 

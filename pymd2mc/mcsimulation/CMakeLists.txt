@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
+option(BUILD_TESTS "Build all of foo's unit tests." FALSE)
 project (mcsim)
-enable_testing()
+
 # Set default build type
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
 message(STATUS "${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
@@ -16,12 +17,15 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 include_directories("${PROJECT_BINARY_DIR}")
 set (BASE_SRC_DIR ${CMAKE_SOURCE_DIR})
-set (directories
-    tests
-    )
-foreach (f ${directories})
-    add_subdirectory(${f})
-endforeach(f)
+if (BUILD_TESTS)
+    # setup testing
+    enable_testing()
+    find_package(GTest REQUIRED)
+    include_directories(${GTEST_INCLUDE_DIR})
+    include_directories(${GMOCK_INCLUDE_DIR})
+    add_subdirectory(tests)
+endif() 
+
 add_library(mcsimCommandLine mcsimCommandLine.cxx)
 add_library(analyzePyrkovaCommandLine analyzePyrkovaCommandLine.cxx)
 add_library(TriangularLattice TriangularLattice.cpp)
