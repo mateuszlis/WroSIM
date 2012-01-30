@@ -72,6 +72,8 @@ int main( int argc, char* argv[] )
         simulation->run( steps);
 
         outputFile.close();
+        delete lattice;
+        delete simulation;
 
     }
     catch ( const cli::exception& e )
