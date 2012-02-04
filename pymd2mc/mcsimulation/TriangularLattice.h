@@ -24,6 +24,8 @@ class TriangularLattice
         int mRowSize;
         static const int mNeighbCnt = 6;
         int mNeighb[mNeighbCnt];
+        int mNeighbLeft[mNeighbCnt];
+        int mNeighbRight[mNeighbCnt];
 
         void clearArr();
         void distributeParticles( int firstTypeParticlesCnt );
