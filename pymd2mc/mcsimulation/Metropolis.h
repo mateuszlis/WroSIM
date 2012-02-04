@@ -18,7 +18,7 @@ using namespace std;
 
 enum Sampler
 {
-    Kawasaki, Almeida
+    Kawasaki, Almeida, MassiveParallelKawasaki
 };
 
 class Metropolis

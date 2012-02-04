@@ -65,9 +65,13 @@ int main( int argc, char* argv[] )
         simulation->setStatus( cout);
 
         if ( sampler == "Kawasaki" )
-            simulation->setSampler( Kawasaki);
+            simulation->setSampler( Kawasaki );
         if ( sampler == "Almeida" )
-            simulation->setSampler( Almeida);
+            simulation->setSampler( Almeida );
+        if ( sampler == "MassiveParallelKawasaki" )
+        {
+            simulation->setSampler( MassiveParallelKawasaki );
+        }
 
         simulation->run( steps);
 
