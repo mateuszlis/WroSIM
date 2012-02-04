@@ -20,32 +20,35 @@ void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
     pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt());
 }
 
+/**
+ * @brief This is experimental feature that is here to test ideas connected with
+ * GPU implementation of Kawasaki sampler.
+ */
 void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
 {
     static long step = 0;
-    static int configuration;
     static int lastPos = 0;
-    if( step == latt->getLatticeSize() / 7 || step == 0 )
+    if( step == latt->getLatticeSize() / 7 || step == 0 ) // As every step involves 7 sites
+        // we perform latticeSize/7 steps to involve all sites in lattice
     {
-        configuration = rand() % 7;
-        pos1 = configuration;
+        pos1 = rand() % 7; // chose initial point for sampling (note that there are only 7 possibilities
         step = 0;
     }
     else
     {
         pos1 = ( ( 2 * latt->getRowSize() + 1 ) + lastPos ) % latt->getLatticeSize();
-        if ( pos1 % 7 == 0 )
+        if ( pos1 % 7 == 0 ) // if we are on the right border, Periodic Boundary Conditions work differently
         {
-            pos1 -= latt->getRowSize();
-            if( pos1 < 0 )
+            pos1 -= latt->getRowSize(); // so we need to go back one row
+            if( pos1 < 0 ) // this is quickfix for the zero site
                 pos1 += latt->getLatticeSize();
 
         }
     }
-    lastPos = pos1;
-    pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt());
+    lastPos = pos1; // remember what you did
+
+    pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt()); // randomly chose second exchange site
     step++;
-    //cout << step << " " << pos1 << " " << configuration << endl;
 }
 //Metropolis public functions
 
