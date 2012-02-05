@@ -56,6 +56,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T )
     : mOmegaAB( omegaAB )
       , mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
+      , mpFNFOutputFile( NULL )
       , mpFrameStream( NULL )
       , mpStatusStream( NULL )
       , mIsSetFrameStream( false )
@@ -93,6 +94,10 @@ void Metropolis::setStatus( ostream &statusStream )
     mIsSetStatusStream = true;
     mpStatusStream = &statusStream;
 }
+void Metropolis::setFNFStream( ostream &fnfStream )
+{
+    mpFNFOutputFile = &fnfStream;
+}
 
 void Metropolis::setOmegaAB( double omegaAB )
 {
@@ -117,6 +122,11 @@ void Metropolis::run( int steps )
         {
             createNeighHist( neighHist );
         }
+        if ( mpFNFOutputFile != NULL && i > EQUIB_STEPS )
+        {
+            ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
+        }
+
         if ( mIsSetStatusStream )
         {
             ( *mpStatusStream ) << "\r" << i; //print status message
@@ -193,6 +203,22 @@ void Metropolis::createNeighHist( long long *histArr )
         histArr[ mpLatt->simNeighbCount( i ) ] += 1;
     }
 }
+double Metropolis::calcFirstNeighboursFract() 
+{
+    int simFirstNeighbCount = 0;
+    for ( int i = 0 ; i < mpLatt->getLatticeSize() ; i++ )
+    {
+        int pos = mpLatt->getNeighbIndex( i, rand() % mpLatt->getNeighborsCnt());
+        if ( ( *mpLatt )[pos] == ( *mpLatt )[i] )
+        {
+            simFirstNeighbCount++;
+        }
+    }
+    return static_cast< double >( simFirstNeighbCount ) / mpLatt->getLatticeSize();
+}
+
+
+
 Metropolis::~Metropolis()
 {
     // TODO Auto-generated destructor stub

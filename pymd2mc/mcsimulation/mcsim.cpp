@@ -50,9 +50,10 @@ int main( int argc, char* argv[] )
         int outputTemperature = opt.T();
         string sampler = opt.sampling();
         string outputFilename = opt.o();
-        ofstream outputFile, neighHistFile;
+        ofstream outputFile, neighHistFile, fnfFile;
         outputFile.open( outputFilename.c_str());
         neighHistFile.open( "neigh_hist_omega.dat");
+        fnfFile.open( "fraction_of_first_neighbors.dat" );
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum);
 
@@ -61,6 +62,7 @@ int main( int argc, char* argv[] )
         simulation->setNeighOutput( neighHistFile );
 
         simulation->setOutput( outputFile);
+        simulation->setFNFStream( fnfFile );
         simulation->setOutputFreq( outputFreq);
         simulation->setStatus( cout);
 

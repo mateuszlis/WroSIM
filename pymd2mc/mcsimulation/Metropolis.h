@@ -28,6 +28,7 @@ class Metropolis
         int mOutputFreq;
 
         ostream* mpNeighOutputFile;
+        ostream* mpFNFOutputFile; // first neighbours fraction
         ostream* mpFrameStream;
         ostream* mpStatusStream;
 
@@ -47,6 +48,7 @@ class Metropolis
         double calcEnergyDiff( int pos1, int pos2 );
         void metropolisStep();
         void createNeighHist( long long *histArr );
+        double calcFirstNeighboursFract();
 
     public:
         static const double R = 1.986;
@@ -59,6 +61,7 @@ class Metropolis
         void setNeighOutput( ostream &neighOutputFile );
         void setOutput( ostream &frameStream );
         void setStatus( ostream &statusStream );
+        void setFNFStream( ostream &fnfStream );
         void setSampler( Sampler s );
         void run( int steps );
         virtual ~Metropolis();
