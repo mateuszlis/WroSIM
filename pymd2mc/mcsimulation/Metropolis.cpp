@@ -27,26 +27,58 @@ void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
 void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
 {
     static long step = 0;
-    static int lastPos = 0;
+    static int **paths = NULL; 
+    static int start = 0;
+    if ( paths == NULL )
+    {
+        paths = new int* [7];
+        for ( int i = 0; i < 7 ; ++i )
+        {
+            paths[i] = new int[ latt->getLatticeSize() ];
+            int index = 0;
+            paths[i][index] = i; // starter is always this
+            int starter = i;
+            ++index;
+            for ( int rowIndex = 1 ; rowIndex < latt->getRowSize() / 7 ; ++rowIndex, ++index )
+            {
+               if ( rowIndex * 7 + i < latt->getRowSize() )
+                   paths[i][index] = rowIndex * 7 + i;
+               else 
+                   paths[i][index] = rowIndex * 7 + i - latt->getRowSize();
+            }
+            // create rowStarters
+            for ( int rowNum = 1 ; rowNum < latt->getRowSize() ; ++rowNum )
+            {
+                if ( starter + 4 < rowNum * latt->getRowSize() )
+                    starter = starter + 4 + latt->getRowSize();
+                else
+                    starter = 4 + starter;
+                paths[i][index] = starter;
+                ++index;
+
+                for ( int rowIndex = 1 ; rowIndex < latt->getRowSize() / 7 ; ++rowIndex, ++index )
+                {
+                    if ( rowIndex * 7 + starter < ( rowNum + 1 ) * latt->getRowSize() )
+                        paths[i][index] = rowIndex * 7 + starter;
+                    else
+                        paths[i][index] = rowIndex * 7 + starter - latt->getRowSize();
+                }
+            }
+
+        }
+        
+    }
     if( step == latt->getLatticeSize() / 7 || step == 0 ) // As every step involves 7 sites
         // we perform latticeSize/7 steps to involve all sites in lattice
     {
         pos1 = rand() % 7; // chose initial point for sampling (note that there are only 7 possibilities
+        start = pos1;
         step = 0;
     }
     else
     {
-        pos1 = ( ( 2 * latt->getRowSize() + 1 ) + lastPos ) % latt->getLatticeSize();
-        if ( pos1 % 7 == 0 ) // if we are on the right border, Periodic Boundary Conditions work differently
-        {
-            pos1 -= latt->getRowSize(); // so we need to go back one row
-            if( pos1 < 0 ) // this is quickfix for the zero site
-                pos1 += latt->getLatticeSize();
-
-        }
+        pos1 = paths[start][step];
     }
-    lastPos = pos1; // remember what you did
-
     pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt()); // randomly chose second exchange site
     step++;
 }
@@ -172,10 +204,11 @@ double Metropolis::prob( double dG )
 
 double Metropolis::calcEnergyDiff( int pos1, int pos2 )
 {
-    int diff1 = ( 6 - mpLatt->simNeighbCount( pos1) ) + ( 6 - mpLatt->simNeighbCount( pos2) );
-    mpLatt->exchangeSites( pos1, pos2);
-    int diff2 = ( 6 - mpLatt->simNeighbCount( pos1) ) + ( 6 - mpLatt->simNeighbCount( pos2) );
-    mpLatt->exchangeSites( pos1, pos2);
+    int s1Diff = 6 - mpLatt->simNeighbCount( pos1 );
+    int s2Diff = 6 - mpLatt->simNeighbCount( pos2 );
+    
+    int diff1 = s1Diff + s2Diff;
+    int diff2 = 14 - ( s1Diff + s2Diff ) ;
     return ( diff2 - diff1 ) * mOmegaAB;
 }
 
