@@ -23,7 +23,6 @@ def main(argv=None):
     clusterHists = []
     frameCounter = 0
     latticeLoader = HexLatticeLoader(frame)
-    sys.setrecursionlimit(max(1000, len(frame.atoms))) #this is cheating
     while not frame is None:
         latticeLoader.updateState(frame, "")
         clusterHists.append(calcClusterHist(latticeLoader, frame))
@@ -54,7 +53,6 @@ def calcClusterHist(latticeLoader, frame):
     atomDict = {}
     done = {}
     for atom in frame.atoms:
-        #print len(done.keys())
         if not done.has_key(atom):
             size = checkCluster(latticeLoader, frame, atom, done)
             #print "done", atom, size
@@ -69,11 +67,21 @@ def checkCluster(latticeLoader, frame, atom, done):
     clusterSize = 1
     done[atom] = 1
     #print atom
-    neighbrs = latticeLoader.getNeighbors(atom)
-    for neighb in neighbrs:
-        if (not done.has_key(neighb)) and neighb.symbol == atom.symbol:
-            clusterSize += checkCluster(latticeLoader, frame, neighb, done)
+    stack = []
+    stack.append(latticeLoader.getNeighbors(atom))
+    
+    # This code was once one of the smartest recursion I've ever made
+    # Unfortunately I had to remove it because of recursion limits.
+    # And so it is.
+    while len(stack):
+        neighbors = stack.pop()
+        for neighb in neighbors:
+            if (not done.has_key(neighb)) and neighb.symbol == atom.symbol:
+                clusterSize += 1
+                done[neighb] = 1
+                stack.append(latticeLoader.getNeighbors(neighb))
     return clusterSize
+
 def openFiles(options):
     try:
         xyzFile = XYZFile(options.xyzFilename)
