@@ -43,7 +43,7 @@ int main( int argc, char* argv[] )
 
         float omega = opt.omega();
         int aLipidsNum = opt.first_particles_count();
-        int lattSize = opt.latt_row_size() * opt.latt_row_size();
+        int lattSize = opt.latt_row_size() * opt.latt_row_count();
         int lattRowSize = opt.latt_row_size();
         int steps = opt.steps();
         int outputFreq = opt.output_freq();

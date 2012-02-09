@@ -24,8 +24,13 @@ class options
     int --latt-row-size = 100
   {
         "<num",
-        "Size of the lattice row (note that lattice size is square of this value
+        "Size of the lattice row 
         This is required if you use lattice generator (not passing start file"
+  };
+    int --latt-row-count = 100
+  {
+        "<num",
+        "Row count ( lattice_size = row_size * row_count ) "
   };
   std::string -o = "traj.xyz"
   {

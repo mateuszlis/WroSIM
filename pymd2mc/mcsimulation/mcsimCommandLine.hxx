@@ -248,6 +248,9 @@ class options
   const int&
   latt_row_size () const;
 
+  const int&
+  latt_row_count () const;
+
   const std::string&
   o () const;
 
@@ -280,6 +283,7 @@ class options
   std::string f_;
   int first_particles_count_;
   int latt_row_size_;
+  int latt_row_count_;
   std::string o_;
   int T_;
   int steps_;

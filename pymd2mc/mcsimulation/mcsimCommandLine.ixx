@@ -138,6 +138,12 @@ latt_row_size () const
   return this->latt_row_size_;
 }
 
+inline const int& options::
+latt_row_count () const
+{
+  return this->latt_row_count_;
+}
+
 inline const std::string& options::
 o () const
 {

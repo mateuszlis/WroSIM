@@ -46,13 +46,9 @@ TriangularLattice::TriangularLattice( int latticeSize, int rowSize, int firstTyp
     mRowSize = rowSize;
     clearArr();
     int neighb[] = { 1, -1, rowSize, -rowSize, rowSize - 1, -rowSize + 1 }; // bloody helical boundary conditions
-    int neighbL[] = { 1, rowSize - 1, rowSize, -rowSize, 2 * rowSize - 1, -rowSize + 1 }; // bloody periodic boundary conditions
-    int neighbR[] = { -rowSize + 1, -1, rowSize, -rowSize, rowSize - 1, - 2 * rowSize + 1 }; // bloody helical boundary conditions
     for ( int i = 0; i < mNeighbCnt; i++ )
     {
         mNeighb[i] = neighb[i];
-        mNeighbLeft[i] = neighbL[i];
-        mNeighbRight[i] = neighbR[i];
     }
 
     this->distributeParticles( firstTypeParticlesCnt);
@@ -95,18 +91,7 @@ int TriangularLattice::simNeighbCount( int pos )
 int TriangularLattice::getNeighbIndex( int pos, int neighborNum ) const
 {
     int translationIndex( 0 );
-    if ( pos % mRowSize == 0 )
-    {
-       translationIndex = mNeighbLeft[neighborNum];
-    }
-    else if ( pos % mRowSize == ( mRowSize - 1 ) )
-    {
-        translationIndex = mNeighbRight[neighborNum];
-    }
-    else
-    {
-        translationIndex = mNeighb[neighborNum];
-    }
+    translationIndex = mNeighb[neighborNum];
 	int neigh = ( pos + translationIndex );
 	if ( neigh >= mLatticeSize )
 		neigh -= mLatticeSize;

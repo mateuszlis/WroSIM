@@ -314,6 +314,7 @@ options (int& argc,
   f_ (),
   first_particles_count_ (2000),
   latt_row_size_ (100),
+  latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
@@ -336,6 +337,7 @@ options (int start,
   f_ (),
   first_particles_count_ (2000),
   latt_row_size_ (100),
+  latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
@@ -358,6 +360,7 @@ options (int& argc,
   f_ (),
   first_particles_count_ (2000),
   latt_row_size_ (100),
+  latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
@@ -382,6 +385,7 @@ options (int start,
   f_ (),
   first_particles_count_ (2000),
   latt_row_size_ (100),
+  latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
@@ -402,6 +406,7 @@ options (::cli::scanner& s,
   f_ (),
   first_particles_count_ (2000),
   latt_row_size_ (100),
+  latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
@@ -425,9 +430,12 @@ print_usage (::std::ostream& os)
   os << "--first-particles-count <num> Value describes number of sites of the first of" << ::std::endl
      << "                              types." << ::std::endl;
 
-  os << "--latt-row-size <num          Size of the lattice row (note that lattice size is" << ::std::endl
-     << "                              square of this value This is required if you use" << ::std::endl
-     << "                              lattice generator (not passing start file" << ::std::endl;
+  os << "--latt-row-size <num          Size of the lattice row" << ::std::endl
+     << ::std::endl
+     << "                              This is required if you use lattice generator (not" << ::std::endl
+     << "                              passing start file" << ::std::endl;
+
+  os << "--latt-row-count <num         Row count ( lattice_size = row_size * row_count )" << ::std::endl;
 
   os << "-o <filename>                 output filename (warning: it will be overriden)" << ::std::endl
      << "                              Default: traj.xyz" << ::std::endl;
@@ -462,6 +470,8 @@ struct _cli_options_map_init
     &::cli::thunk< options, int, &options::first_particles_count_ >;
     _cli_options_map_["--latt-row-size"] = 
     &::cli::thunk< options, int, &options::latt_row_size_ >;
+    _cli_options_map_["--latt-row-count"] = 
+    &::cli::thunk< options, int, &options::latt_row_count_ >;
     _cli_options_map_["-o"] = 
     &::cli::thunk< options, std::string, &options::o_ >;
     _cli_options_map_["-T"] = 

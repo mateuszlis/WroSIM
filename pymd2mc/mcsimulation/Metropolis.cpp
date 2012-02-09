@@ -27,47 +27,7 @@ void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
 void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
 {
     static long step = 0;
-    static int **paths = NULL; 
     static int start = 0;
-    if ( paths == NULL )
-    {
-        paths = new int* [7];
-        for ( int i = 0; i < 7 ; ++i )
-        {
-            paths[i] = new int[ latt->getLatticeSize() ];
-            int index = 0;
-            paths[i][index] = i; // starter is always this
-            int starter = i;
-            ++index;
-            for ( int rowIndex = 1 ; rowIndex < latt->getRowSize() / 7 ; ++rowIndex, ++index )
-            {
-               if ( rowIndex * 7 + i < latt->getRowSize() )
-                   paths[i][index] = rowIndex * 7 + i;
-               else 
-                   paths[i][index] = rowIndex * 7 + i - latt->getRowSize();
-            }
-            // create rowStarters
-            for ( int rowNum = 1 ; rowNum < latt->getRowSize() ; ++rowNum )
-            {
-                if ( starter + 4 < rowNum * latt->getRowSize() )
-                    starter = starter + 4 + latt->getRowSize();
-                else
-                    starter = 4 + starter;
-                paths[i][index] = starter;
-                ++index;
-
-                for ( int rowIndex = 1 ; rowIndex < latt->getRowSize() / 7 ; ++rowIndex, ++index )
-                {
-                    if ( rowIndex * 7 + starter < ( rowNum + 1 ) * latt->getRowSize() )
-                        paths[i][index] = rowIndex * 7 + starter;
-                    else
-                        paths[i][index] = rowIndex * 7 + starter - latt->getRowSize();
-                }
-            }
-
-        }
-        
-    }
     if( step == latt->getLatticeSize() / 7 || step == 0 ) // As every step involves 7 sites
         // we perform latticeSize/7 steps to involve all sites in lattice
     {
@@ -77,7 +37,7 @@ void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &po
     }
     else
     {
-        pos1 = paths[start][step];
+        pos1 = ( 7 * step + start ) % latt->getLatticeSize();
     }
     pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt()); // randomly chose second exchange site
     step++;
