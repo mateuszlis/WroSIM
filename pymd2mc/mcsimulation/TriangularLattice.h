@@ -38,6 +38,7 @@ class TriangularLattice
 
         int getLatticeSize() const;
         int getRowSize() const;
+        int* getLattice() const { return mpLattice; };
 
         int simNeighbCount( int pos );
         void exchangeSites( int pos1, int pos2 );

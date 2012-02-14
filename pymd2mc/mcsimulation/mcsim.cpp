@@ -61,10 +61,10 @@ int main( int argc, char* argv[] )
 
         simulation->setNeighOutput( neighHistFile );
 
-        simulation->setOutput( outputFile);
+        simulation->setOutput( outputFile );
         simulation->setFNFStream( fnfFile );
-        simulation->setOutputFreq( outputFreq);
-        simulation->setStatus( cout);
+        simulation->setOutputFreq( outputFreq );
+        simulation->setStatus( cout );
 
         if ( sampler == "Kawasaki" )
             simulation->setSampler( Kawasaki );
