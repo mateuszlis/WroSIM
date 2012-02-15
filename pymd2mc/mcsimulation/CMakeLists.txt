@@ -1,6 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 option(BUILD_TESTS "Build all of foo's unit tests." FALSE)
 project (mcsim)
+
+#Searching CUDA
+FIND_PACKAGE(CUDA)
+
 #make it work on osx
 set (CMAKE_OSX_ARCHITECTURES i386)
 set (CUDA_64_BIT_DEVICE_CODE OFF)
@@ -43,8 +47,12 @@ add_library(Atom Atom.cpp)
 add_executable(mcsim mcsim.cpp)
 add_executable(analyze analyze.cpp)
 add_executable(analyzePyrkova analyzePyrkova.cpp)
-
-target_link_libraries(mcsim TriangularLattice mcsimCommandLine Metropolis)
+if(CUDA_FOUND)
+    message(STATUS "CUDA")
+    target_link_libraries(mcsim TriangularLattice mcsimCommandLine Metropolis_cuda)
+else(CUDA_FOUND)
+    target_link_libraries(mcsim TriangularLattice mcsimCommandLine Metropolis)
+endif(CUDA_FOUND)
 target_link_libraries(analyzePyrkova ClustersAnalyzer Atom
     analyzePyrkovaCommandLine)
 

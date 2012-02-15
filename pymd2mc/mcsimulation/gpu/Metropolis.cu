@@ -6,14 +6,13 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
-// includes, system
+// std
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <iostream>
 #include <fstream>
-#include "../TriangularLattice.h"
 #include <vector>
 #include <algorithm>
 #include <ctime>
@@ -21,16 +20,16 @@
 #include <assert.h>
 using namespace std;
 
-// includes, project
+// project related
+#include "../TriangularLattice.h"
+#include "../Metropolis.h"
+
+// CUDA related
 #include <cutil_inline.h>
 
-// includes, kernels
+// kernels
 #include "Metropolis_kernel.cu"
 
-class Metropolis
-{
-}
-;
 ////////////////////////////////////////////////////////////////////////////////
 // declaration, forward
 const float R = 1.986;
@@ -44,12 +43,12 @@ float probability( float dG );
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char** argv)
-{
-    runTest(argc, argv);
-
-    cutilExit(argc, argv);
-}
+//int main(int argc, char** argv)
+//{
+//    runTest(argc, argv);
+//
+//    cutilExit(argc, argv);
+//}
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Run a simple test for CUDA
@@ -192,4 +191,182 @@ void printLatt( int *latt, int rowSize, int rowsCount )
 float probability( float dG )
 {
     return exp( -dG / ( R * T ) );
+}
+
+void almeidaSampler( TriangularLattice *latt, int &pos1, int &pos2 )
+{
+    pos1 = rand() % latt->getLatticeSize();
+    pos2 = rand() % latt->getLatticeSize();
+}
+void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
+{
+    pos1 = rand() % latt->getLatticeSize();
+    pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt());
+}
+Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T ) 
+    : mOmegaAB( omegaAB )
+      , mOutputFreq( 100 )
+      , mpNeighOutputFile( NULL )
+      , mpFNFOutputFile( NULL )
+      , mpFrameStream( NULL )
+      , mpStatusStream( NULL )
+      , mIsSetFrameStream( false )
+      , mIsSetNeighOutputFile( false )
+      , mIsSetStatusStream( false )
+      , mpLatt( latt )
+      , mpHistArr( NULL )
+      , T( T )
+
+{
+
+    mStepSize = ( latt->getLatticeSize() );
+    setSampler( Kawasaki);
+
+}
+
+void Metropolis::setOutputFreq( int freq )
+{
+    mOutputFreq = freq;
+}
+
+void Metropolis::setNeighOutput( ostream &neighOutputFile )
+{
+    mIsSetNeighOutputFile = true;
+    mpNeighOutputFile = &neighOutputFile;
+}
+
+void Metropolis::setOutput( ostream &frameStream )
+{
+    mIsSetFrameStream = true;
+    mpFrameStream = &frameStream;
+}
+void Metropolis::setStatus( ostream &statusStream )
+{
+    mIsSetStatusStream = true;
+    mpStatusStream = &statusStream;
+}
+void Metropolis::setFNFStream( ostream &fnfStream )
+{
+    mpFNFOutputFile = &fnfStream;
+}
+
+void Metropolis::setOmegaAB( double omegaAB )
+{
+    mOmegaAB = omegaAB;
+}
+
+void Metropolis::run( int steps )
+{
+    long long neighHist[7] = { 0, 0, 0, 0, 0, 0, 0 };
+    for ( int i = 0; i < steps; i++ )
+    {
+        for ( int j = 0; j < mStepSize; j++ )
+        {
+            metropolisStep();
+        }
+
+        if ( i % mOutputFreq == 0 && mIsSetFrameStream )
+        {
+            ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
+        }
+        if ( mIsSetNeighOutputFile && i > EQUIB_STEPS )
+        {
+            createNeighHist( neighHist );
+        }
+        if ( mpFNFOutputFile != NULL && i > EQUIB_STEPS )
+        {
+            ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
+        }
+
+        if ( mIsSetStatusStream )
+        {
+            ( *mpStatusStream ) << "\r" << i; //print status message
+        }
+
+    }
+    if ( mIsSetNeighOutputFile )
+        for ( int i = 0; i < 7; i++ )
+        {
+            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - EQUIB_STEPS ) );
+            ( *mpNeighOutputFile ) << i 
+                << " " 
+                <<  freq 
+                << "\t" << ( neighHist[ i ] ) 
+                << endl;
+        }
+
+}
+
+void Metropolis::setSampler( Sampler s )
+{
+    if ( s == Kawasaki )
+    {
+        mpSampler = kawasakiSampler;
+    }
+    else
+    {
+        mpSampler = almeidaSampler;
+    }
+}
+
+//private functions
+
+double Metropolis::prob( double dG )
+{
+    return exp( -dG / ( R * T ));
+}
+
+double Metropolis::calcEnergyDiff( int pos1, int pos2 )
+{
+    int s1Diff = 6 - mpLatt->simNeighbCount( pos1 );
+    int s2Diff = 6 - mpLatt->simNeighbCount( pos2 );
+    
+    int diff1 = s1Diff + s2Diff;
+    int diff2 = 14 - ( s1Diff + s2Diff ) ;
+    return ( diff2 - diff1 ) * mOmegaAB;
+}
+
+void Metropolis::metropolisStep()
+{
+    int pos1 = 0;
+    int pos2 = 0;
+    mpSampler( mpLatt, pos1, pos2); //sets pos1 and pos2 by reference
+
+    if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] )
+    {
+        double p = prob( calcEnergyDiff( pos1, pos2));
+        double acceptance = rand() / ( float( RAND_MAX) + 1 );
+        if ( p >= 1 or p > ( acceptance ) )
+        {
+            //cout << "DONE MOVE " << pos1 << " " << pos2 << endl;
+            mpLatt->exchangeSites( pos1, pos2);
+        }
+    }
+}
+void Metropolis::createNeighHist( long long *histArr )
+{
+    for ( int i = 0; i < mpLatt->getLatticeSize(); i++ )
+    {
+        histArr[ mpLatt->simNeighbCount( i ) ] += 1;
+    }
+}
+double Metropolis::calcFirstNeighboursFract() 
+{
+    int simFirstNeighbCount = 0;
+    for ( int i = 0 ; i < mpLatt->getLatticeSize() ; i++ )
+    {
+        int pos = mpLatt->getNeighbIndex( i, rand() % mpLatt->getNeighborsCnt());
+        if ( ( *mpLatt )[pos] == ( *mpLatt )[i] )
+        {
+            simFirstNeighbCount++;
+        }
+    }
+    return static_cast< double >( simFirstNeighbCount ) / mpLatt->getLatticeSize();
+}
+
+
+
+Metropolis::~Metropolis()
+{
+    // TODO Auto-generated destructor stub
 }

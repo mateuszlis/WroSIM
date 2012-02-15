@@ -176,7 +176,15 @@ void Metropolis::metropolisStep()
 {
     int pos1 = 0;
     int pos2 = 0;
-    mpSampler( mpLatt, pos1, pos2); //sets pos1 and pos2 by reference
+    if ( mpSampler != NULL )
+    {
+        mpSampler( mpLatt, pos1, pos2); //sets pos1 and pos2 by reference
+    }
+    else
+    {
+        cout << "Sampler not set" << endl;
+        exit( 0 );
+    }
 
     if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] )
     {
