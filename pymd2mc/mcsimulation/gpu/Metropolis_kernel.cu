@@ -51,7 +51,7 @@ __device__ inline int calcDiffNeighbors(int* latt
 }
 
 __global__ void
-metropolisStep( int * latt, int lattSize, int lattRowSize, int start,
+metropolisStep_kernel( int * latt, int lattSize, int lattRowSize, int start,
         curandState * const rngStates, float * energies )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
