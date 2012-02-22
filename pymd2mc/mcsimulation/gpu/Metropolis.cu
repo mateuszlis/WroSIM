@@ -56,10 +56,6 @@ float probability( float dG );
 ////////////////////////////////////////////////////////////////////////////////
 //! Run a simple test for CUDA
 ////////////////////////////////////////////////////////////////////////////////
-void
-runTest(int argc, char** argv)
-{
-}
 
 long calcSum(int* data, int size)
 {
@@ -113,7 +109,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T )
 
 {
 
-    mStepSize = ( latt->getLatticeSize() );
+    mStepSize = 7;
     setSampler( Kawasaki);
 
 }
@@ -149,37 +145,42 @@ void Metropolis::setOmegaAB( double omegaAB )
     mOmegaAB = omegaAB;
 }
 
+unsigned int getBlockSize( TriangularLattice* pLatt )
+{
+    if ( pLatt->getLatticeSize() % 7 != 0 )
+    {
+        throw std::exception(); // must be divisible by 7
+        // TODO: create exception chierarchy
+    }
+    unsigned int expectedSize = pLatt->getLatticeSize() / 7;
+    unsigned int maxBlocks = 512;
+    while ( expectedSize % maxBlocks != 0 )
+    {
+        maxBlocks /= 2;
+    }
+    return maxBlocks;
+}
+
 void Metropolis::run( int steps )
 {
     cudaSetDevice( cutGetMaxGflopsDeviceId() );
     // set seed for rand()
-    srand(2005);
-    const int LATT_ROW_SIZE = 5; // 96;//1790; //894; //5
-    const int LATT_ROWS_COUNT = 7; //98;//1792; // 896; //7;
-    const long long LATT_SIZE = LATT_ROW_SIZE * LATT_ROWS_COUNT;
-    cout << LATT_SIZE << " size of the lattice " << endl;
-    TriangularLattice *latt = new TriangularLattice( LATT_SIZE,
-    LATT_ROW_SIZE, ( LATT_ROW_SIZE * LATT_ROWS_COUNT ) / 3 ); //400512);
 
-    const int BLOCK_SIZE = 1; //64;//512; //256; //1;
-    const int BLOCKS = 5; // 21;//895; //447; //5;
-    assert( BLOCKS * BLOCK_SIZE == ( LATT_SIZE / 7 ) );
-    const int OUTPUT_FREQ = 300;
+    const int BLOCK_SIZE = getBlockSize( mpLatt ); //64;//512; //256; //1;
+    const int BLOCKS = ( mpLatt->getLatticeSize() / 7 ) / BLOCK_SIZE; // 21;//895; //447; //5;
+    assert( BLOCKS * BLOCK_SIZE == ( mpLatt->getLatticeSize() / 7 ) );
     // allocate device memory for result
-    unsigned int size_latt = LATT_SIZE;
-    unsigned int mem_size_latt = sizeof(int) * size_latt;
+    unsigned int mem_size_latt = sizeof( int ) * mpLatt->getLatticeSize();
     cutilSafeCall(cudaMalloc((void**) &d_latt, mem_size_latt));
 
     // allocate host memory for the result
-    int* h_latt = latt->getLattice(); //(int*) malloc(mem_size_latt);
-    cout << calcSum(h_latt, size_latt ) << " Sum" << endl;
-    //printLatt( h_latt, LATT_ROW_SIZE, LATT_ROWS_COUNT );
+    int* h_latt = mpLatt->getLattice(); //(int*) malloc(mem_size_latt);
+    cout << calcSum(h_latt, mpLatt->getLatticeSize() ) << " Sum" << endl;
     cutilSafeCall(cudaMemcpy(d_latt, h_latt, mem_size_latt,
                               cudaMemcpyHostToDevice) );
     for ( int i = 0 ; i < 36 ; ++i )
     {
         energies[ i ] = probability( ( i - 10 ) * mOmegaAB );
-        cout << energies[ i ] << endl;
     }
 
     float* d_energies;
@@ -213,7 +214,8 @@ void Metropolis::run( int steps )
         {
             int random = rand() % 7;
 
-            metropolisStep_kernel<<< grid, threads >>>( d_latt, LATT_SIZE, LATT_ROW_SIZE,
+            metropolisStep_kernel<<< grid, threads >>>( d_latt,
+            mpLatt->getLatticeSize(), mpLatt->getRowSize(),
                 random, d_rngStates, d_energies );
             cudaDeviceSynchronize();
         }
@@ -222,13 +224,13 @@ void Metropolis::run( int steps )
         {
             cutilSafeCall(cudaMemcpy(h_latt, d_latt, mem_size_latt,
                               cudaMemcpyDeviceToHost) );
-            ( *mpFrameStream ) << ( *latt ); //print frame to output
+            ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
         }
-        if ( mIsSetNeighOutputFile && i > EQUIB_STEPS )
+        if ( mIsSetNeighOutputFile )
         {
             createNeighHist( neighHist );
         }
-        if ( mpFNFOutputFile != NULL && i > EQUIB_STEPS )
+        if ( mpFNFOutputFile != NULL )
         {
             ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
         }
@@ -236,13 +238,14 @@ void Metropolis::run( int steps )
         if ( mIsSetStatusStream )
         {
             ( *mpStatusStream ) << "\r" << i; //print status message
+            ( *mpStatusStream ).flush();
         }
 
     }
     if ( mIsSetNeighOutputFile )
         for ( int i = 0; i < 7; i++ )
         {
-            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - EQUIB_STEPS ) );
+            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps ) );
             ( *mpNeighOutputFile ) << i 
                 << " " 
                 <<  freq 
@@ -265,14 +268,10 @@ void Metropolis::run( int steps )
     cutilCheckError(cutDeleteTimer(timer));
     // compute reference solution
     //computeGold(reference, h_A, h_B, HA, WA, WB);
-    cout << "CUDA res " << calcSum(h_latt, size_latt ) << endl;
-    //printLatt( h_latt, LATT_ROW_SIZE, LATT_ROWS_COUNT );
+    cout << "CUDA res " << calcSum(h_latt, mpLatt->getLatticeSize() ) << endl;
 
-    // check result
 
     // clean up memory
-    //free(h_latt);
-    delete latt;
     cutilSafeCall(cudaFree(d_latt));
     cutilSafeCall(cudaFree(d_rngStates));
     cutilSafeCall(cudaFree(d_energies));
@@ -283,14 +282,7 @@ void Metropolis::run( int steps )
 
 void Metropolis::setSampler( Sampler s )
 {
-    if ( s == Kawasaki )
-    {
-        mpSampler = kawasakiSampler;
-    }
-    else
-    {
-        mpSampler = almeidaSampler;
-    }
+    ;
 }
 
 //private functions
@@ -302,30 +294,12 @@ double Metropolis::prob( double dG )
 
 double Metropolis::calcEnergyDiff( int pos1, int pos2 )
 {
-    int s1Diff = 6 - mpLatt->simNeighbCount( pos1 );
-    int s2Diff = 6 - mpLatt->simNeighbCount( pos2 );
-    
-    int diff1 = s1Diff + s2Diff;
-    int diff2 = 14 - ( s1Diff + s2Diff ) ;
-    return ( diff2 - diff1 ) * mOmegaAB;
+    return 0;
 }
 
 void Metropolis::metropolisStep()
 {
-    int pos1 = 0;
-    int pos2 = 0;
-    mpSampler( mpLatt, pos1, pos2); //sets pos1 and pos2 by reference
-
-    if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] )
-    {
-        double p = prob( calcEnergyDiff( pos1, pos2));
-        double acceptance = rand() / ( float( RAND_MAX) + 1 );
-        if ( p >= 1 or p > ( acceptance ) )
-        {
-            //cout << "DONE MOVE " << pos1 << " " << pos2 << endl;
-            mpLatt->exchangeSites( pos1, pos2);
-        }
-    }
+    ;
 }
 void Metropolis::createNeighHist( long long *histArr )
 {
