@@ -25,6 +25,14 @@ void TriangularLattice::distributeParticles( int firstTypeParticlesCnt )
         this->mpLattice[pos] = 1;
     }
 }
+
+void TriangularLattice::pushNeighborsToQueue( std::list< lattMember > & queue, unsigned int siteInd )
+{
+    for( int i = 0 ; i < mNeighbCnt ; ++i )
+    {
+        queue.push_back( mpLattice[ getNeighbIndex( siteInd, i ) ] );
+    }
+}
 // TODO Copy constructor and assignment operator
 
 TriangularLattice::TriangularLattice( string /*filename*/ )
@@ -104,6 +112,37 @@ int TriangularLattice::getNeighborsCnt() const
     return mNeighbCnt;
 }
 
+void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
+{
+    const lattMember kind = 0;
+    int clusterSize = 1;
+
+    static doneMap doneSites;
+    for( int startPos = 0 ; startPos < getLatticeSize() ; ++startPos )
+    {
+        if( ! doneSites[ startPos ] )
+        {
+            unsigned int currentSite = startPos;
+            doneSites[ currentSite ] = 1;
+            std::list< int > queue;
+            pushNeighborsToQueue( queue, currentSite  );
+            while( queue.size() )
+            {
+                currentSite = queue.back();
+                queue.pop_back();
+                if( ! doneSites[ currentSite ] && mpLattice[ currentSite ] == kind )
+                {
+                    clusterSize++;
+                    doneSites[ currentSite ] = 1;
+                    pushNeighborsToQueue( queue, currentSite );
+                }
+            }
+        map[ clusterSize ]++;
+        }
+    }
+}
+
+        
 TriangularLattice::~TriangularLattice()
 {
 

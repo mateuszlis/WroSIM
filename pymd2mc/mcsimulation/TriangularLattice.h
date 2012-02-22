@@ -6,10 +6,16 @@
  */
 
 #pragma once
+// std
 #include <iostream>
 #include <string>
 #include <iomanip>
 #include <cstdlib>
+
+
+// stl
+#include <map>
+#include <list>
 
 using namespace std;
 
@@ -18,19 +24,11 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt );
 
 class TriangularLattice
 {
-    private:
-        int *mpLattice;
-        int mLatticeSize;
-        int mRowSize;
-        static const int mNeighbCnt = 6;
-        int mNeighb[mNeighbCnt];
-        int mNeighbLeft[mNeighbCnt];
-        int mNeighbRight[mNeighbCnt];
-
-        void clearArr();
-        void distributeParticles( int firstTypeParticlesCnt );
-
     public:
+        typedef int lattMember; // TODO: not implemented everywhere
+        typedef std::map< unsigned int, unsigned int >  clustersMap;
+        typedef map< unsigned int, unsigned int > doneMap;
+
         TriangularLattice( string filename );
         TriangularLattice( int latticeSize, int rowSize, int firstTypeParticlesCnt );
 
@@ -46,8 +44,22 @@ class TriangularLattice
         int getNeighbIndex( int pos, int neighborNum ) const;
         int getNeighborsCnt() const;
 
+        void calculateClusters( clustersMap& map );
         virtual ~TriangularLattice();
 
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );
+    private:
+        lattMember *mpLattice;
+        int mLatticeSize;
+        int mRowSize;
+        static const int mNeighbCnt = 6;
+        int mNeighb[mNeighbCnt];
+        int mNeighbLeft[mNeighbCnt];
+        int mNeighbRight[mNeighbCnt];
+
+        void clearArr();
+        void distributeParticles( int firstTypeParticlesCnt );
+        void pushNeighborsToQueue( std::list< lattMember > & queue, unsigned int siteInd );
+
 };
 
