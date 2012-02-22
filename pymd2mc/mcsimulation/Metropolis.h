@@ -52,7 +52,7 @@ class Metropolis
 
     public:
         static const double R = 1.986;
-        static const int EQUIB_STEPS = 1000;
+        static const int EQUIB_STEPS = 0;
         const int T;
 
         Metropolis( TriangularLattice* latt, double omegaAB = 0.0, int T = 325 );

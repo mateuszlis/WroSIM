@@ -1,9 +1,12 @@
 cmake_minimum_required (VERSION 2.6)
 option(BUILD_TESTS "Build all of foo's unit tests." FALSE)
+option(BUILD_CUDA "Build CUDA version of the simulator." TRUE)
 project (mcsim)
 
 #Searching CUDA
-FIND_PACKAGE(CUDA)
+if(BUILD_CUDA)
+    FIND_PACKAGE(CUDA)
+endif()
 
 #make it work on osx
 set (CMAKE_OSX_ARCHITECTURES i386)
