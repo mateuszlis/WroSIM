@@ -50,10 +50,11 @@ int main( int argc, char* argv[] )
         int outputTemperature = opt.T();
         string sampler = opt.sampling();
         string outputFilename = opt.o();
-        ofstream outputFile, neighHistFile, fnfFile;
+        ofstream outputFile, neighHistFile, fnfFile, clusterFile;
         outputFile.open( outputFilename.c_str());
         neighHistFile.open( "neigh_hist_omega.dat");
         fnfFile.open( "fraction_of_first_neighbors.dat" );
+        clusterFile.open( "clusters.dat" );
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum);
 
@@ -65,6 +66,7 @@ int main( int argc, char* argv[] )
         simulation->setFNFStream( fnfFile );
         simulation->setOutputFreq( outputFreq );
         simulation->setStatus( cout );
+        simulation->setClusterStream( clusterFile );
 
         if ( sampler == "Kawasaki" )
             simulation->setSampler( Kawasaki );
@@ -75,9 +77,11 @@ int main( int argc, char* argv[] )
             simulation->setSampler( MassiveParallelKawasaki );
         }
 
-        simulation->run( steps);
+        simulation->run( steps );
 
         outputFile.close();
+        clusterFile.close();
+        fnfFile.close();
         delete lattice;
         delete simulation;
 

@@ -51,6 +51,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T )
       , mpFNFOutputFile( NULL )
       , mpFrameStream( NULL )
       , mpStatusStream( NULL )
+      , mpClusterStream( NULL )
       , mIsSetFrameStream( false )
       , mIsSetNeighOutputFile( false )
       , mIsSetStatusStream( false )
@@ -89,6 +90,10 @@ void Metropolis::setStatus( ostream &statusStream )
 void Metropolis::setFNFStream( ostream &fnfStream )
 {
     mpFNFOutputFile = &fnfStream;
+}
+void Metropolis::setClusterStream( ostream &clusterStream )
+{
+    mpClusterStream = &clusterStream;
 }
 
 void Metropolis::setOmegaAB( double omegaAB )
