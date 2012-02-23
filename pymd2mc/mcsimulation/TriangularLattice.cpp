@@ -114,13 +114,13 @@ int TriangularLattice::getNeighborsCnt() const
 
 void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 {
-    const lattMember kind = 0;
+    const lattMember kind = 1;
     int clusterSize = 1;
 
-    static doneMap doneSites;
+    doneMap doneSites;
     for( int startPos = 0 ; startPos < getLatticeSize() ; ++startPos )
     {
-        if( ! doneSites[ startPos ] )
+        if( ! doneSites[ startPos ] && mpLattice[ startPos ] == kind )
         {
             unsigned int currentSite = startPos;
             doneSites[ currentSite ] = 1;

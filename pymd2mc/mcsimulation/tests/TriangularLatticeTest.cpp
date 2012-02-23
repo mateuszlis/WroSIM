@@ -8,6 +8,7 @@
 // std
 #include <iostream>
 #include <assert.h>
+#include <tr1/memory>
 
 // stl
 #include <set>
@@ -74,8 +75,40 @@ TEST( TriangularLatticeTest, ExchangeSites )
     delete latt;
 }
 
+TEST( TriangularLatticeTest, ClusterAnalysis )
+{
+    const int LATT_SIZE = 35;
+    std::tr1::shared_ptr< TriangularLattice > latt( new TriangularLattice( LATT_SIZE, 5, 1) );
+    TriangularLattice::clustersMap map;
+    latt->calculateClusters( map );
+    
+    EXPECT_EQ( map[ 1 ], 1 );
+    for( int i = 0 ; i < LATT_SIZE ; ++i )
+    {
+        if( latt->getLattice()[i] == 1 )
+        {
+            latt->getLattice()[ ( i + 1 ) % LATT_SIZE ] = 1;
+            break;
+        }
+    }
+    map.clear();
+    latt->calculateClusters( map );
+    EXPECT_EQ( map[ 1 ], 2 );
+}
 // helpers
 
+void printLatt( int *latt, int rowSize, int rowsCount )
+{
+    for ( int i = 0 ; i < rowsCount ; ++i )
+    {
+        cout << setw( 2 * ( i + 1 ) ) << "  " ;
+        for( int j = 0 ; j < rowSize; ++j )
+        {   
+            cout << setw(2) << latt[ i * rowSize + j ] << "  ";
+        }
+        cout << endl;
+    }
+}
 int calcSum( TriangularLattice *latt )
 {
     int sum = 0;
