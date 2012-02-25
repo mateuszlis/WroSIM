@@ -21,6 +21,7 @@
 #include "TriangularLattice.h"
 
 // helpers
+void printLatt( lattMember *latt, int rowSize, int rowsCount );
 int calcSum( TriangularLattice* );
 std::set< int > getNeighborsOf( int site, TriangularLattice* latt );
 bool checkIfIsNeighborOf( const int& neighbor, const std::set< int >& elements, TriangularLattice* latt );
@@ -93,11 +94,28 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     }
     map.clear();
     latt->calculateClusters( map );
-    EXPECT_EQ( map[ 1 ], 2 );
+    EXPECT_EQ( map[ 2 ], 1 );
+    for( int i = 0 ; i < LATT_SIZE ; ++i )
+    {
+        if( latt->getLattice()[i] == 1 )
+        {
+            latt->getLattice()[ ( i + 14 ) % LATT_SIZE ] = 1;
+            break;
+        }
+    }
+    map.clear();
+    latt->calculateClusters( map );
+    EXPECT_EQ( map[ 2 ], 1 );
+    EXPECT_EQ( map[ 1 ], 1 );
+    latt.reset( new TriangularLattice( LATT_SIZE, 5, 34 ) );
+    map.clear();
+    latt->calculateClusters( map );
+    printLatt( latt->getLattice(), 5, 7 );
+    EXPECT_EQ( map[ 34 ], 1 );
 }
 // helpers
 
-void printLatt( int *latt, int rowSize, int rowsCount )
+void printLatt( lattMember *latt, int rowSize, int rowsCount )
 {
     for ( int i = 0 ; i < rowsCount ; ++i )
     {

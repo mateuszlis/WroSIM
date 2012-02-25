@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <curand_kernel.h>
 
+// project local
+#include "../types.h"
+
 //1790 
 //894
-
 // RNG init kernel
 __global__ void initRNG(curandState * const rngStates,
                         const unsigned int seed)
@@ -18,7 +20,7 @@ __global__ void initRNG(curandState * const rngStates,
     curand_init(seed, tid, 0, &rngStates[tid]);
 }
 
-__device__ inline void exchangeSites(int* latt, int s1, int s2 )
+__device__ inline void exchangeSites(lattMember* latt, int s1, int s2 )
  {
     latt[s1] ^= latt[s2];
     latt[s2] ^= latt[s1];
@@ -33,7 +35,7 @@ __device__ inline void getPosition( int & candidatePos, int lattSize )
         candidatePos += lattSize;
 }
         
-__device__ inline int calcDiffNeighbors(int* latt
+__device__ inline int calcDiffNeighbors(lattMember* latt
     , int lattSize
     , int lattRowSize
     , int site
@@ -51,7 +53,7 @@ __device__ inline int calcDiffNeighbors(int* latt
 }
 
 __global__ void
-metropolisStep_kernel( int * latt, int lattSize, int lattRowSize, int start,
+metropolisStep_kernel( lattMember* latt, int lattSize, int lattRowSize, int start,
         curandState * const rngStates, float * energies )
 {
     unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;

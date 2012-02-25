@@ -33,7 +33,7 @@ class Metropolis
         ostream* mpStatusStream;
         ostream* mpClusterStream;
 
-        bool mIsSetFrameStream;
+        bool mIsSetFrameStream; //FIXME: this variables are unnecesary since we can check if output streams are present
         bool mIsSetNeighOutputFile;
         bool mIsSetStatusStream;
         bool mIsSetClusterStream;

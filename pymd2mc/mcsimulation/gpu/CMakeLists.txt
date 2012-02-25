@@ -35,6 +35,8 @@ set(INCLUDE_DIRS
 #"${NVIDIA_SDK_DIR}/C/common/inc"
 "${CUDA_CUT_INCLUDE_DIR}"
 "${NVIDIA_SDK_DIR}/shared/inc"
+"${NVIDIA_SDK_DIR}CUDALibraries/common/UtilNPP"
+"${NVIDIA_SDK_DIR}CUDALibraries/common/FreeImage/include"
 "${PROJECT_SOURCE_DIR}/inc"
 "${COMMON_SOURCE_DIR}/inc"
 )
@@ -48,9 +50,16 @@ PRINTLIST("Include Directories are:" "${INCLUDE_DIRS}")
 #"${NVIDIA_SDK_DIR}/shared/lib"
 #)
 ##link_directories(${LINK_DIRS})
-
+set( CUDA_NPP_LIBRARY
+    /usr/local/cuda/lib/libnpp.dylib )
+set( CUDA_NPP_UTIL_LIBRARY
+    ${NVIDIA_SDK_DIR}CUDALibraries/common/lib/libUtilNPP_i386.a )
+set( CUDA_FREEIMAGE_LIBRARY
+    ${NVIDIA_SDK_DIR}CUDALibraries/common/FreeImage/lib/darwin/libfreeimage_10_6.a
+    )
 #PRINTLIST("Link directories are:" "${LINK_DIRS}")
-set(LINKED_LIBS  ${CUDA_CUDA_LIBRARY} ${CUDA_CUT_LIBRARY} TriangularLattice)
+set(LINKED_LIBS  ${CUDA_CUDA_LIBRARY} ${CUDA_CUT_LIBRARY} ${CUDA_NPP_LIBRARY} ${CUDA_FREEIMAGE_LIBRARY}
+    ${CUDA_NPP_UTIL_LIBRARY} TriangularLattice)
 PRINTLIST("Linked libraries are:" "${LINKED_LIBS}")
 
 

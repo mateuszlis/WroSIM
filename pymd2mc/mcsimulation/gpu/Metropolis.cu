@@ -12,6 +12,7 @@
 #include <string.h>
 #include <math.h>
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
@@ -20,13 +21,20 @@
 #include <assert.h>
 using namespace std;
 
+
 // project related
+#include "../types.h"
 #include "../TriangularLattice.h"
 #include "../Metropolis.h"
 
 // CUDA related
 #include <cutil_inline.h>
+#include <nppi.h>
+#include <npp.h>
+#include <FreeImage.h>
+#include <ImageIO.h>
 
+using namespace npp;
 // kernels
 #include "Metropolis_kernel.cu"
 
@@ -34,12 +42,12 @@ using namespace std;
 // declaration, forward
 const float R = 1.986;
 const float T = 325;
-int* d_latt;
+lattMember* d_latt;
 float energies[36]; // FIXME:36 is too big
 
 void runTest(int argc, char** argv);
-void printLatt( int *latt, int rowSize, int rowsCount );
-long calcSum(int*, int);
+void printLatt( lattMember *latt, int rowSize, int rowsCount );
+long calcSum(lattMember*, int);
 void printDiff(float*, float*, int, int);
 float probability( float dG );
 
@@ -57,7 +65,46 @@ float probability( float dG );
 //! Run a simple test for CUDA
 ////////////////////////////////////////////////////////////////////////////////
 
-long calcSum(int* data, int size)
+void mySaveImage(const std::string & rFileName, const ImageCPU_8u_C1 & rImage)
+{
+			// create the result image storage using FreeImage so we can easily 
+			// save
+	FIBITMAP * pResultBitmap = FreeImage_Allocate(rImage.width(), rImage.height(), 8 /* bits per pixel */);
+	RGBQUAD * palettePtr = FreeImage_GetPalette(pResultBitmap);
+
+	for(int i = 0; i < 256; i++)
+	{
+		(*palettePtr).rgbReserved = i;
+		(*palettePtr).rgbRed = i;
+		(*palettePtr).rgbGreen = i;
+		(*palettePtr).rgbBlue = i;
+		palettePtr++;
+	}
+
+	NPP_ASSERT_NOT_NULL(pResultBitmap);
+	unsigned int nDstPitch   = FreeImage_GetPitch(pResultBitmap);
+	Npp8u * pDstLine = FreeImage_GetBits(pResultBitmap) + nDstPitch * (rImage.height()-1);
+	const Npp8u * pSrcLine = rImage.data();
+	unsigned int nSrcPitch = rImage.pitch();
+
+
+	for (size_t iLine = 0; iLine < rImage.height(); ++iLine)
+	{
+		memcpy(pDstLine, pSrcLine, rImage.width() * sizeof(Npp8u));
+		pSrcLine += nSrcPitch;
+		pDstLine -= nDstPitch;
+	}
+
+		
+	// now save the result image
+	bool bSuccess;
+	FREE_IMAGE_FORMAT eFormat = FIF_PNG;//FreeImage_GetFileType(rFileName.c_str());
+	int flags = eFormat==FIF_PNG ? PNG_DEFAULT : eFormat==FIF_BMP ? BMP_DEFAULT : 0;
+	bSuccess = FreeImage_Save(eFormat, pResultBitmap, rFileName.c_str(), flags) == TRUE;
+	NPP_ASSERT_MSG(bSuccess, "Failed to save result image.");
+}
+
+long calcSum(lattMember* data, int size)
 {
     long sum( 0 );
     for (int i = 0; i < size; ++i)
@@ -66,7 +113,7 @@ long calcSum(int* data, int size)
 }
 
 
-void printLatt( int *latt, int rowSize, int rowsCount )
+void printLatt( lattMember *latt, int rowSize, int rowsCount )
 {
     for ( int i = 0 ; i < rowsCount ; ++i )
     {
@@ -135,6 +182,11 @@ void Metropolis::setStatus( ostream &statusStream )
     mIsSetStatusStream = true;
     mpStatusStream = &statusStream;
 }
+
+void Metropolis::setClusterStream( ostream &clusterStream )
+{
+    mpClusterStream = &clusterStream;
+}
 void Metropolis::setFNFStream( ostream &fnfStream )
 {
     mpFNFOutputFile = &fnfStream;
@@ -170,11 +222,11 @@ void Metropolis::run( int steps )
     const int BLOCKS = ( mpLatt->getLatticeSize() / 7 ) / BLOCK_SIZE; // 21;//895; //447; //5;
     assert( BLOCKS * BLOCK_SIZE == ( mpLatt->getLatticeSize() / 7 ) );
     // allocate device memory for result
-    unsigned int mem_size_latt = sizeof( int ) * mpLatt->getLatticeSize();
+    unsigned int mem_size_latt = sizeof( TriangularLattice::lattMember ) * mpLatt->getLatticeSize();
     cutilSafeCall(cudaMalloc((void**) &d_latt, mem_size_latt));
 
     // allocate host memory for the result
-    int* h_latt = mpLatt->getLattice(); //(int*) malloc(mem_size_latt);
+    lattMember* h_latt = mpLatt->getLattice(); //(int*) malloc(mem_size_latt);
     cout << calcSum(h_latt, mpLatt->getLatticeSize() ) << " Sum" << endl;
     cutilSafeCall(cudaMemcpy(d_latt, h_latt, mem_size_latt,
                               cudaMemcpyHostToDevice) );
@@ -240,6 +292,44 @@ void Metropolis::run( int steps )
             ( *mpStatusStream ) << "\r" << i; //print status message
             ( *mpStatusStream ).flush();
         }
+		if ( i % ( mOutputFreq ) == 0 ) //FIXME: export this to a function
+        // creates interpolated images
+		{
+            int width = 50;
+            int height = 50;
+			NppiSize roiSize = { width, height };
+			NppiRect roiRect = {0,0, width, height};
+			NppiSize roiSizeSrc = { mpLatt->getRowSize(), mpLatt->getLatticeSize() / mpLatt->getRowSize() };
+			NppiRect roiRectSrc = { 0,0, roiSizeSrc.width, roiSizeSrc.height };
+			ImageNPP_8u_C1 oDeviceDst(roiSize.width, roiSize.height);
+			ImageNPP_8u_C1 oDeviceSrc(roiSizeSrc.width, roiSizeSrc.height);
+
+			
+
+			nppiMulC_8u_C1RSfs(d_latt, mpLatt->getRowSize(), 255, oDeviceSrc.data(), oDeviceSrc.pitch(), roiSizeSrc, 0);
+			nppiResize_8u_C1R(oDeviceSrc.data(), roiSizeSrc, oDeviceSrc.pitch(),
+            roiRectSrc, oDeviceDst.data(), oDeviceDst.pitch(), roiSize, width /
+            (float)roiSizeSrc.width, height / (float)roiSizeSrc.height, NPPI_INTER_SUPER);
+
+			const double coefs[2][3] = {{1.0, 0.33,0.0},{0.0,1.0,0.0}};
+
+			ImageNPP_8u_C1 oDeviceDst2(oDeviceDst.width() + 0.33*oDeviceDst.height(), oDeviceDst.height());
+			NppiSize roiSizeDst2 = {oDeviceDst2.size().nWidth, oDeviceDst2.size().nHeight};
+			NppiRect roiWarpedRect = {0,0,oDeviceDst2.size().nWidth, oDeviceDst2.size().nHeight};
+
+			nppiSet_8u_C1R(0,oDeviceDst2.data(), oDeviceDst2.pitch(), roiSizeDst2);
+
+			nppiWarpAffine_8u_C1R(oDeviceDst.data(), roiSize,oDeviceDst.pitch(), roiRect, oDeviceDst2.data(),oDeviceDst2.pitch(), roiWarpedRect,coefs,NPPI_INTER_NN);
+
+			ImageCPU_8u_C1 oHostDst(oDeviceDst2.size());
+					// and copy the device result data into it
+			oDeviceDst2.copyTo(oHostDst.data(), oHostDst.pitch());
+			
+			stringstream s;
+			s << "image_"<< i <<".png";
+			
+			mySaveImage(s.str(), oHostDst);
+		}
 
     }
     if ( mIsSetNeighOutputFile )
@@ -328,3 +418,4 @@ Metropolis::~Metropolis()
 {
     // TODO Auto-generated destructor stub
 }
+
