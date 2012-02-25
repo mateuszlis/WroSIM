@@ -17,6 +17,9 @@
 #include <map>
 #include <list>
 
+// project local
+#include "types.h"
+
 using namespace std;
 
 class TriangularLattice;
@@ -25,18 +28,18 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt );
 class TriangularLattice
 {
     public:
-        typedef int lattMember; // TODO: not implemented everywhere
+        typedef ::lattMember lattMember; // TODO: not implemented everywhere
         typedef std::map< unsigned int, unsigned int >  clustersMap;
         typedef map< unsigned int, unsigned int > doneMap;
 
         TriangularLattice( string filename );
         TriangularLattice( int latticeSize, int rowSize, int firstTypeParticlesCnt );
 
-        int operator[]( int index ) const;
+        lattMember operator[]( int index ) const;
 
         int getLatticeSize() const;
         int getRowSize() const;
-        int* getLattice() const { return mpLattice; };
+        lattMember* getLattice() const { return mpLattice; };
 
         int simNeighbCount( int pos );
         void exchangeSites( int pos1, int pos2 );

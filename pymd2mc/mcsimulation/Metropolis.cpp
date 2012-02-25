@@ -123,10 +123,23 @@ void Metropolis::run( int steps )
         {
             ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
         }
-
+        if ( mpClusterStream != NULL )
+        {
+            TriangularLattice::clustersMap map;
+            map.clear();
+            mpLatt->calculateClusters( map );
+            int sum = 0;
+            for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
+            {
+                sum += ( *it ).second * ( *it ).first;
+                ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
+            }
+            cout << sum << " " << map.size()<<  std::endl;
+            map.clear();
+        }
         if ( mIsSetStatusStream )
         {
-            ( *mpStatusStream ) << "\r" << i; //print status message
+            //( *mpStatusStream ) << "\r" << i; //print status message
         }
 
     }
