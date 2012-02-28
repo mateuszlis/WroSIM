@@ -271,18 +271,18 @@ void Metropolis::run( int steps )
                 random, d_rngStates, d_energies );
             cudaDeviceSynchronize();
         }
-
-        if ( i % mOutputFreq == 0 && mIsSetFrameStream )
-        {
-            cutilSafeCall(cudaMemcpy(h_latt, d_latt, mem_size_latt,
-                              cudaMemcpyDeviceToHost) );
-            ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
-        }
-        if ( mIsSetNeighOutputFile )
+        //FIXME: currently disabled
+        //if ( i % mOutputFreq == 0 && mIsSetFrameStream )
+        //{
+        //    cutilSafeCall(cudaMemcpy(h_latt, d_latt, mem_size_latt,
+        //                      cudaMemcpyDeviceToHost) );
+        //    ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
+        //}
+        if ( analysisStep( i ) && mIsSetNeighOutputFile )
         {
             createNeighHist( neighHist );
         }
-        if ( mpFNFOutputFile != NULL )
+        if ( analysisStep( i ) && mpFNFOutputFile != NULL )
         {
             ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
         }
@@ -292,7 +292,21 @@ void Metropolis::run( int steps )
             ( *mpStatusStream ) << "\r" << i; //print status message
             ( *mpStatusStream ).flush();
         }
-		if ( i % ( mOutputFreq ) == 0 ) //FIXME: export this to a function
+        if ( analysisStep( i ) && mpClusterStream != NULL )
+        {
+            TriangularLattice::clustersMap map;
+            map.clear();
+            mpLatt->calculateClusters( map );
+            int sum = 0;
+            for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
+            {
+                sum += ( *it ).second * ( *it ).first;
+                ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
+            }
+            cout << sum << " " << map.size()<<  std::endl;
+            map.clear();
+        }
+		if ( analysisStep( i ) ) //FIXME: export this to a function
         // creates interpolated images
 		{
             int width = 50;

@@ -111,19 +111,19 @@ void Metropolis::run( int steps )
             metropolisStep();
         }
 
-        if ( i % mOutputFreq == 0 && mIsSetFrameStream )
+        if ( analysisStep( i ) && mIsSetFrameStream )
         {
             ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
         }
-        if ( mIsSetNeighOutputFile && i > EQUIB_STEPS )
+        if ( analysisStep( i ) && mIsSetNeighOutputFile )
         {
             createNeighHist( neighHist );
         }
-        if ( mpFNFOutputFile != NULL && i > EQUIB_STEPS )
+        if ( analysisStep( i ) && mpFNFOutputFile != NULL )
         {
             ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
         }
-        if ( mpClusterStream != NULL )
+        if ( analysisStep( i ) && mpClusterStream != NULL )
         {
             TriangularLattice::clustersMap map;
             map.clear();
@@ -139,7 +139,7 @@ void Metropolis::run( int steps )
         }
         if ( mIsSetStatusStream )
         {
-            //( *mpStatusStream ) << "\r" << i; //print status message
+            ( *mpStatusStream ) << "\r" << i; //print status message
         }
 
     }
