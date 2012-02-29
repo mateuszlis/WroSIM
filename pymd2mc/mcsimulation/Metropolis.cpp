@@ -126,7 +126,6 @@ void Metropolis::run( int steps )
         if ( analysisStep( i ) && mpClusterStream != NULL )
         {
             TriangularLattice::clustersMap map;
-            map.clear();
             mpLatt->calculateClusters( map );
             int sum = 0;
             for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
@@ -135,7 +134,6 @@ void Metropolis::run( int steps )
                 ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
             }
             cout << sum << " " << map.size()<<  std::endl;
-            map.clear();
         }
         if ( mIsSetStatusStream )
         {

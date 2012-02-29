@@ -62,7 +62,7 @@ class TriangularLattice
 
         void clearArr();
         void distributeParticles( int firstTypeParticlesCnt );
-        void pushNeighborsToQueue( std::list< lattMember > & queue, unsigned int siteInd );
+        void pushNeighborsToQueue( std::list< unsigned int > & queue, unsigned int siteInd );
 
 };
 

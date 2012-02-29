@@ -46,7 +46,7 @@ class Metropolis
         // we are extremely concerned about the performance
         void (*mpSampler)( TriangularLattice *latt, int &, int & ); //FIXME: should use std::tr1::function
 
-        bool analysisStep( int stepNum ) { return stepNum % mOutputFreq && stepNum > EQUIB_STEPS; }
+        bool analysisStep( int stepNum ) { return stepNum % mOutputFreq == 0 && stepNum > EQUIB_STEPS; }
         double prob( double dG );
         double calcEnergyDiff( int pos1, int pos2 );
         void metropolisStep();
@@ -55,7 +55,7 @@ class Metropolis
 
     public:
         static const double R = 1.986; //TODO: find place for constants
-        static const int EQUIB_STEPS = 1000000; //FIXME: Should be configurable
+        static const int EQUIB_STEPS = 50000; //FIXME: Should be configurable
         const int T;
 
         Metropolis( TriangularLattice* latt, double omegaAB = 0.0, int T = 325 );

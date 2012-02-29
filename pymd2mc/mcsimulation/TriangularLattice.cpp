@@ -26,7 +26,7 @@ void TriangularLattice::distributeParticles( int firstTypeParticlesCnt )
     }
 }
 
-void TriangularLattice::pushNeighborsToQueue( std::list< lattMember > & queue, unsigned int siteInd )
+void TriangularLattice::pushNeighborsToQueue( std::list< unsigned int > & queue, unsigned int siteInd )
 {
     for( int i = 0 ; i < mNeighbCnt ; ++i )
     {
@@ -117,14 +117,14 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
     const lattMember kind = 1;
 
     doneMap doneSites;
-    for( int startPos = 0 ; startPos < getLatticeSize() ; ++startPos )
+    for( unsigned int startPos = 0 ; startPos < getLatticeSize() ; ++startPos )
     {
-        int clusterSize = 1;
-        if( ! doneSites[ startPos ] && mpLattice[ startPos ] == kind )
+        unsigned int clusterSize = 1;
+        if( ! doneSites[ startPos ] > 0 && mpLattice[ startPos ] == kind )
         {
             unsigned int currentSite = startPos;
             doneSites[ currentSite ] = 1;
-            std::list< lattMember > queue;
+            std::list< unsigned int > queue;
             pushNeighborsToQueue( queue, currentSite  );
             while( queue.size() )
             {

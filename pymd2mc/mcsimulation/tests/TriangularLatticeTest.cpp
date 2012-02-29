@@ -105,6 +105,7 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     }
     map.clear();
     latt->calculateClusters( map );
+    printLatt( latt->getLattice(), 5, 7 );
     EXPECT_EQ( map[ 2 ], 1 );
     EXPECT_EQ( map[ 1 ], 1 );
     latt.reset( new TriangularLattice( LATT_SIZE, 5, 34 ) );
@@ -122,7 +123,7 @@ void printLatt( lattMember *latt, int rowSize, int rowsCount )
         cout << setw( 2 * ( i + 1 ) ) << "  " ;
         for( int j = 0 ; j < rowSize; ++j )
         {   
-            cout << setw(2) << latt[ i * rowSize + j ] << "  ";
+            cout << setw(2) << static_cast< int >( latt[ i * rowSize + j ] ) << "  ";
         }
         cout << endl;
     }
