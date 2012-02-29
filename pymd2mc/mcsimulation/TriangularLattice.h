@@ -29,23 +29,24 @@ class TriangularLattice
 {
     public:
         typedef ::lattMember lattMember; // TODO: not implemented everywhere
-        typedef std::map< unsigned int, unsigned int >  clustersMap;
-        typedef map< unsigned int, unsigned int > doneMap;
+        typedef int lattIndex;
+        typedef std::map< lattIndex, lattIndex >  clustersMap; // clusterSize ---> cluster count
+        typedef map< lattIndex, bool > doneMap;
 
         TriangularLattice( string filename );
-        TriangularLattice( int latticeSize, int rowSize, int firstTypeParticlesCnt );
+        TriangularLattice( lattIndex latticeSize, lattIndex rowSize, lattIndex firstTypeParticlesCnt );
 
-        lattMember operator[]( int index ) const;
+        lattMember operator[]( lattIndex index ) const;
 
-        int getLatticeSize() const;
-        int getRowSize() const;
+        lattIndex getLatticeSize() const;
+        lattIndex getRowSize() const;
         lattMember* getLattice() const { return mpLattice; };
 
-        int simNeighbCount( int pos );
-        void exchangeSites( int pos1, int pos2 );
+        lattIndex simNeighbCount( lattIndex pos );
+        void exchangeSites( lattIndex pos1, lattIndex pos2 );
 
-        int getNeighbIndex( int pos, int neighborNum ) const;
-        int getNeighborsCnt() const;
+        lattIndex getNeighbIndex( lattIndex pos, int neighborNum ) const;
+        unsigned int getNeighborsCnt() const;
 
         void calculateClusters( clustersMap& map );
         virtual ~TriangularLattice();
@@ -53,16 +54,14 @@ class TriangularLattice
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );
     private:
         lattMember *mpLattice;
-        int mLatticeSize;
-        int mRowSize;
+        lattIndex mLatticeSize;
+        lattIndex mRowSize;
         static const int mNeighbCnt = 6;
-        int mNeighb[mNeighbCnt];
-        int mNeighbLeft[mNeighbCnt];
-        int mNeighbRight[mNeighbCnt];
+        lattIndex mNeighb[mNeighbCnt];
 
         void clearArr();
-        void distributeParticles( int firstTypeParticlesCnt );
-        void pushNeighborsToQueue( std::list< unsigned int > & queue, unsigned int siteInd );
+        void distributeParticles( lattIndex firstTypeParticlesCnt );
+        void pushNeighborsToQueue( std::list< lattIndex > & queue, lattIndex siteInd );
 
 };
 
