@@ -6,6 +6,7 @@
  */
 
 #include "TriangularLattice.h"
+#include <list>
 
 typedef TriangularLattice::lattIndex lattIndex;
 
@@ -16,15 +17,23 @@ void TriangularLattice::clearArr()
         mpLattice[i] = 0;
     }
 }
-void TriangularLattice::distributeParticles( lattIndex firstTypeParticlesCnt )
+void TriangularLattice::distributeParticlesRandomly( lattIndex firstTypeParticlesCnt )
 {
     for ( lattIndex i = 0; i < firstTypeParticlesCnt; i++ )
     {
-        lattIndex pos = 0;
-        while ( this->mpLattice[pos = rand() % mLatticeSize] )
+        lattIndex pos = rand() % getLatticeSize(); //FIXME: if RAND_MAX is too small this causes bad distribution
+        while ( this->mpLattice[pos] > 0)
         {
+				pos = rand() % getLatticeSize();
         };
-        this->mpLattice[pos] = 1;
+        this->mpLattice[pos] = 255;
+    }
+}
+void TriangularLattice::distributeParticles( lattIndex firstTypeParticlesCnt )
+{
+    for ( lattIndex pos = 0; pos < firstTypeParticlesCnt; ++pos  )
+    {
+        this->mpLattice[pos] = 255;
     }
 }
 
@@ -48,7 +57,10 @@ TriangularLattice::TriangularLattice( string /*filename*/ )
     }
     //mNeighb = { 0, 0, 0, 0, 0, 0 };
 }
-TriangularLattice::TriangularLattice( lattIndex latticeSize, lattIndex rowSize, lattIndex firstTypeParticlesCnt )
+TriangularLattice::TriangularLattice( lattIndex latticeSize
+                                    , lattIndex rowSize
+                                    , lattIndex firstTypeParticlesCnt
+                                    , bool distributeRandomly )
 {
     mpLattice = new lattMember[latticeSize];
 
@@ -60,8 +72,14 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize, lattIndex rowSize, 
     {
         mNeighb[i] = neighb[i];
     }
-
-    this->distributeParticles( firstTypeParticlesCnt);
+    if ( distributeRandomly )
+    {
+        this->distributeParticlesRandomly( firstTypeParticlesCnt );
+    }
+    else 
+    {
+        this->distributeParticles( firstTypeParticlesCnt );
+    }
 
 }
 
@@ -117,10 +135,80 @@ unsigned int TriangularLattice::getNeighborsCnt() const
     return mNeighbCnt;
 }
 
+bool TriangularLattice::gotDifferentNeighbors(list<int> neighLabels, int currentLabel)
+{
+	for(list<int>::iterator iterator = neighLabels.begin(); iterator != neighLabels.end(); iterator++)
+		if(*iterator != currentLabel) return true;
+
+	return false;
+}
+
+int TriangularLattice::findAncestor(int currentLabel, TriangularLattice::clustersMap& map)
+{
+	if(map[currentLabel] > 0) return currentLabel;
+	else return findAncestor(currentLabel + map[currentLabel], map);
+}
+
 void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 {
-    const lattMember kind = 1;
+    const lattMember kind = 255;
+	
+	clustersMap clMap;
 
+	int * labels = new int[getLatticeSize()];
+	memset(labels, 0, getLatticeSize() * sizeof(int));
+
+	list<int> neighLabels;
+
+	int currentLabel = 0;
+
+	for(int i = 0; i < getLatticeSize(); i++)
+	{
+		int index = i % getLatticeSize();
+		if(mpLattice[index] == kind)
+		{
+			neighLabels.clear();
+			for(int n = 0; n < 6; ++n)
+				if(labels[getNeighbIndex(index,n)] > 0 ) neighLabels.push_back(findAncestor(labels[getNeighbIndex(index,n)], clMap));
+
+			neighLabels.sort();
+			neighLabels.unique();
+
+			if(neighLabels.size() == 0)
+			{
+				labels[index] = ++currentLabel;
+				clMap[currentLabel] = 1;
+			}
+			else if(!gotDifferentNeighbors(neighLabels, currentLabel))
+			{
+				labels[index] = currentLabel;
+				clMap[findAncestor(currentLabel, clMap)]++;
+			}
+			else
+			{
+				int ancestorLabel = neighLabels.front();
+				neighLabels.pop_front();
+
+				labels[index] = ancestorLabel;
+				clMap[ancestorLabel]++;
+
+				for(list<int>::iterator it = neighLabels.begin(); it != neighLabels.end(); it++)
+				{
+					clMap[ancestorLabel] += clMap[neighLabels.front()];
+					clMap[neighLabels.front()] = ancestorLabel - neighLabels.front();
+				}
+			}
+
+		}
+	}
+
+	for(std::map< lattIndex, lattIndex >::iterator mapIt = clMap.begin(); mapIt != clMap.end(); mapIt++)
+	{
+		if((*mapIt).second > 0)
+			map[(*mapIt).second]++;
+	}
+
+	/*/
     doneMap doneSites;
     for( lattIndex startPos = 0 ; startPos < getLatticeSize() ; ++startPos )
     {
@@ -145,6 +233,7 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
         map[ clusterSize ]++;
         }
     }
+	*/
 }
 
         

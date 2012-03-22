@@ -48,6 +48,9 @@ int main( int argc, char* argv[] )
         int steps = opt.steps();
         int outputFreq = opt.output_freq();
         int outputTemperature = opt.T();
+        int eqSteps = opt.eq_steps();
+        bool chooseStartRandomly = !opt.no_random_start();
+
         string sampler = opt.sampling();
         string outputFilename = opt.o();
         ofstream outputFile, neighHistFile, fnfFile, clusterFile;
@@ -55,10 +58,11 @@ int main( int argc, char* argv[] )
         neighHistFile.open( "neigh_hist_omega.dat");
         fnfFile.open( "fraction_of_first_neighbors.dat" );
         clusterFile.open( "clusters.dat" );
+        std::cout << eqSteps << std::endl;
 
-        TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum);
+        TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum, chooseStartRandomly );
 
-        Metropolis *simulation = new Metropolis( lattice, omega, outputTemperature );
+        Metropolis *simulation = new Metropolis( lattice, omega, outputTemperature, eqSteps );
 
         simulation->setNeighOutput( neighHistFile );
 

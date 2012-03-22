@@ -30,7 +30,7 @@ bool checkIfIsNeighborOf( const int& neighbor, const std::set< int >& elements, 
 TEST( TriangularLattice, Construct )
 {
     TriangularLattice *latt = new TriangularLattice( 100, 10, 20);
-    EXPECT_EQ( calcSum( latt ), 20 );
+    EXPECT_EQ( calcSum( latt ), 20 * 255 );
     delete latt;
 }
 
@@ -57,7 +57,7 @@ TEST( TriangularLatticeTest, CalcNeighbors )
         sum += latt->simNeighbCount( i );
     }
     EXPECT_EQ( sum, 6 * 100 - 12 );
-    EXPECT_EQ( calcSum( latt ), 1);
+    EXPECT_EQ( calcSum( latt ), 255 );
     delete latt;
 }
 
@@ -72,7 +72,7 @@ TEST( TriangularLatticeTest, ExchangeSites )
         if ( pos1 != pos2 )
             latt->exchangeSites( pos1, pos2);
     }
-    EXPECT_EQ( calcSum(latt), 20 );
+    EXPECT_EQ( calcSum(latt), 20 * 255 );
     delete latt;
 }
 

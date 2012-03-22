@@ -174,3 +174,15 @@ omega () const
   return this->omega_;
 }
 
+inline const int& options::
+eq_steps () const
+{
+  return this->eq_steps_;
+}
+
+inline const bool& options::
+no_random_start () const
+{
+  return this->no_random_start_;
+}
+

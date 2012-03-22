@@ -29,7 +29,7 @@ class options
   };
     int --latt-row-count = 100
   {
-        "<num",
+        "<num>",
         "Row count ( lattice_size = row_size * row_count ) "
   };
   std::string -o = "traj.xyz"
@@ -53,7 +53,7 @@ class options
   int --output-freq = 100
   {
         "<num>",
-        "Frequency of making output snapshots (every <num> frame will be
+        "frequency of making output snapshots (every <num> frame will be
         written to the output file"
   };
 
@@ -61,6 +61,16 @@ class options
   {
         "<float>",
         "Value of omega_AB (see documentation)"
+  };
+  int --eq-steps = 0
+  {
+        "<num>",
+        "Number of equilibration steps (analysis methods are turned on after
+        these steps)"
+  };
+  bool --no-random-start 
+  {
+        "Do not choose starting position randomly"     
   };
   
 };

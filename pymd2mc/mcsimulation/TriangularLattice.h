@@ -34,7 +34,11 @@ class TriangularLattice
         typedef map< lattIndex, bool > doneMap;
 
         TriangularLattice( string filename );
-        TriangularLattice( lattIndex latticeSize, lattIndex rowSize, lattIndex firstTypeParticlesCnt );
+
+        TriangularLattice( lattIndex latticeSize
+                         , lattIndex rowSize
+                         , lattIndex firstTypeParticlesCnt
+                         , bool distributeRandomly = true );
 
         lattMember operator[]( lattIndex index ) const;
 
@@ -60,8 +64,11 @@ class TriangularLattice
         lattIndex mNeighb[mNeighbCnt];
 
         void clearArr();
+        void distributeParticlesRandomly( lattIndex firstTypeParticlesCnt );
         void distributeParticles( lattIndex firstTypeParticlesCnt );
         void pushNeighborsToQueue( std::list< lattIndex > & queue, lattIndex siteInd );
+		static bool gotDifferentNeighbors(list<int> neighLabels, int currentLabel);
+		static int findAncestor(int currentLabel, TriangularLattice::clustersMap& map);
 
 };
 

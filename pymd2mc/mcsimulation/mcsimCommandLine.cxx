@@ -319,7 +319,9 @@ options (int& argc,
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0)
+  omega_ (0),
+  eq_steps_ (0),
+  no_random_start_ ()
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -342,7 +344,9 @@ options (int start,
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0)
+  omega_ (0),
+  eq_steps_ (0),
+  no_random_start_ ()
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -365,7 +369,9 @@ options (int& argc,
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0)
+  omega_ (0),
+  eq_steps_ (0),
+  no_random_start_ ()
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -390,7 +396,9 @@ options (int start,
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0)
+  omega_ (0),
+  eq_steps_ (0),
+  no_random_start_ ()
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -411,7 +419,9 @@ options (::cli::scanner& s,
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0)
+  omega_ (0),
+  eq_steps_ (0),
+  no_random_start_ ()
 {
   _parse (s, opt, arg);
 }
@@ -435,7 +445,7 @@ print_usage (::std::ostream& os)
      << "                              This is required if you use lattice generator (not" << ::std::endl
      << "                              passing start file" << ::std::endl;
 
-  os << "--latt-row-count <num         Row count ( lattice_size = row_size * row_count )" << ::std::endl;
+  os << "--latt-row-count <num>        Row count ( lattice_size = row_size * row_count )" << ::std::endl;
 
   os << "-o <filename>                 output filename (warning: it will be overriden)" << ::std::endl
      << "                              Default: traj.xyz" << ::std::endl;
@@ -444,10 +454,15 @@ print_usage (::std::ostream& os)
 
   os << "--steps <num>                 Number of steps to be done in simulation" << ::std::endl;
 
-  os << "--output-freq <num>           Frequency of making output snapshots (every <num>" << ::std::endl
+  os << "--output-freq <num>           frequency of making output snapshots (every <num>" << ::std::endl
      << "                              frame will be written to the output file" << ::std::endl;
 
   os << "--omega <float>               Value of omega_AB (see documentation)" << ::std::endl;
+
+  os << "--eq-steps <num>              Number of equilibration steps (analysis methods" << ::std::endl
+     << "                              are turned on after these steps)" << ::std::endl;
+
+  os << "--no-random-start             Do not choose starting position randomly" << ::std::endl;
 }
 
 typedef
@@ -482,6 +497,10 @@ struct _cli_options_map_init
     &::cli::thunk< options, int, &options::output_freq_ >;
     _cli_options_map_["--omega"] = 
     &::cli::thunk< options, float, &options::omega_ >;
+    _cli_options_map_["--eq-steps"] = 
+    &::cli::thunk< options, int, &options::eq_steps_ >;
+    _cli_options_map_["--no-random-start"] = 
+    &::cli::thunk< options, bool, &options::no_random_start_ >;
   }
 } _cli_options_map_init_;
 

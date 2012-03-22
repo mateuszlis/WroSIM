@@ -140,19 +140,21 @@ void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
     pos1 = rand() % latt->getLatticeSize();
     pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt());
 }
-Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T ) 
+Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equilibSteps) 
     : mOmegaAB( omegaAB )
       , mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
       , mpFNFOutputFile( NULL )
       , mpFrameStream( NULL )
       , mpStatusStream( NULL )
+      , mpClusterStream( NULL )
       , mIsSetFrameStream( false )
       , mIsSetNeighOutputFile( false )
       , mIsSetStatusStream( false )
       , mpLatt( latt )
       , mpHistArr( NULL )
-      , T( T )
+      , mEquilibSteps( equilibSteps )
+      , mT( T )
 
 {
 
@@ -274,8 +276,8 @@ void Metropolis::run( int steps )
 		if ( i % mOutputFreq == 0 ) //FIXME: export this to a function
         // creates interpolated images
 		{
-            int width = 50;
-            int height = 50;
+            int width = 400;
+            int height = 400;
 			NppiSize roiSize = { width, height };
 			NppiRect roiRect = {0,0, width, height};
 			NppiSize roiSizeSrc = { mpLatt->getRowSize(), mpLatt->getLatticeSize() / mpLatt->getRowSize() };
@@ -285,7 +287,9 @@ void Metropolis::run( int steps )
 
 			
 
-			nppiMulC_8u_C1RSfs(d_latt, mpLatt->getRowSize(), 255, oDeviceSrc.data(), oDeviceSrc.pitch(), roiSizeSrc, 0);
+			//nppiMulC_8u_C1RSfs(d_latt, mpLatt->getRowSize(), 1, oDeviceSrc.data(), oDeviceSrc.pitch(), roiSizeSrc, 0);
+            nppiCopy_8u_C1R( d_latt, mpLatt->getRowSize(), oDeviceSrc.data(),
+                oDeviceSrc.pitch(), roiSizeSrc );
 			nppiResize_8u_C1R(oDeviceSrc.data(), roiSizeSrc, oDeviceSrc.pitch(),
             roiRectSrc, oDeviceDst.data(), oDeviceDst.pitch(), roiSize, width /
             (float)roiSizeSrc.width, height / (float)roiSizeSrc.height, NPPI_INTER_SUPER);
@@ -298,7 +302,7 @@ void Metropolis::run( int steps )
 
 			nppiSet_8u_C1R(0,oDeviceDst2.data(), oDeviceDst2.pitch(), roiSizeDst2);
 
-			nppiWarpAffine_8u_C1R(oDeviceDst.data(), roiSize,oDeviceDst.pitch(), roiRect, oDeviceDst2.data(),oDeviceDst2.pitch(), roiWarpedRect,coefs,NPPI_INTER_NN);
+			nppiWarpAffine_8u_C1R(oDeviceDst.data(), roiSize,oDeviceDst.pitch(), roiRect, oDeviceDst2.data(),oDeviceDst2.pitch(), roiWarpedRect,coefs,NPPI_INTER_NN );
 
 			ImageCPU_8u_C1 oHostDst(oDeviceDst2.size());
 					// and copy the device result data into it

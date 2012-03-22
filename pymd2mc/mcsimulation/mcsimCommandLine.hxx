@@ -266,6 +266,12 @@ class options
   const float&
   omega () const;
 
+  const int&
+  eq_steps () const;
+
+  const bool&
+  no_random_start () const;
+
   // Print usage information.
   //
   static void
@@ -289,6 +295,8 @@ class options
   int steps_;
   int output_freq_;
   float omega_;
+  int eq_steps_;
+  bool no_random_start_;
 };
 
 #include "mcsimCommandLine.ixx"

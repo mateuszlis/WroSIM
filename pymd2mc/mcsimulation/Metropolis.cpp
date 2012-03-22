@@ -44,7 +44,7 @@ void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &po
 }
 //Metropolis public functions
 
-Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T ) 
+Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equilibSteps) 
     : mOmegaAB( omegaAB )
       , mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
@@ -57,7 +57,8 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T )
       , mIsSetStatusStream( false )
       , mpLatt( latt )
       , mpHistArr( NULL )
-      , T( T )
+      , mEquilibSteps( equilibSteps )
+      , mT( T )
 
 {
 
@@ -144,7 +145,7 @@ void Metropolis::run( int steps )
     if ( mIsSetNeighOutputFile )
         for ( int i = 0; i < 7; i++ )
         {
-            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - EQUIB_STEPS ) );
+            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - mEquilibSteps ) );
             ( *mpNeighOutputFile ) << i 
                 << " " 
                 <<  freq 
@@ -175,7 +176,7 @@ void Metropolis::setSampler( Sampler s )
 
 double Metropolis::prob( double dG )
 {
-    return exp( -dG / ( R * T ));
+    return exp( -dG / ( R * mT ));
 }
 
 double Metropolis::calcEnergyDiff( int pos1, int pos2 )
