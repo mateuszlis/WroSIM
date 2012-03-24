@@ -86,9 +86,9 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     EXPECT_EQ( map[ 1 ], 1 );
     for( int i = 0 ; i < LATT_SIZE ; ++i )
     {
-        if( latt->getLattice()[i] == 1 )
+        if( latt->getLattice()[i] == 255 )
         {
-            latt->getLattice()[ ( i + 1 ) % LATT_SIZE ] = 1;
+            latt->getLattice()[ ( i + 1 ) % LATT_SIZE ] = 255;
             break;
         }
     }
@@ -97,9 +97,9 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     EXPECT_EQ( map[ 2 ], 1 );
     for( int i = 0 ; i < LATT_SIZE ; ++i )
     {
-        if( latt->getLattice()[i] == 1 )
+        if( latt->getLattice()[i] == 255 )
         {
-            latt->getLattice()[ ( i + 14 ) % LATT_SIZE ] = 1;
+            latt->getLattice()[ ( i + 14 ) % LATT_SIZE ] = 255;
             break;
         }
     }
