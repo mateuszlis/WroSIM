@@ -145,10 +145,15 @@ bool TriangularLattice::gotDifferentNeighbors(list<int> neighLabels, int current
 
 int TriangularLattice::findAncestor(int currentLabel, TriangularLattice::clustersMap& map)
 {
-	if(map[currentLabel] > 0) return currentLabel;
-	else return findAncestor(currentLabel + map[currentLabel], map);
-}
+	int label = currentLabel;
 
+	while(map[label] < 0 && label >= 0)
+	{
+		label += map[label];
+	}
+	return label;
+
+}
 void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 {
     const lattMember kind = 255;
@@ -208,6 +213,8 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 			map[(*mapIt).second]++;
 	}
 
+	delete[] labels;
+	
 	/*/
     doneMap doneSites;
     for( lattIndex startPos = 0 ; startPos < getLatticeSize() ; ++startPos )

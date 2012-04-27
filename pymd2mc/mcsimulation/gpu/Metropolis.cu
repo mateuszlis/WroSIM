@@ -346,7 +346,7 @@ void Metropolis::run( int steps )
             int sum = 0;
             for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
             {
-                ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
+                ( *mpClusterStream ) << i << "\t" << ( *it ).first << "\t" << ( *it ).second << std::endl;
             }
             cout << sum << " " << map.size()<<  std::endl;
         }

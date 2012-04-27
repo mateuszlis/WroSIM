@@ -105,6 +105,7 @@ void Metropolis::setOmegaAB( double omegaAB )
 void Metropolis::run( int steps )
 {
     long long neighHist[7] = { 0, 0, 0, 0, 0, 0, 0 };
+    cout << mStepSize << " Stepsize " << endl;
     for ( int i = 0; i < steps; i++ )
     {
         for ( int j = 0; j < mStepSize; j++ )

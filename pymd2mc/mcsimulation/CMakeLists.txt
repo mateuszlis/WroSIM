@@ -6,11 +6,11 @@ project (mcsim)
 #Searching CUDA
 if(BUILD_CUDA)
     FIND_PACKAGE(CUDA)
+    #make it work on osx
+    set (CMAKE_OSX_ARCHITECTURES i386)
+    set (CUDA_64_BIT_DEVICE_CODE OFF)
 endif()
 
-#make it work on osx
-set (CMAKE_OSX_ARCHITECTURES i386)
-set (CUDA_64_BIT_DEVICE_CODE OFF)
 
 # Set default build type
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
