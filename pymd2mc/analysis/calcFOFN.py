@@ -27,7 +27,7 @@ def main(argv=None):
     end = int( options.end )
     clearFile( options.datFilename )
     with open( options.datFilename, 'w' ) as output:
-        try
+        try:
             interval = int( options.interval )
             for frameCounter in range( begin, end, interval ):
                 if options.verbose: 
@@ -56,8 +56,8 @@ def main(argv=None):
                     correction += correctionFactor
                 fraction = float( similarPixelsCount ) / allPixelsCount
                 output.write( str( frameCounter ) + " " + str( fraction )  + "\n" )
-            except:
-                pass
+        except:
+            pass
     
     if options.verbose:
         print "Execution time", time() - startTime
