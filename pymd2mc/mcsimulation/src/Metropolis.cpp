@@ -55,6 +55,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equi
       , mIsSetFrameStream( false )
       , mIsSetNeighOutputFile( false )
       , mIsSetStatusStream( false )
+      , mIsSetClusterStream( false )
       , mpLatt( latt )
       , mpHistArr( NULL )
       , mEquilibSteps( equilibSteps )

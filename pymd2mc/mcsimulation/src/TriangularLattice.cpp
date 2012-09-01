@@ -137,7 +137,7 @@ unsigned int TriangularLattice::getNeighborsCnt() const
 
 bool TriangularLattice::gotDifferentNeighbors(list<int> neighLabels, int currentLabel)
 {
-	for(list<int>::iterator iterator = neighLabels.begin(); iterator != neighLabels.end(); iterator++)
+	for(list<int>::iterator iterator = neighLabels.begin(); iterator != neighLabels.end(); ++iterator)
 		if(*iterator != currentLabel) return true;
 
 	return false;
@@ -179,7 +179,7 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 			neighLabels.sort();
 			neighLabels.unique();
 
-			if(neighLabels.size() == 0)
+			if(neighLabels.empty())
 			{
 				labels[index] = ++currentLabel;
 				clMap[currentLabel] = 1;
@@ -197,7 +197,7 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 				labels[index] = ancestorLabel;
 				clMap[ancestorLabel]++;
 
-				for(list<int>::iterator it = neighLabels.begin(); it != neighLabels.end(); it++)
+				for(list<int>::iterator it = neighLabels.begin(); it != neighLabels.end(); ++it)
 				{
 					clMap[ancestorLabel] += clMap[neighLabels.front()];
 					clMap[neighLabels.front()] = ancestorLabel - neighLabels.front();
@@ -207,7 +207,7 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 		}
 	}
 
-	for(std::map< lattIndex, lattIndex >::iterator mapIt = clMap.begin(); mapIt != clMap.end(); mapIt++)
+	for(std::map< lattIndex, lattIndex >::iterator mapIt = clMap.begin(); mapIt != clMap.end(); ++mapIt)
 	{
 		if((*mapIt).second > 0)
 			map[(*mapIt).second]++;

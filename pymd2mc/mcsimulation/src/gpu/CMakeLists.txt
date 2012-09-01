@@ -1,8 +1,10 @@
 project(cuda_metropolis)
 message(STATUS "==============================CUDA enabled! ==================================")
 
-set (CMAKE_OSX_ARCHITECTURES i386)
-set (CUDA_64_BIT_DEVICE_CODE OFF)
+if(APPLE)
+    set (CMAKE_OSX_ARCHITECTURES i386)
+    set (CUDA_64_BIT_DEVICE_CODE OFF)
+endif()
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/;${CMAKE_MODULE_PATH}")
 message(STATUS "Module path is now set to: " ${CMAKE_MODULE_PATH} )
 

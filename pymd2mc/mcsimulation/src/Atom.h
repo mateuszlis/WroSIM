@@ -31,6 +31,7 @@ public:
     Distance(double d, int at2Ind): 
         at2Ind(at2Ind), d(d)
     {}
+    // non virtual on purpose - performance
     ~Distance() {}
 };
 

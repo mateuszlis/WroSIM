@@ -44,7 +44,7 @@ class Metropolis
 
         // we use raw pointers instead of std::tr1::function because 
         // we are extremely concerned about the performance
-        void (*mpSampler)( TriangularLattice *latt, int &, int & ); //FIXME: should use std::tr1::function
+        void (*mpSampler)( TriangularLattice *latt, int &, int & ); 
 
         bool analysisStep( int stepNum ) { return stepNum % mOutputFreq == 0 && stepNum > mEquilibSteps; }
         double prob( double dG );
