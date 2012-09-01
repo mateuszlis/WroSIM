@@ -32,6 +32,12 @@ class Molecule:
         self.resname = ""
         self.atoms = []
 
+    def move(self, dx, dy, dz):
+        for atom in self.atoms:
+            atom.x += dx
+            atom.y += dy
+            atom.z += dz
+
 class System:
     def __init__(self, filename):
         self.title = ""
@@ -175,6 +181,27 @@ class System:
             if m.resname == "DPPC":
                 molLst.append(self.dppc2dmpc(m))
         self.molecules = molLst
+
+    def populate(self):
+        molLst = []
+        dx = self.box_x + 0.01 #proved to be perfect magic number
+        dy = self.box_y + 0.01
+        for m in self.molecules:
+            molLst.append(m)
+            m2 = copy.deepcopy(m)
+            m2.move(dx, 0, 0)
+            molLst.append(m2)
+            m3 = copy.deepcopy(m)
+            m3.move(0, dy, 0)
+            molLst.append(m3)
+            m4 = copy.deepcopy(m)
+            m4.move(dx, dy, 0)
+            molLst.append(m4)
+        self.molecules = molLst
+        self.box_x *= 2
+        self.box_y *= 2
+
+
         
     def printgro(self):
         print self.title
@@ -280,7 +307,7 @@ def main():
             order.append(i+1)
     #system.order(order)
 	#system.transform()
-    system.transform()
+    system.populate()
     system.printgro()
 
 if __name__ == '__main__':
