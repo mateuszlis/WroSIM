@@ -99,7 +99,6 @@ void MPKK::run( int steps )
 
     initRNG<<<grid, threads>>>( d_rngStates, rand() );
 
-    long long neighHist[7] = { 0, 0, 0, 0, 0, 0, 0 };
     for ( int i = 0; i < steps; i++ )
     {
         for ( int j = 0; j < mStepSize; j++ )
@@ -127,41 +126,9 @@ void MPKK::run( int steps )
             cutilSafeCall( cudaMemcpy( h_latt, d_latt, memSizeLatt,
                               cudaMemcpyDeviceToHost) );
         }
-        //FIXME: This functionalities go up
-        if ( analysisStep( i ) && mIsSetNeighOutputFile )
-        {
-            createNeighHist( neighHist );
-        }
-        if ( analysisStep( i ) && mpFNFOutputFile != NULL )
-        {
-            ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
-        }
-
-        if ( mIsSetStatusStream )
-        {
-            ( *mpStatusStream ) << "\r" << i; //print status message
-            ( *mpStatusStream ).flush();
-        }
-        if ( analysisStep( i ) && mpClusterStream != NULL )
-        {
-            TriangularLattice::clustersMap map;
-            mpLatt->calculateClusters( map );
-            for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
-            {
-                ( *mpClusterStream ) << i << "\t" << ( *it ).first << "\t" << ( *it ).second << std::endl;
-            }
-        }
+        performAnalysis( i );
     }
-    if ( mIsSetNeighOutputFile )
-        for ( int i = 0; i < 7; i++ )
-        {
-            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps ) );
-            ( *mpNeighOutputFile ) << i 
-                << " " 
-                <<  freq 
-                << "\t" << ( neighHist[ i ] ) 
-                << endl;
-        }
+    finishAnalysis( steps );
     
     // check if kernel execution generated and error
     cutilCheckMsg( "Kernel execution failed" );

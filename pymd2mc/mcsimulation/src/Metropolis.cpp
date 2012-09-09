@@ -8,44 +8,12 @@
 #include "Metropolis.h"
 #include "math.h"
 
-//Non object functions
-void almeidaSampler( TriangularLattice *latt, int &pos1, int &pos2 )
-{
-    pos1 = rand() % latt->getLatticeSize();
-    pos2 = rand() % latt->getLatticeSize();
-}
-void kawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
-{
-    pos1 = rand() % latt->getLatticeSize();
-    pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt());
-}
-
-/**
- * @brief This is experimental feature that is here to test ideas connected with
- * GPU implementation of Kawasaki sampler.
- */
-void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &pos2 )
-{
-    static long step = 0;
-    static int start = 0;
-    if( step == latt->getLatticeSize() / 7 || step == 0 ) // As every step involves 7 sites
-        // we perform latticeSize/7 steps to involve all sites in lattice
-    {
-        pos1 = rand() % 7; // chose initial point for sampling (note that there are only 7 possibilities
-        start = pos1;
-        step = 0;
-    }
-    else
-    {
-        pos1 = ( 7 * step + start ) % latt->getLatticeSize();
-    }
-    pos2 = latt->getNeighbIndex( pos1, rand() % latt->getNeighborsCnt()); // randomly chose second exchange site
-    step++;
-}
 //Metropolis public functions
 
 Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equilibSteps) 
-    :  mOutputFreq( 100 )
+    : mEquilibSteps( equilibSteps )
+      , mT( T )
+      , mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
       , mpFNFOutputFile( NULL )
       , mpFrameStream( NULL )
@@ -57,13 +25,14 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equi
       , mIsSetClusterStream( false )
       , mpLatt( latt )
       , mpHistArr( NULL )
-      , mEquilibSteps( equilibSteps )
-      , mT( T )
       , mOmegaAB( omegaAB )
 
 {
     mStepSize = ( latt->getLatticeSize() );
-    setSampler( Kawasaki );
+    for ( unsigned int i = 0 ; i < LATTICE_NEIGHB_COUNT ; ++i )
+    {
+        mNeighHist[ i ] = 0;
+    }
 }
 
 void Metropolis::setOutputFreq( int freq )
@@ -101,79 +70,52 @@ void Metropolis::setOmegaAB( double omegaAB )
     mOmegaAB = omegaAB;
 }
 
-void Metropolis::run( int steps )
-{
-    long long neighHist[7] = { 0, 0, 0, 0, 0, 0, 0 };
-    cout << mStepSize << " Stepsize " << endl;
-    for ( int i = 0; i < steps; i++ )
-    {
-        for ( int j = 0; j < mStepSize; j++ )
-        {
-            metropolisStep();
-        }
-
-        if ( analysisStep( i ) && mIsSetFrameStream )
-        {
-            ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
-        }
-        if ( analysisStep( i ) && mIsSetNeighOutputFile )
-        {
-            createNeighHist( neighHist );
-        }
-        if ( analysisStep( i ) && mpFNFOutputFile != NULL )
-        {
-            ( *mpFNFOutputFile ) << setw( 10 ) << i << "\t" << calcFirstNeighboursFract() << endl;
-        }
-        if ( analysisStep( i ) && mpClusterStream != NULL )
-        {
-            TriangularLattice::clustersMap map;
-            mpLatt->calculateClusters( map );
-            int sum = 0;
-            for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
-            {
-                sum += ( *it ).second * ( *it ).first;
-                ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
-            }
-            cout << sum << " " << map.size()<<  std::endl;
-        }
-        if ( mIsSetStatusStream )
-        {
-            ( *mpStatusStream ) << "\r" << i; //print status message
-        }
-
-    }
-    if ( mIsSetNeighOutputFile )
-        for ( int i = 0; i < 7; i++ )
-        {
-            double freq = static_cast< double > ( neighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - mEquilibSteps ) );
-            ( *mpNeighOutputFile ) << i 
-                << " " 
-                <<  freq 
-                << "\t" << ( neighHist[ i ] ) 
-                << endl;
-        }
-
-}
-
-void Metropolis::setSampler( Sampler s )
-{
-    if ( s == Kawasaki )
-    {
-        mpSampler = kawasakiSampler;
-    }
-    if ( s == Almeida )
-    {
-        mpSampler = almeidaSampler;
-    }
-    if ( s == MassiveParallelKawasaki )
-    {
-        cout << "Massive parallel Kawasaki Sampler test!" << endl;
-        mpSampler = massiveParallelKawasakiSampler;
-    }
-}
 
 //private functions
 
+void Metropolis::performAnalysis( int stepNum )
+{
+    if ( analysisStep( stepNum ) && mIsSetNeighOutputFile )
+    {
+        createNeighHist( mNeighHist );
+    }
+    if ( analysisStep( stepNum ) && mpFNFOutputFile != NULL )
+    {
+        ( *mpFNFOutputFile ) << setw( 10 ) << stepNum << "\t" << calcFirstNeighboursFract() << endl;
+    }
+    if ( analysisStep( stepNum ) && mpClusterStream != NULL )
+    {
+        TriangularLattice::clustersMap map;
+        mpLatt->calculateClusters( map );
+        int sum = 0;
+        for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
+        {
+            sum += ( *it ).second * ( *it ).first;
+            ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
+        }
+        cout << sum << " " << map.size()<<  std::endl;
+    }
+    if ( mIsSetStatusStream )
+    {
+        ( *mpStatusStream ) << "\r" << stepNum; //print status message
+        ( *mpStatusStream ).flush();
+
+    }
+}
+
+void Metropolis::finishAnalysis( int steps )
+{
+    if ( mIsSetNeighOutputFile )
+        for ( int i = 0; i < 7; i++ )
+        {
+            double freq = static_cast< double > ( mNeighHist[i] ) / ( mpLatt->getLatticeSize() * ( steps - mEquilibSteps ) );
+            ( *mpNeighOutputFile ) << i 
+                << " " 
+                <<  freq 
+                << "\t" << ( mNeighHist[ i ] ) 
+                << endl;
+        }
+}
 double Metropolis::prob( double dG )
 {
     return exp( -dG / ( R * mT ));
@@ -189,31 +131,6 @@ double Metropolis::calcEnergyDiff( int pos1, int pos2 )
     return ( diff2 - diff1 ) * mOmegaAB;
 }
 
-void Metropolis::metropolisStep()
-{
-    int pos1 = 0;
-    int pos2 = 0;
-    if ( mpSampler != NULL )
-    {
-        mpSampler( mpLatt, pos1, pos2); //sets pos1 and pos2 by reference
-    }
-    else
-    {
-        cout << "Sampler not set" << endl;
-        exit( 0 );
-    }
-
-    if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] )
-    {
-        double p = prob( calcEnergyDiff( pos1, pos2));
-        double acceptance = rand() / ( float( RAND_MAX) + 1 );
-        if ( p >= 1 or p > ( acceptance ) )
-        {
-            //cout << "DONE MOVE " << pos1 << " " << pos2 << endl;
-            mpLatt->exchangeSites( pos1, pos2);
-        }
-    }
-}
 void Metropolis::createNeighHist( long long *histArr )
 {
     for ( int i = 0; i < mpLatt->getLatticeSize(); i++ )

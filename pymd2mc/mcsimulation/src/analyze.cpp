@@ -64,7 +64,7 @@ return str;
 
 int main(int argc, char *argv[]) {
 
-    Atom *atoms;
+    Atom *atoms( NULL );
     int global_n_atomsAT1 = 0;
     int global_n_atomsAT2 = 0;
 

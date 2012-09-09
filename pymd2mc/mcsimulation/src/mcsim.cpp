@@ -13,8 +13,7 @@
 #include <fstream>
 
 #include "TriangularLattice.h"
-#include "Metropolis.h"
-
+#include "KawasakiSimulation.h"
 #include "gpu/MPKK.h"
 
 #include "mcsim.h"
@@ -69,7 +68,15 @@ int main( int argc, char* argv[] )
 #ifdef BUILD_CUDA
         MPKK *simulation = new MPKK( lattice, omega, outputTemperature, eqSteps );
 #else
-        Metropolis *simulation = new Metropolis( lattice, omega, outputTemperature, eqSteps );
+        KawasakiSimulation *simulation = new KawasakiSimulation( lattice, omega, outputTemperature, eqSteps );
+        if ( sampler == "Kawasaki" )
+            simulation->setSampler( Kawasaki );
+        if ( sampler == "Almeida" )
+            simulation->setSampler( Almeida );
+        if ( sampler == "MassiveParallelKawasaki" )
+        {
+            simulation->setSampler( MassiveParallelKawasaki );
+        }
 #endif
         simulation->setNeighOutput( neighHistFile );
 
@@ -79,14 +86,6 @@ int main( int argc, char* argv[] )
         simulation->setStatus( cout );
         simulation->setClusterStream( clusterFile );
 
-        if ( sampler == "Kawasaki" )
-            simulation->setSampler( Kawasaki );
-        if ( sampler == "Almeida" )
-            simulation->setSampler( Almeida );
-        if ( sampler == "MassiveParallelKawasaki" )
-        {
-            simulation->setSampler( MassiveParallelKawasaki );
-        }
 
         simulation->run( steps );
 

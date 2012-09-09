@@ -59,8 +59,8 @@ int main(int argc,char *argv[]) {
         return 1;
     }
         
-    int global_n_atoms;
-    Atom *atoms;
+    int global_n_atoms( 0 );
+    Atom *atoms( NULL );
     long double box_x_sum( 0 ), box_y_sum( 0 );
 
     ofstream imgOutStream;
@@ -76,8 +76,8 @@ int main(int argc,char *argv[]) {
     cout << setw(6) << "#Frame" << setw(10) << "omegaDOPC" << setw(10) << "omegaDPPC" <<  "  fraction of lipids clustered" << endl;
     if (ifile.is_open())
     {
-        double box_x, box_y;//, box_z;
-        int n_atoms;
+        double box_x( 0 ), box_y( 0 );//, box_z;
+        int n_atoms( 0 );
         while (ifile.good() )
         {
             int i = 0;

@@ -35,9 +35,23 @@ using namespace std;
 class MPKK: public Metropolis
 {
     public: // functions
+
+        /**
+         * @brief Constructor, see Metropolis::Metropolis
+         **/
         MPKK( TriangularLattice* latt, double omegaAB, int T, int equilibSteps
                 , unsigned int imageRes = 300 );
+
+        /**
+         * @brief Perform a simulation for a number of iterations
+         *
+         * @param steps - number of iterations to be performed
+         **/
         virtual void run( int steps );
+
+        /**
+         * @brief default dtor
+         **/
         virtual ~MPKK();
 
     protected: // fields
