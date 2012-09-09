@@ -1,9 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 option(BUILD_TESTS "Build all of unit tests." FALSE)
-option(BUILD_CUDA "Build CUDA version of the simulator." TRUE)
+option(BUILD_CUDA "Build CUDA version of the simulator." ON)
 project (mcsim)
-
 #Searching CUDA
+
+
 if(BUILD_CUDA)
     FIND_PACKAGE(CUDA)
     if(APPLE)
@@ -15,20 +16,22 @@ endif()
 
 
 # Set default build type
-string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
-if(NOT ${CMAKE_BUILD_TYPE})
-    set(CMAKE_BUILD_TYPE "debug")
-message(STATUS "${PROJECT_NAME}: Build type: ${CMAKE_BUILD_TYPE}")
-endif(NOT ${CMAKE_BUILD_TYPE})
+message(STATUS "${PROJECT_NAME}: Build type - ${CMAKE_BUILD_TYPE}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pipe -fstack-protector-all -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CSS_FLAGS_RELEASE "-O2 -DNO_DEBUG -DNDEBUG -fPIC -rdynamic")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNO_DEBUG -DNDEBUG -fPIC -rdynamic")
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 include_directories("${PROJECT_BINARY_DIR}")
 set (BASE_SRC_DIR "${CMAKE_SOURCE_DIR}/src")
+
+# we will store variables from CMAKE in generated file
+configure_file( "${BASE_SRC_DIR}/mcsim.h.in"
+    ${CMAKE_BINARY_DIR}/generated/mcsim.h )
+include_directories( ${CMAKE_BINARY_DIR}/generated/ )
+
 if (BUILD_TESTS)
     # setup testing
     enable_testing()

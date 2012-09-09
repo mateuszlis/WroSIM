@@ -45,8 +45,7 @@ void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &po
 //Metropolis public functions
 
 Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equilibSteps) 
-    : mOmegaAB( omegaAB )
-      , mOutputFreq( 100 )
+    :  mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
       , mpFNFOutputFile( NULL )
       , mpFrameStream( NULL )
@@ -60,12 +59,11 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equi
       , mpHistArr( NULL )
       , mEquilibSteps( equilibSteps )
       , mT( T )
+      , mOmegaAB( omegaAB )
 
 {
-
     mStepSize = ( latt->getLatticeSize() );
-    setSampler( Kawasaki);
-
+    setSampler( Kawasaki );
 }
 
 void Metropolis::setOutputFreq( int freq )

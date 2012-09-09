@@ -246,7 +246,6 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
         
 TriangularLattice::~TriangularLattice()
 {
-
     delete[] this->mpLattice;
 }
 

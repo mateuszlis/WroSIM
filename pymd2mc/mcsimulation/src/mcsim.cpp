@@ -15,6 +15,10 @@
 #include "TriangularLattice.h"
 #include "Metropolis.h"
 
+#include "gpu/MPKK.h"
+
+#include "mcsim.h"
+
 using namespace std;
 
 #include "mcsimCommandLine.hxx"
@@ -62,8 +66,11 @@ int main( int argc, char* argv[] )
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum, chooseStartRandomly );
 
+#ifdef BUILD_CUDA
+        MPKK *simulation = new MPKK( lattice, omega, outputTemperature, eqSteps );
+#else
         Metropolis *simulation = new Metropolis( lattice, omega, outputTemperature, eqSteps );
-
+#endif
         simulation->setNeighOutput( neighHistFile );
 
         simulation->setOutput( outputFile );

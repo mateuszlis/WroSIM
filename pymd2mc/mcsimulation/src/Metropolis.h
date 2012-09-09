@@ -23,8 +23,25 @@ enum Sampler
 
 class Metropolis
 {
-    private:
-        double mOmegaAB;
+    public:
+        static const double R = 1.986; //TODO: find place for constants
+
+        const int mEquilibSteps; 
+        const int mT;
+
+        Metropolis( TriangularLattice* latt, double omegaAB = 0.0, int T = 325, int equilibSteps = 0 );
+        virtual void setOutputFreq( int freq );
+        virtual void setOmegaAB( double omegaAB );
+        virtual void setNeighOutput( ostream &neighOutputFile );
+        virtual void setOutput( ostream &frameStream );
+        virtual void setStatus( ostream &statusStream );
+        virtual void setFNFStream( ostream &fnfStream );
+        virtual void setClusterStream( ostream &clusterStream );
+        virtual void setSampler( Sampler s );
+        virtual void run( int steps );
+        virtual ~Metropolis();
+
+    protected:
         int mOutputFreq;
 
         ostream* mpNeighOutputFile; //FIXME: should not use ostream*
@@ -52,22 +69,6 @@ class Metropolis
         void metropolisStep();
         void createNeighHist( long long *histArr );
         double calcFirstNeighboursFract();
+        double mOmegaAB;
 
-    public:
-        static const double R = 1.986; //TODO: find place for constants
-
-        const int mEquilibSteps; 
-        const int mT;
-
-        Metropolis( TriangularLattice* latt, double omegaAB = 0.0, int T = 325, int equilibSteps = 0 );
-        void setOutputFreq( int freq );
-        void setOmegaAB( double omegaAB );
-        void setNeighOutput( ostream &neighOutputFile );
-        void setOutput( ostream &frameStream );
-        void setStatus( ostream &statusStream );
-        void setFNFStream( ostream &fnfStream );
-        void setClusterStream( ostream &clusterStream );
-        void setSampler( Sampler s );
-        void run( int steps );
-        virtual ~Metropolis();
 };
