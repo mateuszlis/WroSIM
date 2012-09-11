@@ -34,6 +34,21 @@ TEST( TriangularLattice, Construct )
     delete latt;
 }
 
+TEST( TriangularLattice, ConstructException )
+{
+    TriangularLattice *latt;
+    try
+    {
+        latt = new TriangularLattice( 100, 10, 101 );
+    }
+    catch ( InputParametersException& e )
+    {
+        SUCCEED();
+        return;
+    }
+    FAIL();
+}
+
 TEST( TriangularLatticeTest, GetNeighborIndex )
 {
     TriangularLattice *latt = new TriangularLattice( 9, 3, 3 );

@@ -62,7 +62,13 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
                                     , lattIndex firstTypeParticlesCnt
                                     , bool distributeRandomly )
 {
-    mpLattice = new lattMember[latticeSize];
+    if ( firstTypeParticlesCnt > latticeSize )
+    {
+        throw InputParametersException( "Number of lipids of this type cannot be larger than lattice size" );
+    }
+
+    mpLattice = new lattMember[ latticeSize ];
+
 
     mLatticeSize = latticeSize;
     mRowSize = rowSize;

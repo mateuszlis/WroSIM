@@ -8,6 +8,7 @@
 
 // project related
 #include "MPKK.h"
+#include "../InputParametersException.h"
 
 // CUDA related
 #include <cutil_inline.h>
@@ -69,6 +70,7 @@ MPKK::MPKK( TriangularLattice* latt, double omegaAB, int T, int equilibSteps, un
     , IMAGE_RESOLUTION( imageRes )
 {
     precalculateEnergies();
+    checkLattice();
 }
 
 void MPKK::run( int steps )
@@ -174,16 +176,27 @@ void MPKK::printLatt( TriangularLattice::lattMember *data, int rowSize, int rows
     }
 }
 
+void MPKK::checkLattice()
+{
+    if ( mpLatt->getLatticeSize() % 7 != 0 )
+    {
+        throw InputParametersException( "Size of lattice is not divisible by 7" ); // must be divisible by 7
+    }
+    if ( mpLatt->getRowSize() % 7 != 5 )
+    {
+        std::cout << "!! " << mpLatt->getRowSize() << std::endl;
+        throw InputParametersException( "Row Size of lattice is not divisible by 7" ); 
+    }
+    if ( ( mpLatt->getLatticeSize() / mpLatt->getRowSize() ) % 7 != 0 )
+    {
+        throw InputParametersException( "Row count mod 7 must be equal to 2 for gpu computations" ); 
+    }
+}
+
 unsigned int MPKK::calcBlockSize()
 {
     cudaDeviceProp deviceProps;
     cudaGetDeviceProperties( &deviceProps, cutGetMaxGflopsDeviceId() );
-
-    if ( mpLatt->getLatticeSize() % 7 != 0 )
-    {
-        throw std::exception(); // must be divisible by 7
-        // TODO: create exception chierarchy
-    }
     unsigned int expectedSize = mpLatt->getLatticeSize() / 7;
     unsigned int maxBlocks = deviceProps.maxThreadsPerBlock;
 

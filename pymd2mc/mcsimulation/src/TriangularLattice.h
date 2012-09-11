@@ -18,6 +18,7 @@
 #include <list>
 
 // project local
+#include "InputParametersException.h"
 #include "types.h"
 
 using namespace std;

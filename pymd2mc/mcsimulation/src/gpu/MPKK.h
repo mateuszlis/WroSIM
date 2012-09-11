@@ -61,6 +61,7 @@ class MPKK: public Metropolis
         const unsigned int IMAGE_RESOLUTION;
 
     protected: // helper member functions
+        void checkLattice();
         unsigned int calcBlockSize();
         void precalculateEnergies();
         void generateImage( TriangularLattice::lattMember *d_latt, int stepNum );
