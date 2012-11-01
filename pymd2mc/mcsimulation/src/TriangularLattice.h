@@ -56,7 +56,7 @@ class TriangularLattice
         unsigned int getNeighborsCnt() const;
 
         void calculateClusters( clustersMap& map );
-        void setExchanger( LattExchanger );
+        void setExchanger( LattExchanger* );
         virtual ~TriangularLattice();
 
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );
@@ -64,7 +64,8 @@ class TriangularLattice
         lattMember *mpLattice;
         lattIndex mLatticeSize;
         lattIndex mRowSize;
-        LattExchanger mExchanger;
+        LattExchanger* mpExchanger;
+        bool selfLattExchanger;
         static const int mNeighbCnt = 6;
         lattIndex mNeighb[mNeighbCnt];
 
@@ -72,6 +73,7 @@ class TriangularLattice
         void distributeParticlesRandomly( lattIndex firstTypeParticlesCnt );
         void distributeParticles( lattIndex firstTypeParticlesCnt );
         void pushNeighborsToQueue( std::list< lattIndex > & queue, lattIndex siteInd );
+        void clearExchanger();
 		static bool gotDifferentNeighbors(list<int> neighLabels, int currentLabel);
 		static int findAncestor(int currentLabel, TriangularLattice::clustersMap& map);
 
