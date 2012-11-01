@@ -56,6 +56,7 @@ class TriangularLattice
         unsigned int getNeighborsCnt() const;
 
         void calculateClusters( clustersMap& map );
+        void setExchanger( LattExchanger );
         virtual ~TriangularLattice();
 
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );

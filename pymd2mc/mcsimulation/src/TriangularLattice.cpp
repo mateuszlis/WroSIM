@@ -248,6 +248,11 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 	*/
 }
 
+void TriangularLattice::setExchanger( LattExchanger exchanger )
+{
+    mExchanger = exchanger;
+}
+
         
 TriangularLattice::~TriangularLattice()
 {
