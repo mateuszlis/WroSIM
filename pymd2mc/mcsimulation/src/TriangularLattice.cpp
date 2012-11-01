@@ -50,6 +50,7 @@ TriangularLattice::TriangularLattice( string /*filename*/ )
     : mpLattice( NULL )
       , mLatticeSize( 0 )
       , mRowSize( 0 )
+      , mExchanger( this )
 {
     for ( lattIndex i = 0; i < mNeighbCnt; ++i )
     {
@@ -61,6 +62,7 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
                                     , lattIndex rowSize
                                     , lattIndex firstTypeParticlesCnt
                                     , bool distributeRandomly )
+    : mExchanger( this )
 {
     if ( firstTypeParticlesCnt > latticeSize )
     {
@@ -105,12 +107,9 @@ lattIndex TriangularLattice::getRowSize() const
 }
 void TriangularLattice::exchangeSites( lattIndex pos1, lattIndex pos2 )
 {
-    // fast variable values exchange trick (pos1 != pos2)
-	mpLattice[pos1] ^= mpLattice[pos2];
-    mpLattice[pos2] ^= mpLattice[pos1];
-    mpLattice[pos1] ^= mpLattice[pos2];
-
+    mExchanger.exchangeSites( pos1, pos2 );
 }
+
 lattIndex TriangularLattice::simNeighbCount( lattIndex pos )
 {
     lattIndex sum = 0;

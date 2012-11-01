@@ -19,10 +19,12 @@
 
 // project local
 #include "InputParametersException.h"
+#include "LattExchanger.h"
 #include "types.h"
 
 using namespace std;
 
+class LattExchanger;
 class TriangularLattice;
 ostream &operator<<( ostream &stream, TriangularLattice &latt );
 
@@ -61,6 +63,7 @@ class TriangularLattice
         lattMember *mpLattice;
         lattIndex mLatticeSize;
         lattIndex mRowSize;
+        LattExchanger mExchanger;
         static const int mNeighbCnt = 6;
         lattIndex mNeighb[mNeighbCnt];
 
