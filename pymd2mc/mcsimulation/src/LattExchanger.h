@@ -38,6 +38,16 @@ class LattExchanger
          **/
         virtual void exchangeSites( lattIndex pos1, lattIndex pos2 ) const;
 
+        /**
+         * TODO: document
+         **/
+        virtual bool hasMsd() { return false; }
+
+        /**
+         * TODO: document
+         **/
+        virtual double calcStat() { return 0; };
+
     protected: // fields
         TriangularLattice* mpLatt;
 

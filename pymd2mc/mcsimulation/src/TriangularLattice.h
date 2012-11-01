@@ -57,6 +57,7 @@ class TriangularLattice
 
         void calculateClusters( clustersMap& map );
         void setExchanger( LattExchanger* );
+        LattExchanger* getExchanger();
         virtual ~TriangularLattice();
 
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );

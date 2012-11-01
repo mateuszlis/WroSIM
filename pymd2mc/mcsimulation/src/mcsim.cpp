@@ -86,6 +86,7 @@ int main( int argc, char* argv[] )
 
         simulation->setOutput( outputFile );
         simulation->setFNFStream( fnfFile );
+        simulation->setMsdOutput( cout );
         simulation->setOutputFreq( outputFreq );
         simulation->setStatus( cout );
         simulation->setClusterStream( clusterFile );

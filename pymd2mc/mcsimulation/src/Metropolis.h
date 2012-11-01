@@ -78,6 +78,11 @@ class Metropolis
          **/
         virtual void setClusterStream( ostream &clusterStream );
 
+        /**
+         * @brief Setter for stream for Mean Square Displacement analysis
+         **/
+        virtual void setMsdOutput( ostream &MsdOutput );
+
         /** 
          * @brief Perform simulation for a number of iterations
          * 
@@ -102,6 +107,7 @@ class Metropolis
         ostream* mpFrameStream;
         ostream* mpStatusStream;
         ostream* mpClusterStream;
+        ostream* mpMsdOutputFile;
 
         bool mIsSetFrameStream; //FIXME: this variables are unnecesary since we can check if output streams are present
         bool mIsSetNeighOutputFile;

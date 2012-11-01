@@ -19,6 +19,10 @@ class MsdEnabledLattEx : public LattExchanger
             }
             
         }
+        /**
+         * TODO: document
+         **/
+        virtual bool hasMsd() { return true; }
 
         /**
          * TODO: document

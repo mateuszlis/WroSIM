@@ -265,6 +265,11 @@ void TriangularLattice::setExchanger( LattExchanger* exchanger )
     mpExchanger = exchanger;
 }
 
+LattExchanger* TriangularLattice::getExchanger()
+{
+    return mpExchanger;
+}
+
         
 TriangularLattice::~TriangularLattice()
 {
