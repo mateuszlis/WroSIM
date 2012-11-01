@@ -1,0 +1,45 @@
+#include "LattExchanger.h"
+
+using namespace std;
+class MsdEnabledLattEx : public LattExchanger
+{
+    public: // typedefs
+
+    public: // functions
+        /**
+         * TODO: document
+         **/
+        MsdEnabledLattEx( TriangularLattice* latt ) 
+            : LattExchanger( latt ) 
+        {
+            mTracking = new lattIndex[ latt->getLatticeSize() ];
+            for ( lattIndex i = 0 ; i < latt->getLatticeSize() ; ++i )
+            {
+                mTracking[i] = i;
+            }
+            
+        }
+
+        /**
+         * TODO: document
+         **/
+        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 ) const
+        {
+            mTracking[pos1] ^= mTracking[pos2];
+            mTracking[pos2] ^= mTracking[pos1];
+            mTracking[pos1] ^= mTracking[pos2];
+            LattExchanger::exchangeSites( pos1, pos2 );
+        }
+
+        ~MsdEnabledLattEx()
+        {
+            delete mTracking;
+        }
+
+    protected: // fields
+        TriangularLattice* mpLatt;
+        lattIndex* mTracking;
+
+};
+
+

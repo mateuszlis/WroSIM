@@ -13,6 +13,8 @@
 #include <fstream>
 
 #include "TriangularLattice.h"
+#include "LattExchanger.h"
+#include "MsdEnabledLattEx.h"
 #include "KawasakiSimulation.h"
 #include "gpu/MPKK.h"
 
@@ -64,6 +66,8 @@ int main( int argc, char* argv[] )
         std::cout << eqSteps << std::endl;
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum, chooseStartRandomly );
+        LattExchanger* exchanger = new MsdEnabledLattEx( lattice );
+        lattice->setExchanger( exchanger );
 
 #ifdef BUILD_CUDA
         MPKK *simulation = new MPKK( lattice, omega, outputTemperature, eqSteps );
@@ -93,6 +97,7 @@ int main( int argc, char* argv[] )
         clusterFile.close();
         fnfFile.close();
         delete lattice;
+        delete exchanger;
         delete simulation;
 
     }
