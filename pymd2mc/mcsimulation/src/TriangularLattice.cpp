@@ -6,6 +6,7 @@
  */
 
 #include "TriangularLattice.h"
+#include <string.h>
 #include <list>
 
 typedef TriangularLattice::lattIndex lattIndex;
