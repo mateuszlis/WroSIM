@@ -7,6 +7,7 @@ class MsdEnabledLattEx : public LattExchanger
     public: // typedefs
 
     public: // functions
+        //FIXME: move implementations to cpp file!
         /**
          * TODO: document
          **/
@@ -35,6 +36,9 @@ class MsdEnabledLattEx : public LattExchanger
             LattExchanger::exchangeSites( pos1, pos2 );
         }
 
+        /**
+         * TODO: document
+         **/
         virtual double calcStat()
         {
             double msd( 0 );
@@ -50,7 +54,7 @@ class MsdEnabledLattEx : public LattExchanger
             return msd;
         }
 
-        ~MsdEnabledLattEx()
+        virtual ~MsdEnabledLattEx()
         {
             delete mTracking;
         }

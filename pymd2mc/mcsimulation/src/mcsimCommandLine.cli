@@ -72,5 +72,9 @@ class options
   {
         "Do not choose starting position randomly"     
   };
+  bool --enable-calc-msd
+  {
+        "Enable calculation of Mean Square Displacement. May slow simulation."
+  };
   
 };

@@ -186,3 +186,9 @@ no_random_start () const
   return this->no_random_start_;
 }
 
+inline const bool& options::
+enable_calc_msd () const
+{
+  return this->enable_calc_msd_;
+}
+

@@ -55,6 +55,7 @@ int main( int argc, char* argv[] )
         int outputTemperature = opt.T();
         int eqSteps = opt.eq_steps();
         bool chooseStartRandomly = !opt.no_random_start();
+        bool enableMsd = opt.enable_calc_msd();
 
         string sampler = opt.sampling();
         string outputFilename = opt.o();
@@ -63,12 +64,17 @@ int main( int argc, char* argv[] )
         neighHistFile.open( "neigh_hist_omega.dat");
         fnfFile.open( "fraction_of_first_neighbors.dat" );
         clusterFile.open( "clusters.dat" );
-        msdFile.open( "msd.dat" );
         std::cout << eqSteps << std::endl;
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum, chooseStartRandomly );
-        LattExchanger* exchanger = new MsdEnabledLattEx( lattice );
-        lattice->setExchanger( exchanger );
+        LattExchanger* exchanger = NULL;
+        if ( enableMsd && !exchanger )
+        {
+            std::cout << "Enabled Mean Square Displacement calculation " << std::endl;
+            msdFile.open( "msd.dat" );
+            exchanger = new MsdEnabledLattEx( lattice );
+            lattice->setExchanger( exchanger );
+        }
 
 #ifdef BUILD_CUDA
         MPKK *simulation = new MPKK( lattice, omega, outputTemperature, eqSteps );
@@ -98,9 +104,12 @@ int main( int argc, char* argv[] )
         outputFile.close();
         clusterFile.close();
         fnfFile.close();
-        msdFile.close();
         delete lattice;
-        delete exchanger;
+        if ( exchanger && enableMsd )
+        {
+            msdFile.close();
+            delete exchanger;
+        }
         delete simulation;
 
     }
