@@ -19,6 +19,7 @@ class MsdEnabledLattEx : public LattExchanger
             {
                 mTracking[i] = i;
             }
+            mPBCCorrection = new vector[ latt->getLatticeSize() ];
         }
         /**
          * TODO: document
@@ -34,7 +35,13 @@ class MsdEnabledLattEx : public LattExchanger
             mTracking[pos2] ^= mTracking[pos1];
             mTracking[pos1] ^= mTracking[pos2];
             LattExchanger::exchangeSites( pos1, pos2 );
+            if ( isPBCJump( pos1, pos2 ) )
+            {
+                mPBCCorrection[ mpLatt[ pos1 ] ].col = 0;
+                mPBCCorrection[ mpLatt[ pos2 ] ].row = 0;
+            }
         }
+
 
         /**
          * TODO: document
@@ -56,11 +63,27 @@ class MsdEnabledLattEx : public LattExchanger
 
         virtual ~MsdEnabledLattEx()
         {
+            delete mPBCCorrection;
             delete mTracking;
         }
 
     protected: // fields
         lattIndex* mTracking;
+
+        struct vector
+        {
+            vector() : row( 0 ), col( 0 ) {};
+            lattIndex row;
+            lattIndex col;
+        };
+        vector* mPBCCorrection;
+
+    protected: // functions
+
+        virtual bool isPBCJump( lattIndex pos1, lattIndex pos2 )
+        {
+            return ( abs( pos1 - pos2 ) == 1 || abs( pos1 - pos2 ) == mpLatt->getRowSize() || pos1 - pos2 == -mpLatt->getRowSize() + 1 || pos1 - pos2 == mpLatt->getRowSize() - 1 );
+        }
 
 };
 
