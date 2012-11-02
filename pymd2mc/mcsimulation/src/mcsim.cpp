@@ -58,11 +58,12 @@ int main( int argc, char* argv[] )
 
         string sampler = opt.sampling();
         string outputFilename = opt.o();
-        ofstream outputFile, neighHistFile, fnfFile, clusterFile;
+        ofstream outputFile, neighHistFile, fnfFile, clusterFile, msdFile;
         outputFile.open( outputFilename.c_str());
         neighHistFile.open( "neigh_hist_omega.dat");
         fnfFile.open( "fraction_of_first_neighbors.dat" );
         clusterFile.open( "clusters.dat" );
+        msdFile.open( "msd.dat" );
         std::cout << eqSteps << std::endl;
 
         TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum, chooseStartRandomly );
@@ -86,7 +87,7 @@ int main( int argc, char* argv[] )
 
         simulation->setOutput( outputFile );
         simulation->setFNFStream( fnfFile );
-        simulation->setMsdOutput( cout );
+        simulation->setMsdOutput( msdFile );
         simulation->setOutputFreq( outputFreq );
         simulation->setStatus( cout );
         simulation->setClusterStream( clusterFile );
@@ -97,6 +98,7 @@ int main( int argc, char* argv[] )
         outputFile.close();
         clusterFile.close();
         fnfFile.close();
+        msdFile.close();
         delete lattice;
         delete exchanger;
         delete simulation;

@@ -107,7 +107,7 @@ void Metropolis::performAnalysis( int stepNum )
         ( *mpStatusStream ).flush();
 
     }
-    if ( mpLatt->getExchanger()->hasMsd() && mpMsdOutputFile )
+    if ( mpLatt->getExchanger()->hasMsd() && mpMsdOutputFile && analysisStep( stepNum ) )
     {
         ( *mpMsdOutputFile ) << setw( 10 ) << stepNum << "\t" << mpLatt->getExchanger()->calcStat() << endl;
     }

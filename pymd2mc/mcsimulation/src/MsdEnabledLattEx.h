@@ -1,5 +1,6 @@
 #include "LattExchanger.h"
 
+#include <math.h>
 using namespace std;
 class MsdEnabledLattEx : public LattExchanger
 {
@@ -17,7 +18,6 @@ class MsdEnabledLattEx : public LattExchanger
             {
                 mTracking[i] = i;
             }
-            
         }
         /**
          * TODO: document
@@ -33,6 +33,21 @@ class MsdEnabledLattEx : public LattExchanger
             mTracking[pos2] ^= mTracking[pos1];
             mTracking[pos1] ^= mTracking[pos2];
             LattExchanger::exchangeSites( pos1, pos2 );
+        }
+
+        virtual double calcStat()
+        {
+            double msd( 0 );
+            for ( lattIndex i = 0 ; i < mpLatt->getLatticeSize() ; ++i )
+            {
+                lattIndex startRow = i / mpLatt->getRowSize();
+                lattIndex startCol = i % mpLatt->getRowSize();
+                lattIndex currRow = mTracking[i] / mpLatt->getRowSize();
+                lattIndex currCol = mTracking[i] % mpLatt->getRowSize();
+                msd += ( ( startRow - currRow ) * ( startRow - currRow )  + ( startCol - currCol ) * ( startCol - currCol ) );
+            }
+            msd /= mpLatt->getLatticeSize();
+            return msd;
         }
 
         ~MsdEnabledLattEx()
