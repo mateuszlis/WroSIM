@@ -56,7 +56,6 @@ class MsdEnabledLattEx : public LattExchanger
         }
 
     protected: // fields
-        TriangularLattice* mpLatt;
         lattIndex* mTracking;
 
 };
