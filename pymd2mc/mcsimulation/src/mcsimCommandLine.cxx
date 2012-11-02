@@ -321,7 +321,8 @@ options (int& argc,
   output_freq_ (100),
   omega_ (0),
   eq_steps_ (0),
-  no_random_start_ ()
+  no_random_start_ (),
+  enable_calc_msd_ ()
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -346,7 +347,8 @@ options (int start,
   output_freq_ (100),
   omega_ (0),
   eq_steps_ (0),
-  no_random_start_ ()
+  no_random_start_ (),
+  enable_calc_msd_ ()
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -371,7 +373,8 @@ options (int& argc,
   output_freq_ (100),
   omega_ (0),
   eq_steps_ (0),
-  no_random_start_ ()
+  no_random_start_ (),
+  enable_calc_msd_ ()
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -398,7 +401,8 @@ options (int start,
   output_freq_ (100),
   omega_ (0),
   eq_steps_ (0),
-  no_random_start_ ()
+  no_random_start_ (),
+  enable_calc_msd_ ()
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -421,7 +425,8 @@ options (::cli::scanner& s,
   output_freq_ (100),
   omega_ (0),
   eq_steps_ (0),
-  no_random_start_ ()
+  no_random_start_ (),
+  enable_calc_msd_ ()
 {
   _parse (s, opt, arg);
 }
@@ -463,6 +468,8 @@ print_usage (::std::ostream& os)
      << "                              are turned on after these steps)" << ::std::endl;
 
   os << "--no-random-start             Do not choose starting position randomly" << ::std::endl;
+
+  os << "--enable-calc-msd             Enable calculation of Mean Square Displacement." << ::std::endl;
 }
 
 typedef
@@ -501,6 +508,8 @@ struct _cli_options_map_init
     &::cli::thunk< options, int, &options::eq_steps_ >;
     _cli_options_map_["--no-random-start"] = 
     &::cli::thunk< options, bool, &options::no_random_start_ >;
+    _cli_options_map_["--enable-calc-msd"] = 
+    &::cli::thunk< options, bool, &options::enable_calc_msd_ >;
   }
 } _cli_options_map_init_;
 

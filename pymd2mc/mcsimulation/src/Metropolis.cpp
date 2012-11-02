@@ -19,6 +19,7 @@ Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equi
       , mpFrameStream( NULL )
       , mpStatusStream( NULL )
       , mpClusterStream( NULL )
+      , mpMsdOutputFile( NULL )
       , mIsSetFrameStream( false )
       , mIsSetNeighOutputFile( false )
       , mIsSetStatusStream( false )
@@ -65,6 +66,11 @@ void Metropolis::setClusterStream( ostream &clusterStream )
     mpClusterStream = &clusterStream;
 }
 
+void Metropolis::setMsdOutput( ostream &MsdOutput )
+{
+    mpMsdOutputFile = &MsdOutput;
+}
+
 void Metropolis::setOmegaAB( double omegaAB )
 {
     mOmegaAB = omegaAB;
@@ -100,6 +106,10 @@ void Metropolis::performAnalysis( int stepNum )
         ( *mpStatusStream ) << "\r" << stepNum; //print status message
         ( *mpStatusStream ).flush();
 
+    }
+    if ( mpLatt->getExchanger()->hasMsd() && mpMsdOutputFile && analysisStep( stepNum ) )
+    {
+        ( *mpMsdOutputFile ) << setw( 10 ) << stepNum << "\t" << mpLatt->getExchanger()->calcStat() << endl;
     }
 }
 

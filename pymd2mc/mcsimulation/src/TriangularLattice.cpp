@@ -50,6 +50,8 @@ TriangularLattice::TriangularLattice( string /*filename*/ )
     : mpLattice( NULL )
       , mLatticeSize( 0 )
       , mRowSize( 0 )
+      , mpExchanger( new LattExchanger( this ) )
+      , selfLattExchanger( true )
 {
     for ( lattIndex i = 0; i < mNeighbCnt; ++i )
     {
@@ -61,6 +63,8 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
                                     , lattIndex rowSize
                                     , lattIndex firstTypeParticlesCnt
                                     , bool distributeRandomly )
+      : mpExchanger( new LattExchanger( this ) )
+      , selfLattExchanger( true )
 {
     if ( firstTypeParticlesCnt > latticeSize )
     {
@@ -105,12 +109,9 @@ lattIndex TriangularLattice::getRowSize() const
 }
 void TriangularLattice::exchangeSites( lattIndex pos1, lattIndex pos2 )
 {
-    // fast variable values exchange trick (pos1 != pos2)
-	mpLattice[pos1] ^= mpLattice[pos2];
-    mpLattice[pos2] ^= mpLattice[pos1];
-    mpLattice[pos1] ^= mpLattice[pos2];
-
+    mpExchanger->exchangeSites( pos1, pos2 );
 }
+
 lattIndex TriangularLattice::simNeighbCount( lattIndex pos )
 {
     lattIndex sum = 0;
@@ -249,9 +250,30 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 	*/
 }
 
+void TriangularLattice::clearExchanger()
+{
+    if ( selfLattExchanger )
+    {
+        delete mpExchanger;
+        selfLattExchanger = false;
+    }
+}
+
+void TriangularLattice::setExchanger( LattExchanger* exchanger )
+{
+    clearExchanger();
+    mpExchanger = exchanger;
+}
+
+LattExchanger* TriangularLattice::getExchanger()
+{
+    return mpExchanger;
+}
+
         
 TriangularLattice::~TriangularLattice()
 {
+    clearExchanger();
     delete[] this->mpLattice;
 }
 

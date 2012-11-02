@@ -272,6 +272,9 @@ class options
   const bool&
   no_random_start () const;
 
+  const bool&
+  enable_calc_msd () const;
+
   // Print usage information.
   //
   static void
@@ -297,6 +300,7 @@ class options
   float omega_;
   int eq_steps_;
   bool no_random_start_;
+  bool enable_calc_msd_;
 };
 
 #include "mcsimCommandLine.ixx"
