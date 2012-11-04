@@ -12,6 +12,12 @@ struct vectorDist
     vectorDist( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
     vectorDist operator+( vectorDist added ) { return vectorDist( row + added.row, col + added.col ); }
     vectorDist operator-( vectorDist added ) { return vectorDist( row - added.row, col - added.col ); }
+    vectorDist operator+=( vectorDist added ) 
+    { 
+        col += added.col;
+        row += added.row;
+        return *this;
+    }
     lattIndex squareDisp() { return row*row + col*col; }
     lattIndex row;
     lattIndex col;

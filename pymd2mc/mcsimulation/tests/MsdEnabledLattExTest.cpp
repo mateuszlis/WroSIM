@@ -94,6 +94,8 @@ TEST( MsdEnabledLattEx, calcMsd_PBC_circular  )
     ex.exchangeSites( 4, 5 );
     ex.exchangeSites( 4, 5 );
     ex.exchangeSites( 4, 5 );
+    ex.exchangeSites( 23, 3 );
+    ex.exchangeSites( 23, 3 );
     EXPECT_DOUBLE_EQ( ex.calcStat(), 0. );
     delete latt;
 }

@@ -32,11 +32,12 @@ void MsdEnabledLattEx::exchangeSites( lattIndex pos1, lattIndex pos2 )
     LattExchanger::exchangeSites( pos1, pos2 );
     if ( !isNotPBCJump( pos1, pos2 ) )
     {
-        vectorDist lDist( calcDist( pos1, pos2 ) );
-        mPBCCorrection[ mTracking[ pos1 ] ] = calcDist( pos1, pos2 );
-        incDist( mPBCCorrection[ mTracking[ pos1 ] ] );
-        mPBCCorrection[ mTracking[ pos2 ] ] = calcDist( pos2, pos1 );
-        incDist( mPBCCorrection[ mTracking[ pos2 ] ] );
+        vectorDist lDist( calcDist( pos1, pos2 ) ); // local dist
+        incDist( lDist );
+        mPBCCorrection[ mTracking[ pos1 ] ] += lDist;
+        lDist = calcDist( pos2, pos1 );
+        incDist( lDist );
+        mPBCCorrection[ mTracking[ pos2 ] ] += lDist;
     }
 }
 
