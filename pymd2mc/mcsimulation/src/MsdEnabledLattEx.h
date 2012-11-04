@@ -10,10 +10,13 @@ struct vectorDist
 {
     vectorDist() : row( 0 ), col( 0 ) {};
     vectorDist( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
+    vectorDist operator+( vectorDist added ) { return vectorDist( row + added.row, col + added.col ); }
+    vectorDist operator-( vectorDist added ) { return vectorDist( row - added.row, col - added.col ); }
     lattIndex squareDisp() { return row*row + col*col; }
     lattIndex row;
     lattIndex col;
 };
+ostream &operator<<( ostream &stream, vectorDist & dist );
 
 /**
  * TODO: document
@@ -52,10 +55,13 @@ class MsdEnabledLattEx : public LattExchanger
             mTracking[pos2] ^= mTracking[pos1];
             mTracking[pos1] ^= mTracking[pos2];
             LattExchanger::exchangeSites( pos1, pos2 );
-            if ( isNotPBCJump( pos1, pos2 ) )
+            if ( !isNotPBCJump( pos1, pos2 ) )
             {
-                mPBCCorrection[ mTracking[ pos1 ] ].col = 0;
-                mPBCCorrection[ mTracking[ pos2 ] ].row = 0;
+                vectorDist lDist( calcDist( pos1, pos2 ) );
+                mPBCCorrection[ mTracking[ pos1 ] ] = calcDist( pos1, pos2 );
+                incDist( mPBCCorrection[ mTracking[ pos1 ] ] );
+                mPBCCorrection[ mTracking[ pos2 ] ] = calcDist( pos2, pos1 );
+                incDist( mPBCCorrection[ mTracking[ pos2 ] ] );
             }
         }
 
@@ -68,7 +74,7 @@ class MsdEnabledLattEx : public LattExchanger
             double msd( 0 );
             for ( lattIndex i = 0 ; i < mpLatt->getLatticeSize() ; ++i )
             {
-                msd += calcDist( i, mTracking[i] ).squareDisp();
+                msd += ( calcDist( i, mTracking[i] ) - mPBCCorrection[ mTracking[i] ] ).squareDisp();
             }
             msd /= mpLatt->getLatticeSize();
             return msd;
@@ -103,7 +109,7 @@ class MsdEnabledLattEx : public LattExchanger
 
     protected: // functions
 
-        virtual bool isNotPBCJump( lattIndex pos1, lattIndex pos2 ) 
+        bool isNotPBCJump( lattIndex pos1, lattIndex pos2 ) 
         {
             vectorDist dist( calcDist( pos1, pos2 ) );
             if ( dist.squareDisp() <= 2 )
@@ -112,6 +118,26 @@ class MsdEnabledLattEx : public LattExchanger
             }
             return false;
                     
+        }
+
+        void incDist( vectorDist & pbcDist )
+        {
+            if ( pbcDist.col > 1 )
+            {
+                pbcDist.col++;
+            }
+            if ( pbcDist.col < -1 )
+            {
+                pbcDist.col--;
+            }
+            if ( pbcDist.row > 1 )
+            {
+                pbcDist.row++;
+            }
+            if ( pbcDist.row < -1 )
+            {
+                pbcDist.row--;
+            }
         }
 
 }; // class MsdEnabledLattEx

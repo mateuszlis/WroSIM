@@ -57,8 +57,6 @@ TEST( MsdEnabledLattEx, msdCalc  )
     MsdEnabledLattEx ex( latt );
     ex.exchangeSites( 0, 1 );
     EXPECT_DOUBLE_EQ( ex.calcStat(), 2/1000. );
-    ex.exchangeSites( 4, 6 );
-    EXPECT_DOUBLE_EQ( ex.calcStat(), 0.01 );
     delete latt;
 }
 
