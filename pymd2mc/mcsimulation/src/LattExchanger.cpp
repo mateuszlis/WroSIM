@@ -8,3 +8,4 @@ void LattExchanger::exchangeSites( lattIndex pos1, lattIndex pos2 ) const
     mpLatt->getLattice()[pos2] ^= mpLatt->getLattice()[pos1];
     mpLatt->getLattice()[pos1] ^= mpLatt->getLattice()[pos2];
 }
+

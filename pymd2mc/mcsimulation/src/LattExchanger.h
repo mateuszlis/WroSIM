@@ -48,6 +48,9 @@ class LattExchanger
          **/
         virtual double calcStat() { return 0; };
 
+
+        virtual ~LattExchanger() {};
+
     protected: // fields
         TriangularLattice* mpLatt;
 
