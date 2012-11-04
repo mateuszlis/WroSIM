@@ -83,3 +83,17 @@ TEST( MsdEnabledLattEx, calcMsd_PBC  )
     EXPECT_DOUBLE_EQ( ex.calcStat(), 12/25. );
     delete latt;
 }
+
+
+TEST( MsdEnabledLattEx, calcMsd_PBC_circular  )
+{
+    TriangularLattice *latt;
+    latt = new TriangularLattice( 25, 5, 20 );
+    MsdEnabledLattEx ex( latt );
+    ex.exchangeSites( 4, 5 );
+    ex.exchangeSites( 4, 5 );
+    ex.exchangeSites( 4, 5 );
+    ex.exchangeSites( 4, 5 );
+    EXPECT_DOUBLE_EQ( ex.calcStat(), 0. );
+    delete latt;
+}
