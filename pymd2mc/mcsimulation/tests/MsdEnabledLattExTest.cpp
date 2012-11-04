@@ -13,18 +13,36 @@ TEST( MsdEnabledLattEx, Construct )
     delete latt;
 }
 
-TEST( TriangularLattice, ConstructException )
+TEST( MsdEnabledLattEx, calcDist1  )
 {
+    //FIXME: this should be done in tearUp and tearDown
     TriangularLattice *latt;
-    try
-    {
-        latt = new TriangularLattice( 100, 10, 101 );
-    }
-    catch ( InputParametersException& e )
-    {
-        SUCCEED();
-        return;
-    }
-    FAIL();
+    latt = new TriangularLattice( 1000, 100, 20 );
+    MsdEnabledLattEx ex( latt );
+    vectorDist distance( ex.calcDist( 0, 99 ) );
+    EXPECT_EQ( distance.col, -99 );
+    EXPECT_EQ( distance.row, 0 );
+    delete latt;
 }
 
+
+TEST( MsdEnabledLattEx, calcDist2  )
+{
+    TriangularLattice *latt;
+    latt = new TriangularLattice( 1000, 100, 20 );
+    MsdEnabledLattEx ex( latt );
+    vectorDist distance( ex.calcDist( 298, 99 ) );
+    EXPECT_EQ( distance.col, -1 );
+    EXPECT_EQ( distance.row, 2 );
+    delete latt;
+}
+TEST( MsdEnabledLattEx, calcDist_PBC  )
+{
+    TriangularLattice *latt;
+    latt = new TriangularLattice( 1000, 100, 20 );
+    MsdEnabledLattEx ex( latt );
+    vectorDist distance( ex.calcDist( 100, 99 ) );
+    EXPECT_EQ( distance.col, -99 );
+    EXPECT_EQ( distance.row, 1 );
+    delete latt;
+}
