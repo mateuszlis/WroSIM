@@ -36,7 +36,7 @@ class LattExchanger
         /**
          * TODO: document
          **/
-        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 ) const;
+        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 );
 
         /**
          * TODO: document
@@ -47,6 +47,8 @@ class LattExchanger
          * TODO: document
          **/
         virtual double calcStat() { return 0; };
+
+        virtual ~LattExchanger() {};
 
     protected: // fields
         TriangularLattice* mpLatt;

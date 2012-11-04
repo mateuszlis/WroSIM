@@ -2,66 +2,83 @@
 
 #include <math.h>
 using namespace std;
+/**
+ * @brief Struct used to represent rows and cols distance between lattice sites
+ *
+ **/
+struct vectorDist
+{
+    vectorDist() : row( 0 ), col( 0 ) {};
+    vectorDist( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
+    vectorDist operator+( vectorDist added ) { return vectorDist( row + added.row, col + added.col ); }
+    vectorDist operator-( vectorDist added ) { return vectorDist( row - added.row, col - added.col ); }
+    vectorDist operator+=( vectorDist added ) 
+    { 
+        col += added.col;
+        row += added.row;
+        return *this;
+    }
+    lattIndex squareDisp() { return row*row + col*col; }
+    lattIndex row;
+    lattIndex col;
+}; // struct vectorDist
+
+/**
+ * @brief Outputs vector class contents. Used for debug purposes
+ **/
+ostream &operator<<( ostream &stream, vectorDist & dist );
+
+/**
+ * @brief Class responsible for tracking everything thata happens in the lattice. It is able to calculate Mean Square Displacement based on that information.
+ *
+ **/
 class MsdEnabledLattEx : public LattExchanger
 {
-    public: // typedefs
-
     public: // functions
-        //FIXME: move implementations to cpp file!
         /**
-         * TODO: document
+         * @brief Ctor - assigns tracked lattice (not possible to change). Allocates memory for tracking
+         *
+         * @param latt - lattice that will be tracked
          **/
-        MsdEnabledLattEx( TriangularLattice* latt ) 
-            : LattExchanger( latt ) 
-        {
-            mTracking = new lattIndex[ latt->getLatticeSize() ];
-            for ( lattIndex i = 0 ; i < latt->getLatticeSize() ; ++i )
-            {
-                mTracking[i] = i;
-            }
-        }
+        MsdEnabledLattEx( TriangularLattice* latt );
+
         /**
-         * TODO: document
+         * @brief Since currently it is responsibility of Metropolis class to output statistics, this function is used to determine, whether we have Msd stat enable or not. Should be organized in different way.
+         *
          **/
         virtual bool hasMsd() { return true; }
 
         /**
-         * TODO: document
+         * @brief This function is used by Lattice to facilitate tracking of lattice movement
          **/
-        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 ) const
-        {
-            mTracking[pos1] ^= mTracking[pos2];
-            mTracking[pos2] ^= mTracking[pos1];
-            mTracking[pos1] ^= mTracking[pos2];
-            LattExchanger::exchangeSites( pos1, pos2 );
-        }
+        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 );
 
         /**
-         * TODO: document
+         * @brief Calculates Mean Square Displacement
          **/
-        virtual double calcStat()
-        {
-            double msd( 0 );
-            for ( lattIndex i = 0 ; i < mpLatt->getLatticeSize() ; ++i )
-            {
-                lattIndex startRow = i / mpLatt->getRowSize();
-                lattIndex startCol = i % mpLatt->getRowSize();
-                lattIndex currRow = mTracking[i] / mpLatt->getRowSize();
-                lattIndex currCol = mTracking[i] % mpLatt->getRowSize();
-                msd += ( ( startRow - currRow ) * ( startRow - currRow )  + ( startCol - currCol ) * ( startCol - currCol ) );
-            }
-            msd /= mpLatt->getLatticeSize();
-            return msd;
-        }
+        virtual double calcStat();
 
-        virtual ~MsdEnabledLattEx()
-        {
-            delete mTracking;
-        }
+        /**
+         * @brief Calculates distance between two lattice sites in the means of rows and columns
+         *
+         * @return number of rows and cols between sites pos1 and pos2
+         *
+         **/
+        vectorDist calcDist( lattIndex pos1, lattIndex pos2 );
+
+        virtual ~MsdEnabledLattEx();
 
     protected: // fields
-        lattIndex* mTracking;
 
-};
+        lattIndex* mTracking; ///< track current position of every lipid
+        vectorDist* mPBCCorrection; ///< track PBC jumps
+        static const bool isNeighbor[3][3]; ///< used to determine if sites are direct neighbors
+
+    protected: // functions
+
+        bool isNotPBCJump( lattIndex pos1, lattIndex pos2 );
+        void incDist( vectorDist & pbcDist );
+
+}; // class MsdEnabledLattEx
 
 
