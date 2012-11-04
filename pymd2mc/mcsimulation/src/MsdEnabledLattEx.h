@@ -6,10 +6,10 @@ using namespace std;
  * @brief Struct used to represent rows and cols distance between lattice sites
  *
  **/
-struct vector
+struct vectorDist
 {
-    vector() : row( 0 ), col( 0 ) {};
-    vector( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
+    vectorDist() : row( 0 ), col( 0 ) {};
+    vectorDist( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
     lattIndex row;
     lattIndex col;
 };
@@ -35,7 +35,7 @@ class MsdEnabledLattEx : public LattExchanger
             {
                 mTracking[i] = i;
             }
-            mPBCCorrection = new vector[ latt->getLatticeSize() ];
+            mPBCCorrection = new vectorDist[ latt->getLatticeSize() ];
         }
         /**
          * TODO: document
@@ -81,13 +81,13 @@ class MsdEnabledLattEx : public LattExchanger
          * TODO: document
          *
          **/
-        vector calcDist( lattIndex pos1, lattIndex pos2 )
+        vectorDist calcDist( lattIndex pos1, lattIndex pos2 )
         {
                 lattIndex startRow = pos1 / mpLatt->getRowSize();
                 lattIndex startCol = pos1 % mpLatt->getRowSize();
                 lattIndex endRow = pos2 / mpLatt->getRowSize();
                 lattIndex endCol = pos2 % mpLatt->getRowSize();
-                return vector( startRow - endRow, startCol - endCol );
+                return vectorDist( startRow - endRow, startCol - endCol );
 
         }
 
@@ -100,7 +100,7 @@ class MsdEnabledLattEx : public LattExchanger
     protected: // fields
         lattIndex* mTracking;
 
-        vector* mPBCCorrection;
+        vectorDist* mPBCCorrection;
 
     protected: // functions
 
