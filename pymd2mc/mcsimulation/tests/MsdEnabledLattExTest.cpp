@@ -73,3 +73,15 @@ TEST( MsdEnabledLattEx, isPBCJump  )
     EXPECT_FALSE( ex.isNotPBCJump( 7, 1 ) );
     delete latt;
 }
+
+TEST( MsdEnabledLattEx, calcMsd_PBC  )
+{
+    TriangularLattice *latt;
+    latt = new TriangularLattice( 25, 5, 20 );
+    MsdEnabledLattEx ex( latt );
+    ex.exchangeSites( 4, 5 );
+    ex.exchangeSites( 5, 6 );
+    ex.exchangeSites( 6, 7 );
+    EXPECT_DOUBLE_EQ( ex.calcStat(), 12/25. );
+    delete latt;
+}
