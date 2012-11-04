@@ -2,6 +2,22 @@
 
 #include <math.h>
 using namespace std;
+/**
+ * @brief Struct used to represent rows and cols distance between lattice sites
+ *
+ **/
+struct vector
+{
+    vector() : row( 0 ), col( 0 ) {};
+    vector( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
+    lattIndex row;
+    lattIndex col;
+};
+
+/**
+ * TODO: document
+ *
+ **/
 class MsdEnabledLattEx : public LattExchanger
 {
     public: // typedefs
@@ -29,7 +45,7 @@ class MsdEnabledLattEx : public LattExchanger
         /**
          * TODO: document
          **/
-        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 ) const
+        virtual void exchangeSites( lattIndex pos1, lattIndex pos2 ) 
         {
             mTracking[pos1] ^= mTracking[pos2];
             mTracking[pos2] ^= mTracking[pos1];
@@ -37,8 +53,8 @@ class MsdEnabledLattEx : public LattExchanger
             LattExchanger::exchangeSites( pos1, pos2 );
             if ( isPBCJump( pos1, pos2 ) )
             {
-                mPBCCorrection[ mpLatt[ pos1 ] ].col = 0;
-                mPBCCorrection[ mpLatt[ pos2 ] ].row = 0;
+                mPBCCorrection[ mTracking[ pos1 ] ].col = 0;
+                mPBCCorrection[ mTracking[ pos2 ] ].row = 0;
             }
         }
 
@@ -61,30 +77,38 @@ class MsdEnabledLattEx : public LattExchanger
             return msd;
         }
 
+        /**
+         * TODO: document
+         *
+         **/
+
         virtual ~MsdEnabledLattEx()
         {
-            delete mPBCCorrection;
-            delete mTracking;
+            delete[] mPBCCorrection;
+            delete[] mTracking;
         }
 
     protected: // fields
         lattIndex* mTracking;
 
-        struct vector
-        {
-            vector() : row( 0 ), col( 0 ) {};
-            lattIndex row;
-            lattIndex col;
-        };
         vector* mPBCCorrection;
 
     protected: // functions
 
-        virtual bool isPBCJump( lattIndex pos1, lattIndex pos2 )
+        virtual bool isPBCJump( lattIndex pos1, lattIndex pos2 ) 
         {
             return ( abs( pos1 - pos2 ) == 1 || abs( pos1 - pos2 ) == mpLatt->getRowSize() || pos1 - pos2 == -mpLatt->getRowSize() + 1 || pos1 - pos2 == mpLatt->getRowSize() - 1 );
         }
 
+        vector calcDist( lattIndex pos1, lattIndex pos2 )
+        {
+                lattIndex startRow = pos1 / mpLatt->getRowSize();
+                lattIndex startCol = pos1 % mpLatt->getRowSize();
+                lattIndex endRow = pos2 / mpLatt->getRowSize();
+                lattIndex endCol = pos2 % mpLatt->getRowSize();
+                return vector( startRow - endRow, startCol - endCol );
+
+        }
 };
 
 
