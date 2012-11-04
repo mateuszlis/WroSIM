@@ -52,7 +52,7 @@ class MsdEnabledLattEx : public LattExchanger
             mTracking[pos2] ^= mTracking[pos1];
             mTracking[pos1] ^= mTracking[pos2];
             LattExchanger::exchangeSites( pos1, pos2 );
-            if ( isPBCJump( pos1, pos2 ) )
+            if ( isNotPBCJump( pos1, pos2 ) )
             {
                 mPBCCorrection[ mTracking[ pos1 ] ].col = 0;
                 mPBCCorrection[ mTracking[ pos2 ] ].row = 0;
@@ -99,13 +99,21 @@ class MsdEnabledLattEx : public LattExchanger
 
         vectorDist* mPBCCorrection;
 
+        static const bool isNeighbor[3][3];
+
     protected: // functions
 
-        virtual bool isPBCJump( lattIndex pos1, lattIndex pos2 ) 
+        virtual bool isNotPBCJump( lattIndex pos1, lattIndex pos2 ) 
         {
-            return ( abs( pos1 - pos2 ) == 1 || abs( pos1 - pos2 ) == mpLatt->getRowSize() || pos1 - pos2 == -mpLatt->getRowSize() + 1 || pos1 - pos2 == mpLatt->getRowSize() - 1 );
+            vectorDist dist( calcDist( pos1, pos2 ) );
+            if ( dist.squareDisp() <= 2 )
+            {
+                return isNeighbor[ dist.col - 1 ][ dist.row - 1 ];
+            }
+            return false;
+                    
         }
 
-};
+}; // class MsdEnabledLattEx
 
 

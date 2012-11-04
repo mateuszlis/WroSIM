@@ -2,6 +2,9 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
+#define protected public // test class internals
+// not a very good strategy, but needed here
+
 // project-local
 #include "MsdEnabledLattEx.h"
 #include "TriangularLattice.h"
@@ -56,5 +59,17 @@ TEST( MsdEnabledLattEx, msdCalc  )
     EXPECT_DOUBLE_EQ( ex.calcStat(), 2/1000. );
     ex.exchangeSites( 4, 6 );
     EXPECT_DOUBLE_EQ( ex.calcStat(), 0.01 );
+    delete latt;
+}
+
+TEST( MsdEnabledLattEx, isPBCJump  )
+{
+    TriangularLattice *latt;
+    latt = new TriangularLattice( 25, 5, 20 );
+    MsdEnabledLattEx ex( latt );
+    EXPECT_FALSE( ex.isNotPBCJump( 4, 5 ) );
+    EXPECT_TRUE( ex.isNotPBCJump( 2, 3 ) );
+    EXPECT_FALSE( ex.isNotPBCJump( 2, 8 ) );
+    EXPECT_FALSE( ex.isNotPBCJump( 7, 1 ) );
     delete latt;
 }
