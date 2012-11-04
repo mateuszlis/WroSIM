@@ -10,6 +10,7 @@ struct vectorDist
 {
     vectorDist() : row( 0 ), col( 0 ) {};
     vectorDist( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
+    lattIndex squareDisp() { return row*row + col*col; }
     lattIndex row;
     lattIndex col;
 };
@@ -67,11 +68,7 @@ class MsdEnabledLattEx : public LattExchanger
             double msd( 0 );
             for ( lattIndex i = 0 ; i < mpLatt->getLatticeSize() ; ++i )
             {
-                lattIndex startRow = i / mpLatt->getRowSize();
-                lattIndex startCol = i % mpLatt->getRowSize();
-                lattIndex currRow = mTracking[i] / mpLatt->getRowSize();
-                lattIndex currCol = mTracking[i] % mpLatt->getRowSize();
-                msd += ( ( startRow - currRow ) * ( startRow - currRow )  + ( startCol - currCol ) * ( startCol - currCol ) );
+                msd += calcDist( i, mTracking[i] ).squareDisp();
             }
             msd /= mpLatt->getLatticeSize();
             return msd;

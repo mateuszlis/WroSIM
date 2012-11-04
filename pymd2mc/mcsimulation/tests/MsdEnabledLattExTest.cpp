@@ -46,3 +46,15 @@ TEST( MsdEnabledLattEx, calcDist_PBC  )
     EXPECT_EQ( distance.row, 1 );
     delete latt;
 }
+
+TEST( MsdEnabledLattEx, msdCalc  )
+{
+    TriangularLattice *latt;
+    latt = new TriangularLattice( 1000, 100, 20 );
+    MsdEnabledLattEx ex( latt );
+    ex.exchangeSites( 0, 1 );
+    EXPECT_DOUBLE_EQ( ex.calcStat(), 2/1000. );
+    ex.exchangeSites( 4, 6 );
+    EXPECT_DOUBLE_EQ( ex.calcStat(), 0.01 );
+    delete latt;
+}
