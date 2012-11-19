@@ -20,17 +20,14 @@
 // project-local
 #include "TriangularLattice.h"
 
-// helpers
-void printLatt( lattMember *latt, int rowSize, int rowsCount );
-int calcSum( TriangularLattice* );
-std::set< int > getNeighborsOf( int site, TriangularLattice* latt );
-bool checkIfIsNeighborOf( const int& neighbor, const std::set< int >& elements, TriangularLattice* latt );
-
+// testing
+#include "testUtils.h"
+using namespace testUtils;
 
 TEST( TriangularLattice, Construct )
 {
     TriangularLattice *latt = new TriangularLattice( 100, 10, 20);
-    EXPECT_EQ( calcSum( latt ), 20 * 255 );
+    EXPECT_EQ( calcSum( latt ), 20 * LIPID_B );
     delete latt;
 }
 
@@ -72,7 +69,7 @@ TEST( TriangularLatticeTest, CalcNeighbors )
         sum += latt->simNeighbCount( i );
     }
     EXPECT_EQ( sum, 6 * 100 - 12 );
-    EXPECT_EQ( calcSum( latt ), 255 );
+    EXPECT_EQ( calcSum( latt ), LIPID_B );
     delete latt;
 }
 
@@ -87,7 +84,7 @@ TEST( TriangularLatticeTest, ExchangeSites )
         if ( pos1 != pos2 )
             latt->exchangeSites( pos1, pos2);
     }
-    EXPECT_EQ( calcSum(latt), 20 * 255 );
+    EXPECT_EQ( calcSum(latt), 20 * LIPID_B );
     delete latt;
 }
 
@@ -101,9 +98,9 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     EXPECT_EQ( map[ 1 ], 1 );
     for( int i = 0 ; i < LATT_SIZE ; ++i )
     {
-        if( latt->getLattice()[i] == 255 )
+        if( latt->getLattice()[i] == LIPID_B )
         {
-            latt->getLattice()[ ( i + 1 ) % LATT_SIZE ] = 255;
+            latt->getLattice()[ ( i + 1 ) % LATT_SIZE ] = LIPID_B;
             break;
         }
     }
@@ -112,9 +109,9 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     EXPECT_EQ( map[ 2 ], 1 );
     for( int i = 0 ; i < LATT_SIZE ; ++i )
     {
-        if( latt->getLattice()[i] == 255 )
+        if( latt->getLattice()[i] == LIPID_B )
         {
-            latt->getLattice()[ ( i + 14 ) % LATT_SIZE ] = 255;
+            latt->getLattice()[ ( i + 14 ) % LATT_SIZE ] = LIPID_B;
             break;
         }
     }
@@ -128,57 +125,5 @@ TEST( TriangularLatticeTest, ClusterAnalysis )
     latt->calculateClusters( map );
     printLatt( latt->getLattice(), 5, 7 );
     EXPECT_EQ( map[ 34 ], 1 );
-}
-// helpers
-
-void printLatt( lattMember *latt, int rowSize, int rowsCount )
-{
-    for ( int i = 0 ; i < rowsCount ; ++i )
-    {
-        cout << setw( 2 * ( i + 1 ) ) << "  " ;
-        for( int j = 0 ; j < rowSize; ++j )
-        {   
-            cout << setw(2) << static_cast< int >( latt[ i * rowSize + j ] ) << "  ";
-        }
-        cout << endl;
-    }
-}
-int calcSum( TriangularLattice *latt )
-{
-    int sum = 0;
-    for ( int i = 0; i < latt->getLatticeSize(); i++ )
-    {
-        sum += ( *latt )[i];
-    }
-    return sum;
-}
-
-std::set< int > getNeighborsOf( int site, TriangularLattice* latt )
-{
-    std::set< int > neighbors;
-    for( int neighNum = 0 ; neighNum < 6 ; ++neighNum )
-    {
-        neighbors.insert( latt->getNeighbIndex( site, neighNum ) );
-    }
-    return neighbors;
-}
-
-/**
- * @brief for each element from elements, checks if neighbor is its neighbor on
- * the lattice latt
- */
-bool checkIfIsNeighborOf( const int& neighbor, const std::set< int >& elements, TriangularLattice* latt )
-{
-    for ( std::set< int >::const_iterator it = elements.begin() 
-            ; it != elements.end() 
-            ; ++it )
-    {
-        std::set< int > elementsNeighbors = getNeighborsOf( *it, latt );
-        if ( elementsNeighbors.find( neighbor ) == elementsNeighbors.end() )
-        {
-            return false;
-        }
-    }
-    return true;
 }
 

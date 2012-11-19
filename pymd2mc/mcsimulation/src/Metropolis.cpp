@@ -13,6 +13,7 @@
 Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equilibSteps) 
     : mEquilibSteps( equilibSteps )
       , mT( T )
+      , mpSampler( NULL  )
       , mOutputFreq( 100 )
       , mpNeighOutputFile( NULL )
       , mpFNFOutputFile( NULL )

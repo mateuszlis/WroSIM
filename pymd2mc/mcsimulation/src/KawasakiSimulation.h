@@ -1,5 +1,5 @@
 /*
- * Metropolis.h
+ * KawasakiSimulation.h
  *
  *  Created on: 10-09-2012
  *      Author: lisu
@@ -72,4 +72,5 @@ class KawasakiSimulation : public Metropolis
          * @brief Performs single step of metropolis algorithm for triangular lattice
          */
         void metropolisStep(); 
+
 };

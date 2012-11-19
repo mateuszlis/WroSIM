@@ -15,26 +15,36 @@ void TriangularLattice::clearArr()
 {
     for ( lattIndex i = 0; i < mLatticeSize; i++ )
     {
-        mpLattice[i] = 0;
+        mpLattice[i] = LIPID_A;
     }
 }
 void TriangularLattice::distributeParticlesRandomly( lattIndex firstTypeParticlesCnt )
 {
-    for ( lattIndex i = 0; i < firstTypeParticlesCnt; i++ )
+    for ( lattIndex i = 0; i < firstTypeParticlesCnt; ++i )
     {
         lattIndex pos = rand() % getLatticeSize(); //FIXME: if RAND_MAX is too small this causes bad distribution
-        while ( this->mpLattice[pos] > 0)
+        while ( !isFree( pos ) )
         {
 				pos = rand() % getLatticeSize();
         };
-        this->mpLattice[pos] = 255;
+        this->mpLattice[pos] = LIPID_B;
     }
 }
+bool TriangularLattice::isFree( lattIndex pos ) const
+{
+    return mpLattice[ pos ] == LIPID_A;
+}
+
+TriangularLattice::lattMember TriangularLattice::get( int index ) const
+{ 
+    return mpLattice[ cutToPos( index ) ];
+}
+
 void TriangularLattice::distributeParticles( lattIndex firstTypeParticlesCnt )
 {
     for ( lattIndex pos = 0; pos < firstTypeParticlesCnt; ++pos  )
     {
-        this->mpLattice[pos] = 255;
+        this->mpLattice[pos] = LIPID_B;
     }
 }
 
@@ -116,7 +126,7 @@ void TriangularLattice::exchangeSites( lattIndex pos1, lattIndex pos2 )
 lattIndex TriangularLattice::simNeighbCount( lattIndex pos )
 {
     lattIndex sum = 0;
-    for ( int i = 0; i < 6; i++ )
+    for ( int i = 0; i < mNeighbCnt; i++ )
     {
         lattIndex currentNeigh = getNeighbIndex(pos, i);
         sum += ( mpLattice[pos] == mpLattice[currentNeigh] ? 1 : 0 );
@@ -127,16 +137,20 @@ lattIndex TriangularLattice::simNeighbCount( lattIndex pos )
 lattIndex TriangularLattice::getNeighbIndex( lattIndex pos, int neighborNum ) const
 {
     lattIndex translationIndex( mNeighb[ neighborNum ] );
-	lattIndex neigh = ( pos + translationIndex );
-	if ( neigh >= mLatticeSize )
+	return cutToPos( pos + translationIndex );
+}
+
+lattIndex TriangularLattice::cutToPos( int pos ) const
+{
+	if ( pos >= mLatticeSize )
     {
-		neigh -= mLatticeSize;
+		pos -= mLatticeSize;
     }
-	if ( neigh < 0 )
+	if ( pos < 0 )
     {
-	    neigh += mLatticeSize;
+	    pos += mLatticeSize;
     }
-    return  neigh;
+    return  pos;
 }
 unsigned int TriangularLattice::getNeighborsCnt() const
 {
@@ -164,7 +178,7 @@ int TriangularLattice::findAncestor(int currentLabel, TriangularLattice::cluster
 }
 void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 {
-    const lattMember kind = 255;
+    const lattMember kind = LIPID_B;
 	
 	clustersMap clMap;
 
@@ -283,7 +297,7 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
     stream << latt.getLatticeSize() << endl;
     stream << "Simulation" << endl;
     for ( lattIndex i = 0; i < latt.getLatticeSize(); i++ )
-        if ( latt[i] )
+        if ( latt[i] == LIPID_A )
         {
 	    lattIndex line( i / latt.getRowSize() );
             double y = line * 0.866025;
@@ -292,12 +306,32 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
         }
     for ( lattIndex i = 0; i < latt.getLatticeSize(); i++ )
     {
-        if ( ! ( latt.mpLattice[i] ) )
+        if ( latt[i] == LIPID_B )
         {
 	    lattIndex line( i / latt.getRowSize() );
             double y = line * 0.866025;
             double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
             stream << "B\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
+        }
+    }
+    for ( lattIndex i = 0; i < latt.getLatticeSize(); i++ )
+    {
+        if ( latt[i] == PROTEIN_A )
+        {
+	    lattIndex line( i / latt.getRowSize() );
+            double y = line * 0.866025;
+            double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
+            stream << "PROTEIN\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
+        }
+    }
+    for ( lattIndex i = 0; i < latt.getLatticeSize(); i++ )
+    {
+        if ( latt[i] == PROTEIN_B )
+        {
+	    lattIndex line( i / latt.getRowSize() );
+            double y = line * 0.866025;
+            double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
+            stream << "PROTEIN_B\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
         }
     }
     return stream;

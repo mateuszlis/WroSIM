@@ -181,7 +181,7 @@ int main(int argc,char *argv[]) {
                 }
             }
 
-            double omega_abAt1( 0 ), omega_abAt2;
+            double omega_abAt1( 0 ), omega_abAt2( 0 );
             if ( mixedAt1 && frameCounter > minFrames )
             {
                 double PAt1;

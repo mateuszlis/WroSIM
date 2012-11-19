@@ -39,6 +39,7 @@ void massiveParallelKawasakiSampler( TriangularLattice *latt, int &pos1, int &po
 
 KawasakiSimulation::KawasakiSimulation( TriangularLattice* latt, double omegaAB, int T, int equilibSteps )
     : Metropolis( latt, omegaAB, T, equilibSteps )
+      , mpSampler( kawasakiSampler )
 {}
 
 KawasakiSimulation::~KawasakiSimulation()
@@ -98,10 +99,11 @@ void KawasakiSimulation::metropolisStep()
     if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] )
     {
         double p = prob( calcEnergyDiff( pos1, pos2));
-        double acceptance = rand() / ( float( RAND_MAX ) + 1 );
+        double acceptance = rand() / ( static_cast< float >( RAND_MAX ) + 1 );
         if ( p >= 1 or p > ( acceptance ) )
         {
             mpLatt->exchangeSites( pos1, pos2);
         }
     }
 }
+

@@ -30,13 +30,14 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt );
 
 class TriangularLattice
 {
-    public:
+    public: // typedefs
         typedef ::lattMember lattMember; // TODO: not implemented everywhere
         typedef int lattIndex;
         typedef std::map< lattIndex, lattIndex >  clustersMap; // clusterSize ---> cluster count
         typedef map< lattIndex, bool > doneMap;
 
-        TriangularLattice( string filename );
+    public: // functions
+        TriangularLattice( string filename ); //TODO: not yet implemented
 
         TriangularLattice( lattIndex latticeSize
                          , lattIndex rowSize
@@ -44,6 +45,7 @@ class TriangularLattice
                          , bool distributeRandomly = true );
 
         lattMember operator[]( lattIndex index ) const;
+        lattMember get( int index ) const; // applies helical boundary conditions
 
         lattIndex getLatticeSize() const;
         lattIndex getRowSize() const;
@@ -61,7 +63,8 @@ class TriangularLattice
         virtual ~TriangularLattice();
 
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );
-    private:
+
+    protected:
         lattMember *mpLattice;
         lattIndex mLatticeSize;
         lattIndex mRowSize;
@@ -70,9 +73,11 @@ class TriangularLattice
         static const int mNeighbCnt = 6;
         lattIndex mNeighb[mNeighbCnt];
 
-        void clearArr();
-        void distributeParticlesRandomly( lattIndex firstTypeParticlesCnt );
-        void distributeParticles( lattIndex firstTypeParticlesCnt );
+        virtual void clearArr();
+        virtual void distributeParticlesRandomly( lattIndex firstTypeParticlesCnt );
+        virtual void distributeParticles( lattIndex firstTypeParticlesCnt );
+        virtual bool isFree( lattIndex pos ) const;
+        virtual lattIndex cutToPos( int pos ) const;
         void pushNeighborsToQueue( std::list< lattIndex > & queue, lattIndex siteInd );
         void clearExchanger();
 		static bool gotDifferentNeighbors(list<int> neighLabels, int currentLabel);
