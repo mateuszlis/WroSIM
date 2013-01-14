@@ -88,7 +88,7 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
     mLatticeSize = latticeSize;
     mRowSize = rowSize;
     clearArr();
-    lattIndex neighb[] = { 1, -1, rowSize, -rowSize, rowSize - 1, -rowSize + 1 }; // bloody helical boundary conditions
+    lattIndex neighb[] = { 1, rowSize, rowSize - 1, -1, -rowSize, -rowSize + 1 }; // bloody helical boundary conditions
     for ( lattIndex i = 0; i < mNeighbCnt; i++ )
     {
         mNeighb[i] = neighb[i];
@@ -126,7 +126,7 @@ void TriangularLattice::exchangeSites( lattIndex pos1, lattIndex pos2 )
 lattIndex TriangularLattice::simNeighbCount( lattIndex pos )
 {
     lattIndex sum = 0;
-    for ( int i = 0; i < mNeighbCnt; i++ )
+    for ( int i = 0; i < mNeighbCnt; ++i )
     {
         lattIndex currentNeigh = getNeighbIndex(pos, i);
         sum += ( mpLattice[pos] == mpLattice[currentNeigh] ? 1 : 0 );
@@ -299,7 +299,7 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
     for ( lattIndex i = 0; i < latt.getLatticeSize(); i++ )
         if ( latt[i] == LIPID_A )
         {
-	    lattIndex line( i / latt.getRowSize() );
+	    lattIndex line( ( latt.getLatticeSize() - i ) / latt.getRowSize() );
             double y = line * 0.866025;
             double x = ( i % latt.getRowSize() ) - line * 0.5;
             stream << "A\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
@@ -308,7 +308,7 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
     {
         if ( latt[i] == LIPID_B )
         {
-	    lattIndex line( i / latt.getRowSize() );
+	    lattIndex line( ( latt.getLatticeSize() - i ) / latt.getRowSize() );
             double y = line * 0.866025;
             double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
             stream << "B\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
@@ -318,7 +318,7 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
     {
         if ( latt[i] == PROTEIN_A )
         {
-	    lattIndex line( i / latt.getRowSize() );
+	    lattIndex line( ( latt.getLatticeSize() - i ) / latt.getRowSize() );
             double y = line * 0.866025;
             double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
             stream << "PROTEIN\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;
@@ -328,7 +328,7 @@ ostream &operator<<( ostream &stream, TriangularLattice &latt )
     {
         if ( latt[i] == PROTEIN_B )
         {
-	    lattIndex line( i / latt.getRowSize() );
+	    lattIndex line( ( latt.getLatticeSize() - i ) / latt.getRowSize() );
             double y = line * 0.866025;
             double x = ( i % latt.getRowSize() ) - ( line * 0.5 ); 
             stream << "PROTEIN_B\t" << setprecision( 8) << x << "\t" << y << "\t0.00000000" << endl;

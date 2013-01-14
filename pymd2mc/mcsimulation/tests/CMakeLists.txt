@@ -3,6 +3,7 @@ add_executable (TriangularLatticeTest testUtils.cpp TriangularLatticeTest.cpp)
 add_executable (ProteinTriangularLatticeTest testUtils.cpp ProteinTriangularLatticeTest.cpp)
 add_executable (ClustersAnalyzerTest ClustersAnalyzerTest.cpp)
 add_executable (MsdEnabledLattExTest MsdEnabledLattExTest.cpp)
+add_executable (KawasakiProteinsTest testUtils.cpp KawasakiProteinsTest.cpp )
 #every test has its own valgrind version
 #so it is easy to turn off time-consuming valgrind tests in ctest while
 #debugging
@@ -12,6 +13,9 @@ add_test(TriangularLatticeTest|Valgrind valgrind --leak-check=full
 add_test(ProteinTriangularLatticeTest ${EXECUTABLE_OUTPUT_PATH}/ProteinTriangularLatticeTest)
 add_test(ProteinTriangularLatticeTest|Valgrind valgrind --leak-check=full
     --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/ProteinTriangularLatticeTest ) #exclude exception test, because there is sth wrong with it in OS X
+add_test(KawasakiProteinsTest ${EXECUTABLE_OUTPUT_PATH}/KawasakiProteinsTest)
+add_test(KawasakiProteinsTest|Valgrind valgrind --leak-check=full
+    --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/KawasakiProteinsTest ) 
 add_test(ClustersAnalyzerTest  ${EXECUTABLE_OUTPUT_PATH}/ClustersAnalyzerTest)
 add_test(ClustersAnalyzerTest|Valgrind valgrind --leak-check=full
     --undef-value-errors=no -v --error-exitcode=1 ${EXECUTABLE_OUTPUT_PATH}/ClustersAnalyzerTest)
@@ -26,5 +30,6 @@ add_test(cppcheckAll  cppcheck ${BASE_SRC_DIR} --error-exitcode=1 --enable=all -
 
 target_link_libraries(TriangularLatticeTest TriangularLattice gtest gtest_main gmock)
 target_link_libraries(ProteinTriangularLatticeTest TriangularLattice ProteinTriangularLattice gtest gtest_main gmock)
+target_link_libraries(KawasakiProteinsTest TriangularLattice ProteinTriangularLattice KawasakiProteins KawasakiSimulation Metropolis gtest gtest_main gmock)
 target_link_libraries(ClustersAnalyzerTest ClustersAnalyzer gtest gtest_main)
 target_link_libraries(MsdEnabledLattExTest TriangularLattice gtest gtest_main)

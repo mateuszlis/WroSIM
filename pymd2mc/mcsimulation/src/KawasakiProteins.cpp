@@ -1,7 +1,14 @@
 #include "KawasakiProteins.h"
 
-KawasakiProteins::KawasakiProteins( ProteinTriangularLattice* latt, double omegaAB, int T, int equilibSteps )
-    : KawasakiSimulation( latt, omegaAB, T, equilibSteps )
+KawasakiProteins::KawasakiProteins( ProteinTriangularLattice* latt
+                        , double omegaAB
+                        , double omegaAC
+                        , double omegaBC
+                        , int T
+                        , int equilibSteps )
+    : KawasakiSimulation( latt, omegaAB, T, equilibSteps ) 
+    , mOmegaAC( omegaAC )
+    , mOmegaBC( omegaBC )
 {
     mpLatt = latt;
 }
@@ -14,12 +21,15 @@ void KawasakiProteins::run( int steps )
 {
     for ( int i = 0; i < steps; i++ )
     {
-        for ( int j = 0; j < mStepSize; j++ )
+        for ( int j = 0; j < mStepSize; ++j )
         {
             metropolisStep();
         }
 
-        proteinStep();
+        for ( int j = 0 ; j < 1; ++j )
+        {
+            proteinStep();
+        }
 
         if ( analysisStep( i ) && mIsSetFrameStream )
         {
@@ -36,8 +46,20 @@ void KawasakiProteins::proteinStep()
 {
     if ( mpLatt->getProteinCnt() )
     {
-        ProteinTriangularLattice::lattIndex protein( rand() % mpLatt->getProteinCnt() );
-        mpLatt->moveProtein( mpLatt->getProteins()[protein], mpLatt->getProteins()[protein] + 1 ); //FIXME +1 is just a quick thing
+        double energyBefore( calcEnergy() );
+        ProteinTriangularLattice::lattIndex proteinIndex( rand() % mpLatt->getProteinCnt() );
+        lattIndex protein( mpLatt->getProteins()[ proteinIndex ] );
+        lattIndex directionSite( rand() % mpLatt->getNeighborsCnt() );
+        mpLatt->moveProtein( protein
+                           , mpLatt->getNeighbIndex( protein, directionSite  ) );
+        double energyAfter( calcEnergy() );
+        double p = prob( energyAfter - energyBefore );
+        double acceptance = rand() / ( float( RAND_MAX ) + 1 );
+        if ( !( p >= 1 or p > ( acceptance ) ) )
+        {
+           mpLatt->moveProtein( protein
+                              , mpLatt->getNeighbIndex( protein, directionSite + 3 ) ); //revoke
+        }
     }
 
 };
@@ -59,7 +81,7 @@ void KawasakiProteins::metropolisStep()
 
     if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] && isLipid( ( *mpLatt )[pos2] ) && isLipid( ( *mpLatt )[pos1] )  )
     {
-        double p = prob( calcEnergyDiff( pos1, pos2));
+        double p = prob( calcEnergyDiff( pos1, pos2) );
         double acceptance = rand() / ( float( RAND_MAX ) + 1 );
         if ( p >= 1 or p > ( acceptance ) )
         {
@@ -75,13 +97,61 @@ bool KawasakiProteins::isLipid( lattMember site )
 
 double KawasakiProteins::calcEnergyDiff( int pos1, int pos2 )
 {
-    static const double mProtein_A = 300;
-    static const double mProtein_B = -200;
-    int s1Diff = 6 - mpLatt->simNeighbCount( pos1 );
-    int s2Diff = 6 - mpLatt->simNeighbCount( pos2 );
+    int s1Diff = mpLatt->calcOtherLipidNeighbors( pos1 );
+    int s2Diff = mpLatt->calcOtherLipidNeighbors( pos2 );
+    int s1protANeighb = mpLatt->calcNeighbors( pos1, PROTEIN_A );
+    int s2protANeighb = mpLatt->calcNeighbors( pos2, PROTEIN_A );
     
-    int diff1 = s1Diff + s2Diff;
-    int diff2 = 14 - ( s1Diff + s2Diff ) ;
-    //mpLatt->getProteins()
-    return ( diff2 - diff1 ) * mOmegaAB;
+    int s1_after( 7 - ( s1Diff + s1protANeighb ) );
+    int s2_after( 7 - ( s2Diff + s2protANeighb ) );
+    int s1prot_after( s2protANeighb );
+    int s2prot_after( s2protANeighb );
+
+
+    if ( ( *mpLatt )[ pos1 ] == LIPID_A )
+    {
+        return ( s1_after + s2_after - ( s1Diff + s2Diff ) ) * mOmegaAB + ( s1prot_after - s1protANeighb ) * mOmegaAC + ( s2prot_after - s2protANeighb ) * mOmegaBC;
+    }
+    else
+    {
+        return ( s1_after + s2_after - ( s1Diff + s2Diff ) ) * mOmegaAB + ( s1prot_after - s1protANeighb ) * mOmegaBC + ( s2prot_after - s2protANeighb ) * mOmegaAC;
+    }
+
+}
+
+double KawasakiProteins::calcEnergy()
+{
+    unsigned int ABcount( 0 ), ACcount( 0 ), BCcount( 0 );
+
+    for ( lattIndex i( 0 ) ; i < mpLatt->getLatticeSize() ; ++i )
+    {
+        for ( lattIndex neighbIndex( 0 ) ; ( neighbIndex < mpLatt->getNeighborsCnt() ) ; ++neighbIndex )
+        {
+            lattIndex neighb( mpLatt->getNeighbIndex( i, neighbIndex ) );
+            if ( ( *mpLatt )[i] != ( *mpLatt )[ neighb ] )
+            {
+                if ( ( ( *mpLatt )[i] == LIPID_A && ( *mpLatt )[ neighb ] == LIPID_B )
+                        || ( ( *mpLatt )[i] == LIPID_B && ( *mpLatt )[ neighb ] == LIPID_A ) )
+                {
+                    ABcount++;
+                }
+                if ( ( ( *mpLatt )[i] == LIPID_A && ( *mpLatt )[ neighb ] == PROTEIN_A )
+                        || ( ( *mpLatt )[i] == PROTEIN_A && ( *mpLatt )[ neighb ] == LIPID_A ) )
+                {
+                    ACcount++;
+                }
+                if ( ( ( *mpLatt )[i] == LIPID_B && ( *mpLatt )[ neighb ] == PROTEIN_A )
+                        || ( ( *mpLatt )[i] == PROTEIN_A && ( *mpLatt )[ neighb ] == LIPID_B ) )
+                {
+                    BCcount++;
+                }
+            }
+                
+        }
+        
+    }
+    ABcount /= 2; // each pair was counted twice
+    BCcount /= 2;
+    ACcount /= 2;
+    return ABcount * mOmegaAB + ACcount * mOmegaAC + BCcount * mOmegaBC;
 }

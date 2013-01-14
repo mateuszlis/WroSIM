@@ -133,6 +133,12 @@ first_particles_count () const
 }
 
 inline const int& options::
+proteins_count () const
+{
+  return this->proteins_count_;
+}
+
+inline const int& options::
 latt_row_size () const
 {
   return this->latt_row_size_;
@@ -169,9 +175,21 @@ output_freq () const
 }
 
 inline const float& options::
-omega () const
+omegaAB () const
 {
-  return this->omega_;
+  return this->omegaAB_;
+}
+
+inline const float& options::
+omegaAC () const
+{
+  return this->omegaAC_;
+}
+
+inline const float& options::
+omegaBC () const
+{
+  return this->omegaBC_;
 }
 
 inline const int& options::

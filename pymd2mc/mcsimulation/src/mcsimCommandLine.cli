@@ -21,6 +21,11 @@ class options
         "Value describes number of sites of the first of types. 
         This required to generate lattice if you don't pass the starting point file." 
   };
+  int --proteins_count = 16 
+  {
+        "<num>",
+        "Number of protein-like (larger) particles in simulation."
+  };
     int --latt-row-size = 100
   {
         "<num",
@@ -57,10 +62,20 @@ class options
         written to the output file"
   };
 
-  float --omega = 0
+  float --omegaAB = 0
   {
         "<float>",
         "Value of omega_AB (see documentation)"
+  };
+  float --omegaAC = 0
+  {
+        "<float>",
+        "Value of omega_AC (see documentation)"
+  };
+  float --omegaBC = 0
+  {
+        "<float>",
+        "Value of omega_BC (see documentation)"
   };
   int --eq-steps = 0
   {

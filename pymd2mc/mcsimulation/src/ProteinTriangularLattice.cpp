@@ -1,6 +1,7 @@
 #include "ProteinTriangularLattice.h"
 
 #include <limits>
+#include "LattExchanger.h"
 
 ProteinTriangularLattice::ProteinTriangularLattice( lattIndex latticeSize
                                 , lattIndex rowSize
@@ -9,6 +10,12 @@ ProteinTriangularLattice::ProteinTriangularLattice( lattIndex latticeSize
                                 , bool distributeRandomly )
     : TriangularLattice( latticeSize, rowSize, firstTypeParticlesCnt, distributeRandomly )
       , mProteinCnt( proteinCnt )
+      , RIGHT_NEIGH_OFFSET( 1 )
+      , RIGHT_TOP_NEIGH_OFFSET( -mRowSize + 1 )
+      , RIGHT_BOTTOM_NEIGH_OFFSET( mRowSize ) 
+      , LEFT_BOTTOM_NEIGH_OFFSET( mRowSize - 1 )
+      , LEFT_TOP_NEIGH_OFFSET( -mRowSize )
+      , LEFT_NEIGH_OFFSET( -1 )
 {
     mProteinSites[ 0 ] = 0;
     mProteinSites[ 1 ] = 1;
@@ -17,11 +24,89 @@ ProteinTriangularLattice::ProteinTriangularLattice( lattIndex latticeSize
     mProteinSites[ 4 ] = -rowSize;
     mProteinSites[ 5 ] = rowSize - 1;
     mProteinSites[ 6 ] = -rowSize + 1; // TODO: this fixed the protein size
-
     if( distributeRandomly )
         distributeProteinsRandomly();
     else
         distributeProteins();
+
+
+    // FIXME: values that are currently hardcoded - in future will be developed using optimization
+    mSitesMovedMoveRight.push_back( RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( mSitesMovedMoveRight.back() + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( mSitesMovedMoveRight.back() + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( mSitesMovedMoveRight.back() + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( mSitesMovedMoveRight.back() + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( mSitesMovedMoveRight.back() + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( mSitesMovedMoveRight.back() + LEFT_BOTTOM_NEIGH_OFFSET );
+    //additional items
+    mSitesMovedMoveRight.push_back( RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveRight.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+
+    mSitesMovedMoveLeft.push_back( LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_BOTTOM_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( mSitesMovedMoveLeft.back() + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( mSitesMovedMoveLeft.back() + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( mSitesMovedMoveLeft.back() + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( mSitesMovedMoveLeft.back() + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( mSitesMovedMoveLeft.back() + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( mSitesMovedMoveLeft.back() + RIGHT_BOTTOM_NEIGH_OFFSET );
+    //additional items
+    mSitesMovedMoveLeft.push_back( LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveLeft.push_back( LEFT_BOTTOM_NEIGH_OFFSET + LEFT_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+
+
+    mSitesMovedMoveUp.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( LEFT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( LEFT_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( RIGHT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( RIGHT_TOP_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( mSitesMovedMoveUp.back() + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( mSitesMovedMoveUp.back() + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( mSitesMovedMoveUp.back() + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( mSitesMovedMoveUp.back() + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( mSitesMovedMoveUp.back() + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( mSitesMovedMoveUp.back() + RIGHT_NEIGH_OFFSET );
+    //additional items
+    mSitesMovedMoveUp.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveUp.push_back( RIGHT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+
+    mSitesMovedMoveDown.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( RIGHT_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( LEFT_BOTTOM_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( LEFT_TOP_NEIGH_OFFSET + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( mSitesMovedMoveDown.back() + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( mSitesMovedMoveDown.back() + RIGHT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( mSitesMovedMoveDown.back() + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( mSitesMovedMoveDown.back() + LEFT_TOP_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( mSitesMovedMoveDown.back() + LEFT_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( mSitesMovedMoveDown.back() + LEFT_NEIGH_OFFSET );
+    //additional items
+    mSitesMovedMoveDown.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( RIGHT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
+    mSitesMovedMoveDown.push_back( LEFT_BOTTOM_NEIGH_OFFSET + RIGHT_BOTTOM_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET );
 }
 
 void ProteinTriangularLattice::distributeProteinsRandomly()
@@ -62,22 +147,42 @@ void ProteinTriangularLattice::distributeProteins()
 
 void ProteinTriangularLattice::moveProtein( lattIndex site, lattIndex destination )
 {
-    double res = ( rand() ) / static_cast< float >( RAND_MAX );
-    if ( res < 0.25 ) moveProteinRight( site );
-    else if ( res < 0.5 ) moveProteinLeft( site );
-    else if ( res < 0.75 ) moveProteinUp( site );
-    else moveProteinDown( site );
+    vectorDist dist( mpExchanger->calcDist( site, destination ) );
+    // choose direction
+    if ( abs( dist.col ) > abs( dist.row ) )
+    {
+        if ( dist.col < 0 ) 
+        {
+            if ( isSpaceToMove( site, mSitesMovedMoveRight ) )
+                moveProteinRight( site );
+            else return;
+        }
+        else
+        {
+            if ( isSpaceToMove( site, mSitesMovedMoveLeft ) )
+                moveProteinLeft( site );
+            else return;
+        }
+    }
+    else
+    {
+        if ( dist.row > 0 ) 
+        {
+            if ( isSpaceToMove( site, mSitesMovedMoveUp ) )
+                moveProteinUp( site );
+            else return;
+        }
+        else 
+        {
+            if ( isSpaceToMove( site, mSitesMovedMoveDown ) )
+                moveProteinDown( site );
+            else return;
+        }
+    }
 }
 void ProteinTriangularLattice::moveProteinRight( lattIndex site )
 {
-    static const int RIGHT_NEIGH_OFFSET = 1;
-    static const int RIGHT_TOP_NEIGH_OFFSET = -mRowSize + 1;
-    static const int RIGHT_BOTTOM_NEIGH_OFFSET = mRowSize ;
-    static const int LEFT_BOTTOM_NEIGH_OFFSET = mRowSize - 1 ;
-    static const int LEFT_TOP_NEIGH_OFFSET = -mRowSize;
-    static const int LEFT_NEIGH_OFFSET = -1;
     static const int MOVED_SITES_SIZE = 3;
-
 
     lattMember movedSites[ MOVED_SITES_SIZE ];
     lattMember protein( mpLattice[ site ] );
@@ -87,11 +192,8 @@ void ProteinTriangularLattice::moveProteinRight( lattIndex site )
     movedSites[1] = get( rightSite + RIGHT_TOP_NEIGH_OFFSET );
     movedSites[2] = get( rightSite + RIGHT_BOTTOM_NEIGH_OFFSET );
 
-    if ( !isSpaceToMove( movedSites, MOVED_SITES_SIZE ) )
-    {
-        return;
-    }
     // move right top site
+
     pushAndPop( site + RIGHT_TOP_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET, movedSites[1] );
     pushAndPop( site + RIGHT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET, movedSites[1] );
     pushAndPop( site + LEFT_TOP_NEIGH_OFFSET, movedSites[1] );
@@ -103,6 +205,7 @@ void ProteinTriangularLattice::moveProteinRight( lattIndex site )
     pushAndPop( site + LEFT_BOTTOM_NEIGH_OFFSET, movedSites[2] );
 
     // move center
+
     lattIndex lastMovedSite = rightSite + RIGHT_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET;
     pushAndPop( lastMovedSite, movedSites[0] );
     lastMovedSite += LEFT_TOP_NEIGH_OFFSET;
@@ -136,12 +239,6 @@ void ProteinTriangularLattice::moveProteinRight( lattIndex site )
 
 void ProteinTriangularLattice::moveProteinLeft( lattIndex site )
 {
-    static const int RIGHT_NEIGH_OFFSET = 1;
-    static const int RIGHT_TOP_NEIGH_OFFSET = -mRowSize + 1;
-    static const int RIGHT_BOTTOM_NEIGH_OFFSET = mRowSize ;
-    static const int LEFT_BOTTOM_NEIGH_OFFSET = mRowSize - 1 ;
-    static const int LEFT_TOP_NEIGH_OFFSET = -mRowSize;
-    static const int LEFT_NEIGH_OFFSET = -1;
 
     static const int MOVED_SITES_SIZE = 3;
     lattMember movedSites[ MOVED_SITES_SIZE ];
@@ -151,11 +248,6 @@ void ProteinTriangularLattice::moveProteinLeft( lattIndex site )
     movedSites[0] = get( leftSite + LEFT_NEIGH_OFFSET );
     movedSites[1] = get( leftSite + LEFT_TOP_NEIGH_OFFSET );
     movedSites[2] = get( leftSite + LEFT_BOTTOM_NEIGH_OFFSET );
-
-    if ( !isSpaceToMove( movedSites, MOVED_SITES_SIZE ) )
-    { 
-        return;
-    }
 
     // move left top site
     pushAndPop( site + LEFT_TOP_NEIGH_OFFSET + LEFT_TOP_NEIGH_OFFSET, movedSites[1] );
@@ -200,13 +292,6 @@ void ProteinTriangularLattice::moveProteinLeft( lattIndex site )
 
 void ProteinTriangularLattice::moveProteinUp( lattIndex site )
 {
-    static const int RIGHT_NEIGH_OFFSET = 1;
-    static const int RIGHT_TOP_NEIGH_OFFSET = -mRowSize + 1;
-    static const int RIGHT_BOTTOM_NEIGH_OFFSET = mRowSize ;
-    static const int LEFT_BOTTOM_NEIGH_OFFSET = mRowSize - 1 ;
-    static const int LEFT_TOP_NEIGH_OFFSET = -mRowSize;
-    static const int LEFT_NEIGH_OFFSET = -1;
-
     static const int MOVED_SITES_SIZE = 3;
     lattMember movedSites[ MOVED_SITES_SIZE ];
     lattMember protein( mpLattice[ site ] );
@@ -215,11 +300,6 @@ void ProteinTriangularLattice::moveProteinUp( lattIndex site )
     movedSites[0] = get( topSite + LEFT_TOP_NEIGH_OFFSET );
     movedSites[1] = get( topSite + LEFT_NEIGH_OFFSET );
     movedSites[2] = get( topSite + RIGHT_TOP_NEIGH_OFFSET );
-
-    if ( !isSpaceToMove( movedSites, MOVED_SITES_SIZE ) )
-    { 
-        return;
-    }
 
     // move left top site 
     pushAndPop( site + LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET, movedSites[1] );
@@ -264,13 +344,6 @@ void ProteinTriangularLattice::moveProteinUp( lattIndex site )
 
 void ProteinTriangularLattice::moveProteinDown( lattIndex site )
 {
-    static const int RIGHT_NEIGH_OFFSET = 1;
-    static const int RIGHT_TOP_NEIGH_OFFSET = -mRowSize + 1;
-    static const int RIGHT_BOTTOM_NEIGH_OFFSET = mRowSize ;
-    static const int LEFT_BOTTOM_NEIGH_OFFSET = mRowSize - 1 ;
-    static const int LEFT_TOP_NEIGH_OFFSET = -mRowSize;
-    static const int LEFT_NEIGH_OFFSET = -1;
-
     static const int MOVED_SITES_SIZE = 3;
     lattMember movedSites[ MOVED_SITES_SIZE ];
     lattMember protein( mpLattice[ site ] );
@@ -279,11 +352,6 @@ void ProteinTriangularLattice::moveProteinDown( lattIndex site )
     movedSites[0] = get( bottomSite + RIGHT_BOTTOM_NEIGH_OFFSET );
     movedSites[1] = get( bottomSite + RIGHT_NEIGH_OFFSET );
     movedSites[2] = get( bottomSite + LEFT_BOTTOM_NEIGH_OFFSET );
-
-    if ( !isSpaceToMove( movedSites, MOVED_SITES_SIZE ) )
-    { 
-        return;
-    }
 
     // move left bottom site 
     pushAndPop( site + RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET, movedSites[1] );
@@ -374,13 +442,20 @@ void ProteinTriangularLattice::putProtein( lattIndex pos, LATTICE_FIELD_NAMES pr
     }
 };
 
-bool ProteinTriangularLattice::isSpaceToMove( lattMember movedSites[], lattIndex movedSitesSize )
+
+bool ProteinTriangularLattice::isSpaceToMove( lattIndex site, const std::vector< int >& sitesMoved )
 {
-    for ( int i = 0 ; i < movedSitesSize ; ++i )
+    std::vector< int >::const_iterator movedSite( sitesMoved.begin() )
+                                     , endOfSites( sitesMoved.end() );
+    for ( ; movedSite != endOfSites ; ++movedSite )
     {
-        if ( movedSites[i] == PROTEIN_A || movedSites[i] == PROTEIN_B )
+        if ( get( site + ( *movedSite ) ) == PROTEIN_A 
+            || get( site + ( *movedSite ) ) == PROTEIN_B )
+        {
             return false;
+        }
     }
     return true;
+
 }
 

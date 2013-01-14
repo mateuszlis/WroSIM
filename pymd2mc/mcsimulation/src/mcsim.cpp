@@ -51,7 +51,10 @@ int main( int argc, char* argv[] )
             return 0;
         }
 
-        double omega = opt.omega();
+        double omegaAB = opt.omegaAB();
+        double omegaAC = opt.omegaAC();
+        double omegaBC = opt.omegaBC();
+        int proteinsNum = opt.proteins_count();
         int aLipidsNum = opt.first_particles_count();
         int lattSize = opt.latt_row_size() * opt.latt_row_count();
         int lattRowSize = opt.latt_row_size();
@@ -66,13 +69,13 @@ int main( int argc, char* argv[] )
         string outputFilename = opt.o();
         ofstream outputFile, neighHistFile, fnfFile, clusterFile, msdFile;
         outputFile.open( outputFilename.c_str());
-        neighHistFile.open( "neigh_hist_omega.dat");
+        neighHistFile.open( "neigh_hist_omegaAB.dat");
         fnfFile.open( "fraction_of_first_neighbors.dat" );
         clusterFile.open( "clusters.dat" );
         std::cout << eqSteps << std::endl;
 
         //FIXME: Currently KawasakiProteins is the only option - add command line support
-        ProteinTriangularLattice *lattice = new ProteinTriangularLattice( lattSize, lattRowSize, aLipidsNum, 10, chooseStartRandomly );
+        ProteinTriangularLattice *lattice = new ProteinTriangularLattice( lattSize, lattRowSize, aLipidsNum, proteinsNum, chooseStartRandomly );
         LattExchanger* exchanger = NULL;
         if ( enableMsd && !exchanger )
         {
@@ -83,9 +86,14 @@ int main( int argc, char* argv[] )
         }
 
 #ifdef BUILD_CUDA
-        MPKK *simulation = new MPKK( lattice, omega, outputTemperature, eqSteps );
+        MPKK *simulation = new MPKK( lattice, omegaAB, outputTemperature, eqSteps );
 #else
-        KawasakiProteins *simulation = new KawasakiProteins( lattice, omega, outputTemperature, eqSteps );
+        KawasakiProteins *simulation = new KawasakiProteins( lattice
+                                                           , omegaAB
+                                                           , omegaAC
+                                                           , omegaBC
+                                                           , outputTemperature
+                                                           , eqSteps );
         if ( sampler == "Kawasaki" )
             simulation->setSampler( Kawasaki );
         if ( sampler == "Almeida" )

@@ -313,13 +313,16 @@ options (int& argc,
   sampling_ ("Kawasaki"),
   f_ (),
   first_particles_count_ (2000),
+  proteins_count_ (16),
   latt_row_size_ (100),
   latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0),
+  omegaAB_ (0),
+  omegaAC_ (0),
+  omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ ()
@@ -339,13 +342,16 @@ options (int start,
   sampling_ ("Kawasaki"),
   f_ (),
   first_particles_count_ (2000),
+  proteins_count_ (16),
   latt_row_size_ (100),
   latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0),
+  omegaAB_ (0),
+  omegaAC_ (0),
+  omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ ()
@@ -365,13 +371,16 @@ options (int& argc,
   sampling_ ("Kawasaki"),
   f_ (),
   first_particles_count_ (2000),
+  proteins_count_ (16),
   latt_row_size_ (100),
   latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0),
+  omegaAB_ (0),
+  omegaAC_ (0),
+  omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ ()
@@ -393,13 +402,16 @@ options (int start,
   sampling_ ("Kawasaki"),
   f_ (),
   first_particles_count_ (2000),
+  proteins_count_ (16),
   latt_row_size_ (100),
   latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0),
+  omegaAB_ (0),
+  omegaAC_ (0),
+  omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ ()
@@ -417,13 +429,16 @@ options (::cli::scanner& s,
   sampling_ ("Kawasaki"),
   f_ (),
   first_particles_count_ (2000),
+  proteins_count_ (16),
   latt_row_size_ (100),
   latt_row_count_ (100),
   o_ ("traj.xyz"),
   T_ (325),
   steps_ (10000),
   output_freq_ (100),
-  omega_ (0),
+  omegaAB_ (0),
+  omegaAC_ (0),
+  omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ ()
@@ -445,6 +460,9 @@ print_usage (::std::ostream& os)
   os << "--first-particles-count <num> Value describes number of sites of the first of" << ::std::endl
      << "                              types." << ::std::endl;
 
+  os << "--proteins_count <num>        Number of protein-like (larger) particles in" << ::std::endl
+     << "                              simulation." << ::std::endl;
+
   os << "--latt-row-size <num          Size of the lattice row" << ::std::endl
      << ::std::endl
      << "                              This is required if you use lattice generator (not" << ::std::endl
@@ -462,7 +480,11 @@ print_usage (::std::ostream& os)
   os << "--output-freq <num>           frequency of making output snapshots (every <num>" << ::std::endl
      << "                              frame will be written to the output file" << ::std::endl;
 
-  os << "--omega <float>               Value of omega_AB (see documentation)" << ::std::endl;
+  os << "--omegaAB <float>             Value of omega_AB (see documentation)" << ::std::endl;
+
+  os << "--omegaAC <float>             Value of omega_AC (see documentation)" << ::std::endl;
+
+  os << "--omegaBC <float>             Value of omega_BC (see documentation)" << ::std::endl;
 
   os << "--eq-steps <num>              Number of equilibration steps (analysis methods" << ::std::endl
      << "                              are turned on after these steps)" << ::std::endl;
@@ -490,6 +512,8 @@ struct _cli_options_map_init
     &::cli::thunk< options, std::string, &options::f_ >;
     _cli_options_map_["--first-particles-count"] = 
     &::cli::thunk< options, int, &options::first_particles_count_ >;
+    _cli_options_map_["--proteins_count"] = 
+    &::cli::thunk< options, int, &options::proteins_count_ >;
     _cli_options_map_["--latt-row-size"] = 
     &::cli::thunk< options, int, &options::latt_row_size_ >;
     _cli_options_map_["--latt-row-count"] = 
@@ -502,8 +526,12 @@ struct _cli_options_map_init
     &::cli::thunk< options, int, &options::steps_ >;
     _cli_options_map_["--output-freq"] = 
     &::cli::thunk< options, int, &options::output_freq_ >;
-    _cli_options_map_["--omega"] = 
-    &::cli::thunk< options, float, &options::omega_ >;
+    _cli_options_map_["--omegaAB"] = 
+    &::cli::thunk< options, float, &options::omegaAB_ >;
+    _cli_options_map_["--omegaAC"] = 
+    &::cli::thunk< options, float, &options::omegaAC_ >;
+    _cli_options_map_["--omegaBC"] = 
+    &::cli::thunk< options, float, &options::omegaBC_ >;
     _cli_options_map_["--eq-steps"] = 
     &::cli::thunk< options, int, &options::eq_steps_ >;
     _cli_options_map_["--no-random-start"] = 

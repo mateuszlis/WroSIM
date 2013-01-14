@@ -35,7 +35,12 @@ class KawasakiProteins : public KawasakiSimulation
          * @param omegaAB - energy of interaction between lipids
          * @param T - temperature
          **/
-        KawasakiProteins( ProteinTriangularLattice* latt, double omegaAB = 0.0, int T = 325, int equilibSteps = 0 );
+        KawasakiProteins( ProteinTriangularLattice* latt
+                        , double omegaAB = 0.0
+                        , double omegaAC = 0.0
+                        , double omegaBC = 0.0
+                        , int T = 325
+                        , int equilibSteps = 0 );
 
         /**
          * @brief Starts a simulation for defined number of iterations
@@ -51,6 +56,8 @@ class KawasakiProteins : public KawasakiSimulation
 
     protected: // fields
         ProteinTriangularLattice* mpLatt;
+        const double mOmegaAC;
+        const double mOmegaBC;
     protected: // member functions
         /**
          * @brief Performs single step of for proteins
@@ -68,4 +75,5 @@ class KawasakiProteins : public KawasakiSimulation
         void metropolisStep();
 
         double calcEnergyDiff( int pos1, int pos2 );
+        double calcEnergy();
 };

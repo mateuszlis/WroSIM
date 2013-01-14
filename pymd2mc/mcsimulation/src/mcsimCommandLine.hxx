@@ -246,6 +246,9 @@ class options
   first_particles_count () const;
 
   const int&
+  proteins_count () const;
+
+  const int&
   latt_row_size () const;
 
   const int&
@@ -264,7 +267,13 @@ class options
   output_freq () const;
 
   const float&
-  omega () const;
+  omegaAB () const;
+
+  const float&
+  omegaAC () const;
+
+  const float&
+  omegaBC () const;
 
   const int&
   eq_steps () const;
@@ -291,13 +300,16 @@ class options
   std::string sampling_;
   std::string f_;
   int first_particles_count_;
+  int proteins_count_;
   int latt_row_size_;
   int latt_row_count_;
   std::string o_;
   int T_;
   int steps_;
   int output_freq_;
-  float omega_;
+  float omegaAB_;
+  float omegaAC_;
+  float omegaBC_;
   int eq_steps_;
   bool no_random_start_;
   bool enable_calc_msd_;
