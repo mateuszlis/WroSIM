@@ -325,7 +325,9 @@ options (int& argc,
   omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
-  enable_calc_msd_ ()
+  enable_calc_msd_ (),
+  protein_step_freq_ (1),
+  protein_step_size_ (1)
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -354,7 +356,9 @@ options (int start,
   omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
-  enable_calc_msd_ ()
+  enable_calc_msd_ (),
+  protein_step_freq_ (1),
+  protein_step_size_ (1)
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -383,7 +387,9 @@ options (int& argc,
   omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
-  enable_calc_msd_ ()
+  enable_calc_msd_ (),
+  protein_step_freq_ (1),
+  protein_step_size_ (1)
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -414,7 +420,9 @@ options (int start,
   omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
-  enable_calc_msd_ ()
+  enable_calc_msd_ (),
+  protein_step_freq_ (1),
+  protein_step_size_ (1)
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -441,7 +449,9 @@ options (::cli::scanner& s,
   omegaBC_ (0),
   eq_steps_ (0),
   no_random_start_ (),
-  enable_calc_msd_ ()
+  enable_calc_msd_ (),
+  protein_step_freq_ (1),
+  protein_step_size_ (1)
 {
   _parse (s, opt, arg);
 }
@@ -492,6 +502,10 @@ print_usage (::std::ostream& os)
   os << "--no-random-start             Do not choose starting position randomly" << ::std::endl;
 
   os << "--enable-calc-msd             Enable calculation of Mean Square Displacement." << ::std::endl;
+
+  os << "--protein-step-freq <num>     Protein step will occur every [freq] steps" << ::std::endl;
+
+  os << "--protein-step-size <num>     How many proteins do we move at one step?" << ::std::endl;
 }
 
 typedef
@@ -538,6 +552,10 @@ struct _cli_options_map_init
     &::cli::thunk< options, bool, &options::no_random_start_ >;
     _cli_options_map_["--enable-calc-msd"] = 
     &::cli::thunk< options, bool, &options::enable_calc_msd_ >;
+    _cli_options_map_["--protein-step-freq"] = 
+    &::cli::thunk< options, int, &options::protein_step_freq_ >;
+    _cli_options_map_["--protein-step-size"] = 
+    &::cli::thunk< options, int, &options::protein_step_size_ >;
   }
 } _cli_options_map_init_;
 

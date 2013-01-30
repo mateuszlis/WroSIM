@@ -9,5 +9,6 @@ enum LATTICE_FIELD_NAMES
     PROTEIN_B = 200,
     LIPID_B = 255
 };
+bool isProtein( lattMember memb );
 
 

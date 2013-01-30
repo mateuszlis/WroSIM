@@ -62,6 +62,8 @@ int main( int argc, char* argv[] )
         int outputFreq = opt.output_freq();
         int outputTemperature = opt.T();
         int eqSteps = opt.eq_steps();
+        int proteinStepFreq = opt.protein_step_freq();
+        int proteinStepSize = opt.protein_step_size();
         bool chooseStartRandomly = !opt.no_random_start();
         bool enableMsd = opt.enable_calc_msd();
 
@@ -81,11 +83,13 @@ int main( int argc, char* argv[] )
         {
             std::cout << "Enabled Mean Square Displacement calculation " << std::endl;
             msdFile.open( "msd.dat" );
-            exchanger = new MsdEnabledLattEx( lattice );
+            exchanger = new MsdEnabledLattEx( lattice, lattice->getProteins(), lattice->getProteinCnt() );
+            exchanger->setProteins( lattice->getProteins(), lattice->getProteinCnt() );
             lattice->setExchanger( exchanger );
         }
 
 #ifdef BUILD_CUDA
+        std::cout << "CUDA simulation " << omegaAC << " " << omegaBC << "ProteinStepSize " << proteinStepSize << proteinStepFreq << std::endl;
         MPKK *simulation = new MPKK( lattice, omegaAB, outputTemperature, eqSteps );
 #else
         KawasakiProteins *simulation = new KawasakiProteins( lattice
@@ -93,7 +97,9 @@ int main( int argc, char* argv[] )
                                                            , omegaAC
                                                            , omegaBC
                                                            , outputTemperature
-                                                           , eqSteps );
+                                                           , eqSteps 
+                                                           , proteinStepFreq
+                                                           , proteinStepSize );
         if ( sampler == "Kawasaki" )
             simulation->setSampler( Kawasaki );
         if ( sampler == "Almeida" )

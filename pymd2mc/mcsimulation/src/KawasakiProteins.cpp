@@ -5,10 +5,14 @@ KawasakiProteins::KawasakiProteins( ProteinTriangularLattice* latt
                         , double omegaAC
                         , double omegaBC
                         , int T
-                        , int equilibSteps )
+                        , int equilibSteps 
+                        , int proteinStepFreq 
+                        , int proteinStepSize )
     : KawasakiSimulation( latt, omegaAB, T, equilibSteps ) 
     , mOmegaAC( omegaAC )
     , mOmegaBC( omegaBC )
+    , mProteinStepFreq( proteinStepFreq )
+    , mProteinStepSize( proteinStepSize )
 {
     mpLatt = latt;
 }
@@ -21,21 +25,25 @@ void KawasakiProteins::run( int steps )
 {
     for ( int i = 0; i < steps; i++ )
     {
-        for ( int j = 0; j < mStepSize; ++j )
-        {
-            metropolisStep();
-        }
-
-        for ( int j = 0 ; j < 1; ++j )
-        {
-            proteinStep();
-        }
-
         if ( analysisStep( i ) && mIsSetFrameStream )
         {
             ( *mpFrameStream ) << ( *mpLatt ); //print frame to output
         }
         performAnalysis( i );
+
+        for ( int j = 0; j < mStepSize; ++j )
+        {
+            metropolisStep();
+        }
+    
+        if ( i % mProteinStepFreq == 0 )
+        {
+            for ( int j = 0 ; j < mProteinStepSize ; ++j )
+            {
+                proteinStep();
+            }
+        }
+
 
     }
     finishAnalysis( steps );

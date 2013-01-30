@@ -44,7 +44,7 @@ class TriangularLattice
                          , lattIndex firstTypeParticlesCnt
                          , bool distributeRandomly = true );
 
-        lattMember operator[]( lattIndex index ) const;
+        lattMember &operator[]( lattIndex index ) const;
         lattMember get( int index ) const; // applies helical boundary conditions
 
         lattIndex getLatticeSize() const;
@@ -55,11 +55,13 @@ class TriangularLattice
         void exchangeSites( lattIndex pos1, lattIndex pos2 );
 
         lattIndex getNeighbIndex( lattIndex pos, int neighborNum ) const;
-        unsigned int getNeighborsCnt() const;
+        int getNeighborsCnt() const;
 
         void calculateClusters( clustersMap& map );
         void setExchanger( LattExchanger* );
         LattExchanger* getExchanger();
+        virtual lattIndex cutToPos( int pos ) const;
+        static const int mNeighbCnt = 6;
         virtual ~TriangularLattice();
 
         friend ostream &operator<<( ostream &stream, TriangularLattice &latt );
@@ -70,14 +72,12 @@ class TriangularLattice
         lattIndex mRowSize;
         LattExchanger* mpExchanger;
         bool selfLattExchanger;
-        static const int mNeighbCnt = 6;
         lattIndex mNeighb[mNeighbCnt];
 
         virtual void clearArr();
         virtual void distributeParticlesRandomly( lattIndex firstTypeParticlesCnt );
         virtual void distributeParticles( lattIndex firstTypeParticlesCnt );
         virtual bool isFree( lattIndex pos ) const;
-        virtual lattIndex cutToPos( int pos ) const;
         void pushNeighborsToQueue( std::list< lattIndex > & queue, lattIndex siteInd );
         void clearExchanger();
 		static bool gotDifferentNeighbors(list<int> neighLabels, int currentLabel);

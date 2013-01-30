@@ -8,6 +8,7 @@
 
 namespace testUtils
 {
+    void printPermutation( lattIndex *latt, int rowSize, int rowsCount );
     void printLatt( lattMember *latt, int rowSize, int rowsCount );
     int calcSum( TriangularLattice* );
     std::set< int > getNeighborsOf( int site, TriangularLattice* latt );

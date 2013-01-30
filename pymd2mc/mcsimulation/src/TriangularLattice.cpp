@@ -61,7 +61,6 @@ TriangularLattice::TriangularLattice( string /*filename*/ )
     : mpLattice( NULL )
       , mLatticeSize( 0 )
       , mRowSize( 0 )
-      , mpExchanger( new LattExchanger( this ) )
       , selfLattExchanger( true )
 {
     for ( lattIndex i = 0; i < mNeighbCnt; ++i )
@@ -69,13 +68,13 @@ TriangularLattice::TriangularLattice( string /*filename*/ )
         mNeighb[i] = 0;
     }
     //mNeighb = { 0, 0, 0, 0, 0, 0 };
+    mpExchanger = new LattExchanger( this );
 }
 TriangularLattice::TriangularLattice( lattIndex latticeSize
                                     , lattIndex rowSize
                                     , lattIndex firstTypeParticlesCnt
                                     , bool distributeRandomly )
-      : mpExchanger( new LattExchanger( this ) )
-      , selfLattExchanger( true )
+      : selfLattExchanger( true )
 {
     if ( firstTypeParticlesCnt > latticeSize )
     {
@@ -86,7 +85,7 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
 
 
     mLatticeSize = latticeSize;
-    mRowSize = rowSize;
+    this->mRowSize = rowSize;
     clearArr();
     lattIndex neighb[] = { 1, rowSize, rowSize - 1, -1, -rowSize, -rowSize + 1 }; // bloody helical boundary conditions
     for ( lattIndex i = 0; i < mNeighbCnt; i++ )
@@ -101,10 +100,12 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
     {
         this->distributeParticles( firstTypeParticlesCnt );
     }
+    
+    mpExchanger = new LattExchanger( this );
 
 }
 
-TriangularLattice::lattMember TriangularLattice::operator[]( lattIndex index ) const
+TriangularLattice::lattMember &TriangularLattice::operator[]( lattIndex index ) const
 {
     return mpLattice[index];
 }
@@ -152,7 +153,7 @@ lattIndex TriangularLattice::cutToPos( int pos ) const
     }
     return  pos;
 }
-unsigned int TriangularLattice::getNeighborsCnt() const
+int TriangularLattice::getNeighborsCnt() const
 {
     return mNeighbCnt;
 }
@@ -236,33 +237,6 @@ void TriangularLattice::calculateClusters( TriangularLattice::clustersMap& map )
 	}
 
 	delete[] labels;
-	
-	/*/
-    doneMap doneSites;
-    for( lattIndex startPos = 0 ; startPos < getLatticeSize() ; ++startPos )
-    {
-        lattIndex clusterSize = 1;
-        if( ! doneSites[ startPos ] > 0 && mpLattice[ startPos ] == kind )
-        {
-            lattIndex currentSite = startPos;
-            doneSites[ currentSite ] = 1;
-            std::list< lattIndex > queue;
-            pushNeighborsToQueue( queue, currentSite  );
-            while( queue.size() )
-            {
-                currentSite = queue.back();
-                queue.pop_back();
-                if( ! doneSites[ currentSite ] && mpLattice[ currentSite ] == kind )
-                {
-                    clusterSize++;
-                    pushNeighborsToQueue( queue, currentSite );
-                    doneSites[ currentSite ] = 1;
-                }
-            }
-        map[ clusterSize ]++;
-        }
-    }
-	*/
 }
 
 void TriangularLattice::clearExchanger()

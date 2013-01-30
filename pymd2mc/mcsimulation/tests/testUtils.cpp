@@ -2,6 +2,18 @@
 
 namespace testUtils
 {
+    void printPermutation( lattIndex *latt, int rowSize, int rowsCount )
+    {
+        for ( int i = 0 ; i < rowsCount ; ++i )
+        {
+            cout << setw( 2 * ( i + 1 ) ) << "  " ;
+            for( int j = 0 ; j < rowSize; ++j )
+            {   
+                cout << setw(2) << static_cast< int >( latt[ i * rowSize + j ] ) << "  ";
+            }
+            cout << endl;
+        }
+    }
     void printLatt( lattMember *latt, int rowSize, int rowsCount )
     {
         for ( int i = 0 ; i < rowsCount ; ++i )

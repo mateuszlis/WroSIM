@@ -210,3 +210,15 @@ enable_calc_msd () const
   return this->enable_calc_msd_;
 }
 
+inline const int& options::
+protein_step_freq () const
+{
+  return this->protein_step_freq_;
+}
+
+inline const int& options::
+protein_step_size () const
+{
+  return this->protein_step_size_;
+}
+

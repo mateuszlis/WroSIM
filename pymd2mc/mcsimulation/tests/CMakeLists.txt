@@ -2,7 +2,7 @@ include_directories(${BASE_SRC_DIR})
 add_executable (TriangularLatticeTest testUtils.cpp TriangularLatticeTest.cpp)
 add_executable (ProteinTriangularLatticeTest testUtils.cpp ProteinTriangularLatticeTest.cpp)
 add_executable (ClustersAnalyzerTest ClustersAnalyzerTest.cpp)
-add_executable (MsdEnabledLattExTest MsdEnabledLattExTest.cpp)
+add_executable (MsdEnabledLattExTest testUtils.cpp MsdEnabledLattExTest.cpp)
 add_executable (KawasakiProteinsTest testUtils.cpp KawasakiProteinsTest.cpp )
 #every test has its own valgrind version
 #so it is easy to turn off time-consuming valgrind tests in ctest while
@@ -32,4 +32,4 @@ target_link_libraries(TriangularLatticeTest TriangularLattice gtest gtest_main g
 target_link_libraries(ProteinTriangularLatticeTest TriangularLattice ProteinTriangularLattice gtest gtest_main gmock)
 target_link_libraries(KawasakiProteinsTest TriangularLattice ProteinTriangularLattice KawasakiProteins KawasakiSimulation Metropolis gtest gtest_main gmock)
 target_link_libraries(ClustersAnalyzerTest ClustersAnalyzer gtest gtest_main)
-target_link_libraries(MsdEnabledLattExTest TriangularLattice gtest gtest_main)
+target_link_libraries(MsdEnabledLattExTest TriangularLattice ProteinTriangularLattice gtest gtest_main)

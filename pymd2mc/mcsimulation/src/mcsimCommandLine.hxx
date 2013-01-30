@@ -284,6 +284,12 @@ class options
   const bool&
   enable_calc_msd () const;
 
+  const int&
+  protein_step_freq () const;
+
+  const int&
+  protein_step_size () const;
+
   // Print usage information.
   //
   static void
@@ -313,6 +319,8 @@ class options
   int eq_steps_;
   bool no_random_start_;
   bool enable_calc_msd_;
+  int protein_step_freq_;
+  int protein_step_size_;
 };
 
 #include "mcsimCommandLine.ixx"

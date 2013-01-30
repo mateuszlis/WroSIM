@@ -110,7 +110,9 @@ void Metropolis::performAnalysis( int stepNum )
     }
     if ( mpLatt->getExchanger()->hasMsd() && mpMsdOutputFile && analysisStep( stepNum ) )
     {
-        ( *mpMsdOutputFile ) << setw( 10 ) << stepNum << "\t" << mpLatt->getExchanger()->calcStat() << endl;
+        double msd( 0 ), protMsd( 0 );
+        mpLatt->getExchanger()->calcStat( msd, protMsd );
+        ( *mpMsdOutputFile ) << setw( 10 ) << stepNum << "\t" << msd << "\t" << protMsd << endl;
     }
 }
 

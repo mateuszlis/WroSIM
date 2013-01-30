@@ -40,7 +40,9 @@ class KawasakiProteins : public KawasakiSimulation
                         , double omegaAC = 0.0
                         , double omegaBC = 0.0
                         , int T = 325
-                        , int equilibSteps = 0 );
+                        , int equilibSteps = 0 
+                        , int proteinStepFreq = 1
+                        , int proteinStepSize = 1 );
 
         /**
          * @brief Starts a simulation for defined number of iterations
@@ -58,6 +60,8 @@ class KawasakiProteins : public KawasakiSimulation
         ProteinTriangularLattice* mpLatt;
         const double mOmegaAC;
         const double mOmegaBC;
+        const int mProteinStepFreq;
+        const int mProteinStepSize;
     protected: // member functions
         /**
          * @brief Performs single step of for proteins

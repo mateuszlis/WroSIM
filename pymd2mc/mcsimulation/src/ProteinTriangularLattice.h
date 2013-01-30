@@ -21,43 +21,24 @@ class ProteinTriangularLattice : public TriangularLattice
         /**
          * @brief Distributes Proteins in lattice
          **/
-        void distributeProteins();
+        virtual void distributeProteins();
 
         /**
          * @brief Distributes Proteins in lattice randomly
          **/
-        void distributeProteinsRandomly();
+        virtual void distributeProteinsRandomly();
 
         /**
          * @brief Moves protein from given lattice site one step to given lattice site
          **/
-        void moveProtein( lattIndex site, lattIndex destination );
+        virtual void moveProtein( lattIndex site, lattIndex destination );
 
-        /**
-         * @brief Moves protein right
-         **/
-        void moveProteinRight( lattIndex site );
-
-        /**
-         * @brief Moves protein left
-         **/
-        void moveProteinLeft( lattIndex site );
-
-        /**
-         * @brief Moves protein to the Top 
-         **/
-        void moveProteinUp( lattIndex site );
-        /**
-         * @brief Moves protein down 
-         **/
-        void moveProteinDown( lattIndex site );
-        
         /**
          * @brief Get array of protein positions
          *
          * @return pointer to array of protein positions. Size of the array is number of proteins
          **/
-        lattIndex* getProteins() { return mProteins; }
+        virtual lattIndex* getProteins() const { return mProteins; }
 
         /**
          * @brief Get number of proteins in lattice
@@ -90,6 +71,9 @@ class ProteinTriangularLattice : public TriangularLattice
             }
             return sum;
         }
+
+
+
         /**
          * @brief destructor
          **/
@@ -101,26 +85,9 @@ class ProteinTriangularLattice : public TriangularLattice
         lattIndex* mProteins; ///< array of protein center positions
 
     protected: // fields 
-        lattIndex mProteinSites[ mProteinSize ];
-
-        const int RIGHT_NEIGH_OFFSET;
-        const int RIGHT_TOP_NEIGH_OFFSET;
-        const int RIGHT_BOTTOM_NEIGH_OFFSET;
-        const int LEFT_BOTTOM_NEIGH_OFFSET;
-        const int LEFT_TOP_NEIGH_OFFSET;
-        const int LEFT_NEIGH_OFFSET;
-
-        std::vector< int > mSitesMovedMoveRight;
-        std::vector< int > mSitesMovedMoveLeft;
-        std::vector< int > mSitesMovedMoveUp;
-        std::vector< int > mSitesMovedMoveDown;
 
     protected: // functions
         virtual bool isFree( lattIndex pos );
         void putProtein( lattIndex pos, LATTICE_FIELD_NAMES protein = PROTEIN_A );
-        void pushAndPop( lattIndex site, lattMember &value );
-        void updateProteinArray( lattIndex site, lattIndex newPos );
-        bool isSpaceToMove( lattIndex site, lattMember movedSites[], lattIndex movedSitesSize );
-        bool isSpaceToMove( lattIndex site, const std::vector< int >& sitesMoved );
                         
 }; // class ProteinTriangularLattice

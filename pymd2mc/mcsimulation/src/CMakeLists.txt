@@ -6,7 +6,7 @@ endif(CUDA_FOUND)
 
 add_library(mcsimCommandLine mcsimCommandLine.cxx)
 add_library(analyzePyrkovaCommandLine analyzePyrkovaCommandLine.cxx)
-add_library(TriangularLattice TriangularLattice.cpp LattExchanger.cpp MsdEnabledLattEx.cpp )
+add_library(TriangularLattice TriangularLattice.cpp LattExchanger.cpp MsdEnabledLattEx.cpp types.cpp )
 add_library(ProteinTriangularLattice ProteinTriangularLattice.cpp)
 add_library(Metropolis Metropolis.cpp)
 add_library(KawasakiSimulation KawasakiSimulation.cpp)
@@ -20,7 +20,7 @@ if(CUDA_FOUND)
     target_link_libraries(mcsim Metropolis_cuda)
 else(CUDA_FOUND)
     add_executable(mcsim mcsimCommandLine TriangularLattice.cpp LattExchanger.cpp MsdEnabledLattEx.cpp ProteinTriangularLattice.cpp Metropolis.cpp
-        KawasakiSimulation.cpp mcsim.cpp)
+        KawasakiSimulation.cpp types.cpp mcsim.cpp)
     target_link_libraries(mcsim Metropolis KawasakiSimulation KawasakiProteins)
 endif(CUDA_FOUND)
 target_link_libraries(analyzePyrkova ClustersAnalyzer Atom

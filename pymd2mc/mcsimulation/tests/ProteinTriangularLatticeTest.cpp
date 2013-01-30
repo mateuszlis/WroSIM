@@ -62,8 +62,8 @@ TEST( ProteinTriangularLattice, moveProteinRight )
 {
     static int LIPID_B_COUNT( 0 );
     static const int PROTEIN_COUNT( 1 );
-    static const ProteinTriangularLattice::lattIndex proteinPos( 0 );
-    static const ProteinTriangularLattice::lattIndex siteOnTheRight( 2 );
+    ProteinTriangularLattice::lattIndex proteinPos( 0 );
+    ProteinTriangularLattice::lattIndex siteOnTheRight( 2 );
     std::tr1::shared_ptr< ProteinTriangularLattice > latt( new ProteinTriangularLattice( 100, 10, LIPID_B_COUNT, PROTEIN_COUNT, false ) );
 
     // let's edit lattice a little by hand
@@ -92,4 +92,18 @@ TEST( ProteinTriangularLattice, moveProteinRight )
     EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
     ProteinTriangularLattice::lattIndex proteinPosAfterMove( 1 );// calculated by hand
     EXPECT_EQ( latt->getProteins()[0], proteinPosAfterMove ); 
+    proteinPos = latt->getProteins()[0];
+    siteOnTheRight += 1;
+    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    proteinPos = latt->getProteins()[0];
+    siteOnTheRight += 1;
+    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    siteOnTheRight += 1;
+    proteinPos = latt->getProteins()[0];
+    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    siteOnTheRight += 1;
+    proteinPos = latt->getProteins()[0];
+    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    printLatt( latt->getLattice(), 10, 10 );
+    EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
 }
