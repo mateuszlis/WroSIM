@@ -26,6 +26,8 @@ class Atom:
         self.vx = vx
         self.vy = vy
         self.vz = vz
+    def __cmp__(self, other):
+        return self.z - other.z
 
 class Molecule:
     def __init__(self):
@@ -37,6 +39,8 @@ class Molecule:
             atom.x += dx
             atom.y += dy
             atom.z += dz
+    def __cmp__(self, other):
+        return self.atoms[0] < other.atoms[0]
 
 class System:
     def __init__(self, filename):
@@ -151,6 +155,16 @@ class System:
         newmol.atoms[32].symbol = "O33"
         return newmol
 
+    def card2pope(self, cardMol):
+        newmol = Molecule()
+        newmol.resname = "POPE"
+        newmol.atoms = copy.deepcopy(cardMol.atoms[:13])
+        newmol.atoms[0].symbol = "NH3"
+        newmol.atoms[1].symbol = "PO4"
+        newmol.atoms[2].symbol = "GL1"
+        newmol.atoms[3].symbol = "GL2"
+        return newmol
+
 	while abs(dz) < 0.2:
 		dz *= 2 
         newmol.atoms.append(Atom("C4A",0, last.x, last.y, last.z + dz, 0, 0, 0))
@@ -172,15 +186,53 @@ class System:
 	return newmol
   
 
+    def is_top(self, mol):
+        atom = mol.atoms[0]
+        return atom.z < 4
+
     def transform(self):
         molLst = []
+        top_counter = 0
+        bottom_counter = 0
         for m in self.molecules:
-            if not m.resname in ["DPPC"]:
+            if not m.resname in ["CARD"]:
                 molLst.append(m)
                 continue
-            if m.resname == "DPPC":
-                molLst.append(self.dppc2dmpc(m))
+            if m.resname == "CARD":
+                if self.is_top(m):
+                    top_counter += 1
+                    counter = top_counter
+                else:
+                    bottom_counter += 1
+                    counter = bottom_counter
+                if counter < 94:
+                    molLst.append(self.card2pope(m))
+                else:
+                    molLst.append(m)
         self.molecules = molLst
+
+    def sort(self):
+        d = {}
+        for mol in self.molecules:
+            if mol.resname in d:
+                d[mol.resname].append(mol)
+            else:
+                d[mol.resname] = [mol]
+        mols = []
+        mols += sorted(d["CARD"])
+        mols += sorted(d["POPE"])
+        mols += d["W"]
+        del d["CARD"]
+        del d["POPE"]
+        del d["W"]
+        for mol_lst in d.values():
+            mols += mol_lst
+        self.molecules = mols
+
+
+
+
+
 
     def populate(self):
         molLst = []
@@ -297,17 +349,19 @@ def main():
     #system.put_first("DOO1")
 
     #system.printgro()
+    system.transform()
 	
-    order = []
-    for i in range(256):
-        if (i+1)%2:
-            order.append(i+1)
-    for i in range(256):
-        if not (i+1)%2:
-            order.append(i+1)
+    #order = []
+    #for i in range(256):
+    #    if (i+1)%2:
+    #        order.append(i+1)
+    #for i in range(256):
+    #    if not (i+1)%2:
+    #        order.append(i+1)
     #system.order(order)
 	#system.transform()
-    system.populate()
+    #system.populate()
+    system.sort()
     system.printgro()
 
 if __name__ == '__main__':
