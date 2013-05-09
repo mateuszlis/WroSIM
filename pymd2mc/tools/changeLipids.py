@@ -55,7 +55,7 @@ class System:
 
     def __readgro__(self, filename):
 
-        f = open(sys.argv[1])
+        f = open(filename)
         lines = f.readlines()
         title = lines[0].strip()
         n_atoms = int(lines[1])
@@ -195,20 +195,9 @@ class System:
         top_counter = 0
         bottom_counter = 0
         for m in self.molecules:
-            if not m.resname in ["CARD"]:
+            if not m.resname in ["CARD", "POPE", "ION"]:
                 molLst.append(m)
                 continue
-            if m.resname == "CARD":
-                if self.is_top(m):
-                    top_counter += 1
-                    counter = top_counter
-                else:
-                    bottom_counter += 1
-                    counter = bottom_counter
-                if counter < 94:
-                    molLst.append(self.card2pope(m))
-                else:
-                    molLst.append(m)
         self.molecules = molLst
 
     def sort(self):
@@ -219,12 +208,16 @@ class System:
             else:
                 d[mol.resname] = [mol]
         mols = []
-        mols += sorted(d["CARD"])
-        mols += sorted(d["POPE"])
-        mols += d["W"]
-        del d["CARD"]
-        del d["POPE"]
-        del d["W"]
+        mols += sorted(d.get("CARD", []))
+        mols += sorted(d.get("POPE", []))
+        w = d.get("W", [])
+        mols += w
+        card = d.get("CARD", None)
+        del card
+        pope = d.get("POPE", None)
+        del pope
+        
+        del w
         for mol_lst in d.values():
             mols += mol_lst
         self.molecules = mols
