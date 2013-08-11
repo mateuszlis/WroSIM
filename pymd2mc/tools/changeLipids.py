@@ -185,6 +185,12 @@ class System:
 	newmol.atoms += copy.deepcopy(dspcMol.atoms[9:13])
 	return newmol
   
+    def water2cl(self, waterMol):
+        newmol = Molecule()
+        newmol.resname = "ION"
+        newmol.atoms = copy.deepcopy(waterMol.atoms)
+        newmol.atoms[0].symbol = "CL-"
+        return newmol
 
     def is_top(self, mol):
         atom = mol.atoms[0]
@@ -192,34 +198,47 @@ class System:
 
     def transform(self):
         molLst = []
+        counter = 0
         top_counter = 0
         bottom_counter = 0
         for m in self.molecules:
-            if not m.resname in ["CARD", "POPE", "ION"]:
+            if not m.resname in ["W"]:
                 molLst.append(m)
                 continue
+            else:
+                counter += 1
+                if counter < 37 * 5 + 1:
+                    molLst.append(self.water2cl(m))
+                else:
+                    molLst.append(m)
+
         self.molecules = molLst
 
     def sort(self):
         d = {}
+        predef = ["ARG","TRP", "PRO","PHE","ILE"]
+        mols = []
         for mol in self.molecules:
+            if mol.resname in predef:
+                mols.append(mol)
+                continue
             if mol.resname in d:
                 d[mol.resname].append(mol)
             else:
                 d[mol.resname] = [mol]
-        mols = []
         mols += sorted(d.get("CARD", []))
         mols += sorted(d.get("POPE", []))
-        w = d.get("W", [])
+        w = sorted(d.get("W", []))
         mols += w
+        del w
         card = d.get("CARD", None)
         del card
         pope = d.get("POPE", None)
         del pope
         
-        del w
         for mol_lst in d.values():
-            mols += mol_lst
+            if mol_lst[0].resname not in ["W", "CARD", "POPE"]:
+                mols += mol_lst
         self.molecules = mols
 
 
