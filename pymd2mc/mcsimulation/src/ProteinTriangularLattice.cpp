@@ -1,5 +1,6 @@
 #include "ProteinTriangularLattice.h"
 
+#include "LattExchanger.h"
 #include <limits>
 
 ProteinTriangularLattice::ProteinTriangularLattice( lattIndex latticeSize
@@ -79,7 +80,7 @@ bool ProteinTriangularLattice::isFree( lattIndex pos )
     }
 
     // check for collisions
-    for ( unsigned int site = 0 ; site < mLatticeSize ; ++site )
+    for ( int site = 0 ; site < mLatticeSize ; ++site )
     {
         if ( ( mpExchanger->calcDist( pos, site ) ).squareDisp() <= safeDistance )
         {

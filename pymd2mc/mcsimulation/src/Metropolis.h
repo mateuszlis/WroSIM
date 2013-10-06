@@ -24,7 +24,7 @@ using namespace std;
 class Metropolis
 {
     public: // fields
-        static const double R = 1.986; //TODO: find place for constants
+        const double R;
 
         const int mEquilibSteps;  ///< number of equilibration steps
         const int mT; ///< temperature of simulation
@@ -47,11 +47,6 @@ class Metropolis
          * @param freq - frequency (10 - means that every 10 steps there will be analysis step)
          **/
         virtual void setOutputFreq( int freq );
-
-        /**
-         * @brief Setter for the energy of interactions between lipids
-         **/
-        virtual void setOmegaAB( double omegaAB );
 
         /**
          * @brief Setter for neighbor sites calculator output stream

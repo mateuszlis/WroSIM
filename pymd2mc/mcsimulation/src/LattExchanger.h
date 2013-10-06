@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <cstdlib>
 #include <vector>
+#include <memory>
+using std::shared_ptr;
 
 
 // stl
@@ -13,6 +15,7 @@
 
 // project local
 #include "TriangularLattice.h"
+#include "InteractionsTracker.h"
 #include "types.h"
 
 class TriangularLattice;
@@ -29,8 +32,8 @@ struct vectorDist
     vectorDist( lattIndex argRow, lattIndex argCol ) : row( argRow ), col( argCol ) {};
     vectorDist operator+( vectorDist added ) { return vectorDist( row + added.row, col + added.col ); }
     vectorDist operator-( vectorDist added ) { return vectorDist( row - added.row, col - added.col ); }
-    vectorDist operator+=( vectorDist added ) 
-    { 
+    vectorDist operator+=( vectorDist added )
+    {
         col += added.col;
         row += added.row;
         return *this;
@@ -66,10 +69,12 @@ class LattExchanger
         /**
          * @brief: TODO document
          **/
-        virtual void setProteins( lattIndex* proteins, lattIndex proteinCnt ) 
+        virtual void setProteins( lattIndex* proteins, lattIndex proteinCnt )
         {
             mProteins = proteins;
             mProteinCnt = proteinCnt;
+            mTracker = std::make_shared< InteractionsTracker >
+                    ( mpLatt, mProteins, mProteinCnt );
         }
 
         /**
@@ -99,10 +104,18 @@ class LattExchanger
          **/
         vectorDist calcDist( lattIndex pos1, lattIndex pos2 );
 
+        /**
+         *
+         * @brief Returns strength of protein interactions in specified area
+         *
+         * @return double protein interactions factor
+         **/
+        double getProteinInteraction( lattIndex pos );
+
 
         virtual ~LattExchanger() {};
 
-    protected: // functions 
+    protected: // functions
 
         /**
          * @brief Moves protein right
@@ -115,11 +128,11 @@ class LattExchanger
         virtual void moveProteinLeft( lattIndex site );
 
         /**
-         * @brief Moves protein to the Top 
+         * @brief Moves protein to the Top
          **/
         virtual void moveProteinUp( lattIndex site );
         /**
-         * @brief Moves protein down 
+         * @brief Moves protein down
          **/
         virtual void moveProteinDown( lattIndex site );
 
@@ -132,7 +145,7 @@ class LattExchanger
         virtual void pushAndPop( lattIndex site, int &value );
         virtual void push( int site, int & value );
         virtual void updateProteinArray( lattIndex site, lattIndex newPos );
-        
+
     protected: // fields
         TriangularLattice* mpLatt;
         const int RIGHT_NEIGH_OFFSET;
@@ -144,6 +157,7 @@ class LattExchanger
 
         lattIndex* mProteins;
         lattIndex mProteinCnt;
+        shared_ptr< InteractionsTracker > mTracker;
 
         std::vector< int > mSitesMovedMoveRight;
         std::vector< int > mSitesMovedMoveLeft;

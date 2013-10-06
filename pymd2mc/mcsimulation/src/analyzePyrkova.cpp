@@ -77,9 +77,9 @@ int main(int argc,char *argv[]) {
     if (ifile.is_open())
     {
         double box_x( 0 ), box_y( 0 );//, box_z;
-        int n_atoms( 0 );
         while (ifile.good() )
         {
+            int n_atoms( 0 );
             int i = 0;
             n_atoms = 0;
             while ( (i-3) <= n_atoms && ifile.good())

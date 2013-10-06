@@ -326,8 +326,8 @@ options (int& argc,
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ (),
-  protein_step_freq_ (1),
-  protein_step_size_ (1)
+  protein_step_freq_ (100),
+  protein_step_size_ (10)
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -357,8 +357,8 @@ options (int start,
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ (),
-  protein_step_freq_ (1),
-  protein_step_size_ (1)
+  protein_step_freq_ (100),
+  protein_step_size_ (10)
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -388,8 +388,8 @@ options (int& argc,
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ (),
-  protein_step_freq_ (1),
-  protein_step_size_ (1)
+  protein_step_freq_ (100),
+  protein_step_size_ (10)
 {
   ::cli::argv_scanner s (argc, argv, erase);
   _parse (s, opt, arg);
@@ -421,8 +421,8 @@ options (int start,
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ (),
-  protein_step_freq_ (1),
-  protein_step_size_ (1)
+  protein_step_freq_ (100),
+  protein_step_size_ (10)
 {
   ::cli::argv_scanner s (start, argc, argv, erase);
   _parse (s, opt, arg);
@@ -450,8 +450,8 @@ options (::cli::scanner& s,
   eq_steps_ (0),
   no_random_start_ (),
   enable_calc_msd_ (),
-  protein_step_freq_ (1),
-  protein_step_size_ (1)
+  protein_step_freq_ (100),
+  protein_step_size_ (10)
 {
   _parse (s, opt, arg);
 }

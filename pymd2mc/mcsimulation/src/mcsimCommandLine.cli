@@ -91,12 +91,12 @@ class options
   {
         "Enable calculation of Mean Square Displacement. May slow simulation."
   };
-  int --protein-step-freq = 1
+  int --protein-step-freq = 100
   {
         "<num>",
         "Protein step will occur every [freq] steps"
   };
-  int --protein-step-size = 1
+  int --protein-step-size = 10
   {
         "<num>",
         "How many proteins do we move at one step?"

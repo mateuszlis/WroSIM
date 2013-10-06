@@ -7,11 +7,13 @@
 
 #include "Metropolis.h"
 #include "math.h"
+#include "LattExchanger.h"
 
 //Metropolis public functions
 
 Metropolis::Metropolis( TriangularLattice* latt, double omegaAB, int T, int equilibSteps) 
-    : mEquilibSteps( equilibSteps )
+    : R(1.986)
+      , mEquilibSteps( equilibSteps )
       , mT( T )
       , mpSampler( NULL  )
       , mOutputFreq( 100 )
@@ -70,11 +72,6 @@ void Metropolis::setClusterStream( ostream &clusterStream )
 void Metropolis::setMsdOutput( ostream &MsdOutput )
 {
     mpMsdOutputFile = &MsdOutput;
-}
-
-void Metropolis::setOmegaAB( double omegaAB )
-{
-    mOmegaAB = omegaAB;
 }
 
 

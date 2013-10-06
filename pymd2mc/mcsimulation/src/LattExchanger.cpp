@@ -2,15 +2,16 @@
 #include "LattExchanger.h"
 
 LattExchanger::LattExchanger( TriangularLattice* latt, lattIndex *proteins, lattIndex proteinsCnt )
-            : mpLatt( latt ) 
+            : mpLatt( latt )
             , RIGHT_NEIGH_OFFSET( 1 )
             , RIGHT_TOP_NEIGH_OFFSET( -latt->getRowSize() + 1 )
-            , RIGHT_BOTTOM_NEIGH_OFFSET( latt->getRowSize() ) 
+            , RIGHT_BOTTOM_NEIGH_OFFSET( latt->getRowSize() )
             , LEFT_BOTTOM_NEIGH_OFFSET( latt->getRowSize() - 1 )
             , LEFT_TOP_NEIGH_OFFSET( -latt->getRowSize() )
             , LEFT_NEIGH_OFFSET( -1 )
             , mProteins( proteins )
             , mProteinCnt( proteinsCnt )
+            , mTracker( new InteractionsTracker( latt, mProteins, mProteinCnt ) )
     {
         mProteinSites[ 0 ] = 0;
         mProteinSites[ 1 ] = 1;
@@ -112,7 +113,7 @@ void LattExchanger::moveProtein( lattIndex site, lattIndex destination )
     // choose direction
     if ( abs( dist.col ) > abs( dist.row ) )
     {
-        if ( 
+        if (
                 ( dist.col < 0 && dist.col > -mpLatt->getRowSize() + 2 )
                 || dist.col > mpLatt->getRowSize() - 4) // PBC jump
         {
@@ -130,11 +131,11 @@ void LattExchanger::moveProtein( lattIndex site, lattIndex destination )
             }
             else return;
         }
-    } 
+    }
     else
     {
     lattIndex latticeColSize( mpLatt->getLatticeSize() / mpLatt->getRowSize() );
-        if ( 
+        if (
               ( dist.row < 0 && dist.row > -latticeColSize + 2 )
               || dist.row > latticeColSize - 4 )  // PBC jump
         {
@@ -144,7 +145,7 @@ void LattExchanger::moveProtein( lattIndex site, lattIndex destination )
             }
             else return;
         }
-        else 
+        else
         {
             if ( isSpaceToMove( site, mSitesMovedMoveUp ) )
             {
@@ -165,13 +166,19 @@ vectorDist LattExchanger::calcDist( lattIndex pos1, lattIndex pos2 )
 
 }
 
+double LattExchanger::getProteinInteraction( lattIndex pos )
+{
+    return mTracker->getInteraction( pos );
+}
+
 void LattExchanger::moveProteinRight( lattIndex site )
 {
     static const int MOVED_SITES_SIZE = 3;
 
     int movedSites[ MOVED_SITES_SIZE ];
     lattIndex rightSite = site + 1; // rightest site of the protein
-    
+    mTracker->registerProteinMove( site, rightSite );
+
     movedSites[0] = mpLatt->get( rightSite + RIGHT_NEIGH_OFFSET );
     movedSites[1] = mpLatt->get( rightSite + RIGHT_TOP_NEIGH_OFFSET );
     movedSites[2] = mpLatt->get( rightSite + RIGHT_BOTTOM_NEIGH_OFFSET );
@@ -239,7 +246,8 @@ void LattExchanger::moveProteinLeft( lattIndex site )
     static const int MOVED_SITES_SIZE = 3;
     int movedSites[ MOVED_SITES_SIZE ];
     lattIndex leftSite = site - 1; // rightest site of the protein
-    
+    mTracker->registerProteinMove( site, leftSite );
+
     movedSites[0] = mpLatt->get( leftSite + LEFT_NEIGH_OFFSET );
     movedSites[1] = mpLatt->get( leftSite + LEFT_TOP_NEIGH_OFFSET );
     movedSites[2] = mpLatt->get( leftSite + LEFT_BOTTOM_NEIGH_OFFSET );
@@ -303,12 +311,13 @@ void LattExchanger::moveProteinUp( lattIndex site )
     static const int MOVED_SITES_SIZE = 3;
     int movedSites[ MOVED_SITES_SIZE ];
     lattIndex topSite = site + LEFT_TOP_NEIGH_OFFSET; // topest site of the protein
-    
+    mTracker->registerProteinMove( site, topSite );
+
     movedSites[0] = mpLatt->get( topSite + LEFT_TOP_NEIGH_OFFSET );
     movedSites[1] = mpLatt->get( topSite + LEFT_NEIGH_OFFSET );
     movedSites[2] = mpLatt->get( topSite + RIGHT_TOP_NEIGH_OFFSET );
 
-    // move left top site 
+    // move left top site
     initPushAndPop( topSite + LEFT_NEIGH_OFFSET );
     pushAndPop( site + LEFT_NEIGH_OFFSET + LEFT_NEIGH_OFFSET, movedSites[1] );
     pushAndPop( site + LEFT_NEIGH_OFFSET + LEFT_BOTTOM_NEIGH_OFFSET, movedSites[1] );
@@ -367,12 +376,13 @@ void LattExchanger::moveProteinDown( lattIndex site )
     static const int MOVED_SITES_SIZE = 3;
     int movedSites[ MOVED_SITES_SIZE ];
     lattIndex bottomSite = site + RIGHT_BOTTOM_NEIGH_OFFSET; // bottomest site of the protein
-    
+    mTracker->registerProteinMove( site, bottomSite );
+
     movedSites[0] = mpLatt->get( bottomSite + RIGHT_BOTTOM_NEIGH_OFFSET );
     movedSites[1] = mpLatt->get( bottomSite + RIGHT_NEIGH_OFFSET );
     movedSites[2] = mpLatt->get( bottomSite + LEFT_BOTTOM_NEIGH_OFFSET );
 
-    // move left bottom site 
+    // move left bottom site
     initPushAndPop( bottomSite + RIGHT_NEIGH_OFFSET );
     pushAndPop( site + RIGHT_NEIGH_OFFSET + RIGHT_NEIGH_OFFSET, movedSites[1] );
     pushAndPop( site + RIGHT_NEIGH_OFFSET + RIGHT_TOP_NEIGH_OFFSET, movedSites[1] );
@@ -460,7 +470,7 @@ bool LattExchanger::isSpaceToMove( lattIndex site, const std::vector< int >& sit
                                      , endOfSites( sitesMoved.end() );
     for ( ; movedSite != endOfSites ; ++movedSite )
     {
-        if ( mpLatt->get( site + ( *movedSite ) ) == PROTEIN_A 
+        if ( mpLatt->get( site + ( *movedSite ) ) == PROTEIN_A
             || mpLatt->get( site + ( *movedSite ) ) == PROTEIN_B )
         {
             return false;

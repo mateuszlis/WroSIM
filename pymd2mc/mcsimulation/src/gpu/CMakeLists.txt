@@ -10,6 +10,9 @@ message(STATUS "CommonSource Dir is set to: ${COMMON_SOURCE_DIR} ")
 #Searching CUDA
 FIND_PACKAGE(CUDA)
 
+set(CMAKE_CXX_FLAGS_BACKUP ${CMAKE_CXX_FLAGS})
+set(CMAKE_CXX_FLAGS "-pipe -fstack-protector-all -Wall -Wextra ")
+message(STATUS "Compilation flags changed temporarily for CUDA ${CMAKE_CXX_FLAGS}")
 # Set the flags
 SET(CUDA_PROPAGATE_HOST_FLAGS ON CACHE BOOL "Propagate C/CXX Flags and friends to the host compiler in NVCC via -Xompile  " FORCE)
 
@@ -58,3 +61,6 @@ message( STATUS ${COMMON_FILES_SRC})
 CUDA_ADD_LIBRARY(Metropolis_cuda  Metropolis.cu )
 target_link_libraries(Metropolis_cuda  ${LINKED_LIBS} )
 message(STATUS "=========================================================================")
+
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_BACKUP})
+message(STATUS "Flags changed again to the previous state ${CMAKE_CXX_FLAGS}")

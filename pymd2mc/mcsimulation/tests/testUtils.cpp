@@ -8,19 +8,7 @@ namespace testUtils
         {
             cout << setw( 2 * ( i + 1 ) ) << "  " ;
             for( int j = 0 ; j < rowSize; ++j )
-            {   
-                cout << setw(2) << static_cast< int >( latt[ i * rowSize + j ] ) << "  ";
-            }
-            cout << endl;
-        }
-    }
-    void printLatt( lattMember *latt, int rowSize, int rowsCount )
-    {
-        for ( int i = 0 ; i < rowsCount ; ++i )
-        {
-            cout << setw( 2 * ( i + 1 ) ) << "  " ;
-            for( int j = 0 ; j < rowSize; ++j )
-            {   
+            {
                 cout << setw(2) << static_cast< int >( latt[ i * rowSize + j ] ) << "  ";
             }
             cout << endl;
@@ -48,8 +36,8 @@ namespace testUtils
 
     bool checkIfIsNeighborOf( const int& neighbor, const std::set< int >& elements, TriangularLattice* latt )
     {
-        for ( std::set< int >::const_iterator it = elements.begin() 
-                ; it != elements.end() 
+        for ( std::set< int >::const_iterator it = elements.begin()
+                ; it != elements.end()
                 ; ++it )
         {
             std::set< int > elementsNeighbors = getNeighborsOf( *it, latt );

@@ -54,7 +54,6 @@ int main( int argc, char* argv[] )
         double omegaAB = opt.omegaAB();
         double omegaAC = opt.omegaAC();
         double omegaBC = opt.omegaBC();
-        int proteinsNum = opt.proteins_count();
         int aLipidsNum = opt.first_particles_count();
         int lattSize = opt.latt_row_size() * opt.latt_row_count();
         int lattRowSize = opt.latt_row_size();
@@ -67,18 +66,25 @@ int main( int argc, char* argv[] )
         bool chooseStartRandomly = !opt.no_random_start();
         bool enableMsd = opt.enable_calc_msd();
 
-        string sampler = opt.sampling();
         string outputFilename = opt.o();
         ofstream outputFile, neighHistFile, fnfFile, clusterFile, msdFile;
         outputFile.open( outputFilename.c_str());
         neighHistFile.open( "neigh_hist_omegaAB.dat");
         fnfFile.open( "fraction_of_first_neighbors.dat" );
         clusterFile.open( "clusters.dat" );
-        std::cout << eqSteps << std::endl;
 
+        LattExchanger* exchanger = nullptr;
+
+#ifdef BUILD_CUDA
+        //FIXME: CUDA simulations probably are broken
+        TriangularLattice *lattice = new TriangularLattice( lattSize, lattRowSize, aLipidsNum, chooseStartRandomly );
+        std::cout << "CUDA simulation " << omegaAC << " " << omegaBC << "ProteinStepSize " << proteinStepSize << proteinStepFreq << std::endl;
+        MPKK *simulation = new MPKK( lattice, omegaAB, outputTemperature, eqSteps );
+#else
+        string sampler = opt.sampling();
+        int proteinsNum = opt.proteins_count();
         //FIXME: Currently KawasakiProteins is the only option - add command line support
         ProteinTriangularLattice *lattice = new ProteinTriangularLattice( lattSize, lattRowSize, aLipidsNum, proteinsNum, chooseStartRandomly );
-        LattExchanger* exchanger = NULL;
         if ( enableMsd && !exchanger )
         {
             std::cout << "Enabled Mean Square Displacement calculation " << std::endl;
@@ -87,11 +93,6 @@ int main( int argc, char* argv[] )
             exchanger->setProteins( lattice->getProteins(), lattice->getProteinCnt() );
             lattice->setExchanger( exchanger );
         }
-
-#ifdef BUILD_CUDA
-        std::cout << "CUDA simulation " << omegaAC << " " << omegaBC << "ProteinStepSize " << proteinStepSize << proteinStepFreq << std::endl;
-        MPKK *simulation = new MPKK( lattice, omegaAB, outputTemperature, eqSteps );
-#else
         KawasakiProteins *simulation = new KawasakiProteins( lattice
                                                            , omegaAB
                                                            , omegaAC

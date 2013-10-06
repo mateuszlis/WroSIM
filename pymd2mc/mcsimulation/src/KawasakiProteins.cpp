@@ -1,14 +1,15 @@
 #include "KawasakiProteins.h"
+#include "LattExchanger.h"
 
 KawasakiProteins::KawasakiProteins( ProteinTriangularLattice* latt
                         , double omegaAB
                         , double omegaAC
                         , double omegaBC
                         , int T
-                        , int equilibSteps 
-                        , int proteinStepFreq 
+                        , int equilibSteps
+                        , int proteinStepFreq
                         , int proteinStepSize )
-    : KawasakiSimulation( latt, omegaAB, T, equilibSteps ) 
+    : KawasakiSimulation( latt, omegaAB, T, equilibSteps )
     , mOmegaAC( omegaAC )
     , mOmegaBC( omegaBC )
     , mProteinStepFreq( proteinStepFreq )
@@ -35,7 +36,7 @@ void KawasakiProteins::run( int steps )
         {
             metropolisStep();
         }
-    
+
         if ( i % mProteinStepFreq == 0 )
         {
             for ( int j = 0 ; j < mProteinStepSize ; ++j )
@@ -77,7 +78,7 @@ void KawasakiProteins::metropolisStep()
 {
     int pos1 = 0;
     int pos2 = 0;
-    if ( mpSampler != NULL )
+    if ( unlikely( mpSampler != NULL ) )
     {
         mpSampler( mpLatt, pos1, pos2); //sets pos1 and pos2 by reference
     }
@@ -87,7 +88,9 @@ void KawasakiProteins::metropolisStep()
         exit( 0 );
     }
 
-    if ( ( *mpLatt )[pos1] != ( *mpLatt )[pos2] && isLipid( ( *mpLatt )[pos2] ) && isLipid( ( *mpLatt )[pos1] )  )
+    if ( likely( ( *mpLatt )[pos1] != ( *mpLatt )[pos2]
+            && isLipid( ( *mpLatt )[pos2] )
+            && isLipid( ( *mpLatt )[pos1] ) )  )
     {
         double p = prob( calcEnergyDiff( pos1, pos2) );
         double acceptance = rand() / ( float( RAND_MAX ) + 1 );
@@ -107,22 +110,26 @@ double KawasakiProteins::calcEnergyDiff( int pos1, int pos2 )
 {
     int s1Diff = mpLatt->calcOtherLipidNeighbors( pos1 );
     int s2Diff = mpLatt->calcOtherLipidNeighbors( pos2 );
+    double s1_protInter = mpLatt->getExchanger()->getProteinInteraction( pos1 );
+    double s2_protInter = mpLatt->getExchanger()->getProteinInteraction( pos2 );
     int s1protANeighb = mpLatt->calcNeighbors( pos1, PROTEIN_A );
     int s2protANeighb = mpLatt->calcNeighbors( pos2, PROTEIN_A );
-    
+
     int s1_after( 7 - ( s1Diff + s1protANeighb ) );
     int s2_after( 7 - ( s2Diff + s2protANeighb ) );
-    int s1prot_after( s2protANeighb );
-    int s2prot_after( s2protANeighb );
+    //int s1prot_after( s2protANeighb );
+    //int s2prot_after( s2protANeighb );
 
 
     if ( ( *mpLatt )[ pos1 ] == LIPID_A )
     {
-        return ( s1_after + s2_after - ( s1Diff + s2Diff ) ) * mOmegaAB + ( s1prot_after - s1protANeighb ) * mOmegaAC + ( s2prot_after - s2protANeighb ) * mOmegaBC;
+        double result = ( s1_after + s2_after - ( s1Diff + s2Diff ) ) * mOmegaAB + ( s2_protInter - s1_protInter ) * mOmegaAC + ( s1_protInter - s2_protInter ) * mOmegaBC;
+        return result;
     }
     else
     {
-        return ( s1_after + s2_after - ( s1Diff + s2Diff ) ) * mOmegaAB + ( s1prot_after - s1protANeighb ) * mOmegaBC + ( s2prot_after - s2protANeighb ) * mOmegaAC;
+        double result = ( s1_after + s2_after - ( s1Diff + s2Diff ) ) * mOmegaAB + ( s2_protInter - s1_protInter ) * mOmegaBC + ( s1_protInter - s2_protInter ) * mOmegaAC;
+        return result;
     }
 
 }
@@ -154,9 +161,9 @@ double KawasakiProteins::calcEnergy()
                     BCcount++;
                 }
             }
-                
+
         }
-        
+
     }
     ABcount /= 2; // each pair was counted twice
     BCcount /= 2;

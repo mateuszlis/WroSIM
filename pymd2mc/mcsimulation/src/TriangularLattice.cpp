@@ -6,8 +6,10 @@
  */
 
 #include "TriangularLattice.h"
+#include "LattExchanger.h"
 #include <string.h>
 #include <list>
+#include <stdexcept>
 
 typedef TriangularLattice::lattIndex lattIndex;
 
@@ -48,13 +50,6 @@ void TriangularLattice::distributeParticles( lattIndex firstTypeParticlesCnt )
     }
 }
 
-void TriangularLattice::pushNeighborsToQueue( std::list< lattIndex > & queue, lattIndex siteInd )
-{
-    for( lattIndex i = 0 ; i < mNeighbCnt ; ++i )
-    {
-        queue.push_back( getNeighbIndex( siteInd, i ) );
-    }
-}
 // TODO Copy constructor and assignment operator
 
 TriangularLattice::TriangularLattice( string /*filename*/ )
@@ -103,6 +98,19 @@ TriangularLattice::TriangularLattice( lattIndex latticeSize
     
     mpExchanger = new LattExchanger( this );
 
+}
+
+TriangularLattice::TriangularLattice( const TriangularLattice &  )
+      : mpLattice( nullptr )
+        , mLatticeSize( 0 )
+        , mRowSize( 0 )
+        , mpExchanger( nullptr )
+        , selfLattExchanger( true )
+        , mNeighb{0, 0, 0, 0, 0, 0}
+
+{
+    std::cout << "Undesired copy instruction" << std::endl;
+    throw std::runtime_error( "Undesired copy in Triangular lattice" );
 }
 
 TriangularLattice::lattMember &TriangularLattice::operator[]( lattIndex index ) const

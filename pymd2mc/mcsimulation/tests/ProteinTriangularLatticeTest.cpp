@@ -33,7 +33,10 @@ TEST( ProteinTriangularLattice, Construct_withProteins_Random )
     std::tr1::shared_ptr< ProteinTriangularLattice > latt( new ProteinTriangularLattice( 100, 10, LIPID_B_COUNT, PROTEIN_COUNT ) );
     TriangularLattice* localPtr( latt.get() ); // calcSum function accepts TriangularLattice* - this is stupid
     printLatt( latt->getLattice(), 10, 10 );
-    EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
+    EXPECT_EQ( calcSum( localPtr )
+            ,  static_cast< int >( LIPID_B_COUNT * LIPID_B
+                                    + PROTEIN_COUNT * PROTEIN_A
+                                    * ProteinTriangularLattice::mProteinSize ) );
 }
 
 TEST( ProteinTriangularLattice, Construct_withProteins_NONRandom_SingleProtein )
@@ -42,7 +45,10 @@ TEST( ProteinTriangularLattice, Construct_withProteins_NONRandom_SingleProtein )
     static const int PROTEIN_COUNT( 1 );
     std::tr1::shared_ptr< ProteinTriangularLattice > latt( new ProteinTriangularLattice( 100, 10, LIPID_B_COUNT, PROTEIN_COUNT, false ) );
     TriangularLattice* localPtr( latt.get() ); // calcSum function accepts TriangularLattice* - this is stupid
-    EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
+    EXPECT_EQ( calcSum( localPtr )
+            ,  static_cast< int > ( LIPID_B_COUNT * LIPID_B
+                                    + PROTEIN_COUNT * PROTEIN_A
+                                    * ProteinTriangularLattice::mProteinSize ) );
 }
 TEST( ProteinTriangularLattice, Construct_withProteins_NONRandom )
 {
@@ -50,7 +56,10 @@ TEST( ProteinTriangularLattice, Construct_withProteins_NONRandom )
     static const int PROTEIN_COUNT( 3 );
     std::tr1::shared_ptr< ProteinTriangularLattice > latt( new ProteinTriangularLattice( 100, 10, LIPID_B_COUNT, PROTEIN_COUNT, false ) );
     TriangularLattice* localPtr( latt.get() ); // calcSum function accepts TriangularLattice* - this is stupid
-    EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
+    EXPECT_EQ( calcSum( localPtr )
+            ,  static_cast< int >( LIPID_B_COUNT * LIPID_B
+                                    + PROTEIN_COUNT * PROTEIN_A
+                                    * ProteinTriangularLattice::mProteinSize ) );
     printLatt( latt->getLattice(), 10, 10 );
     for ( int i = 0 ; i < PROTEIN_COUNT ; ++i )
     {
@@ -73,7 +82,7 @@ TEST( ProteinTriangularLattice, moveProteinRight )
     latt->getLattice()[92]= LIPID_B ;
 
     printLatt( latt->getLattice(), 10, 10 );
-    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    latt->moveProtein( proteinPos, siteOnTheRight );
 
     printLatt( latt->getLattice(), 10, 10 );
 
@@ -88,22 +97,30 @@ TEST( ProteinTriangularLattice, moveProteinRight )
     EXPECT_EQ( latt->getLattice()[82], LIPID_B );
     EXPECT_EQ( latt->getLattice()[20], LIPID_B );
 
-    TriangularLattice* localPtr( latt.get() ); 
-    EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
+    TriangularLattice* localPtr( latt.get() );
+    EXPECT_EQ( calcSum( localPtr )
+            ,  static_cast< int > (
+                        LIPID_B_COUNT
+                        * LIPID_B + PROTEIN_COUNT
+                        * PROTEIN_A
+                        * ProteinTriangularLattice::mProteinSize ) );
     ProteinTriangularLattice::lattIndex proteinPosAfterMove( 1 );// calculated by hand
-    EXPECT_EQ( latt->getProteins()[0], proteinPosAfterMove ); 
+    EXPECT_EQ( latt->getProteins()[0], proteinPosAfterMove );
     proteinPos = latt->getProteins()[0];
     siteOnTheRight += 1;
-    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    latt->moveProtein( proteinPos, siteOnTheRight );
     proteinPos = latt->getProteins()[0];
     siteOnTheRight += 1;
-    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    latt->moveProtein( proteinPos, siteOnTheRight );
     siteOnTheRight += 1;
     proteinPos = latt->getProteins()[0];
-    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    latt->moveProtein( proteinPos, siteOnTheRight );
     siteOnTheRight += 1;
     proteinPos = latt->getProteins()[0];
-    latt->moveProtein( proteinPos, siteOnTheRight ); 
+    latt->moveProtein( proteinPos, siteOnTheRight );
     printLatt( latt->getLattice(), 10, 10 );
-    EXPECT_EQ( calcSum( localPtr ),  LIPID_B_COUNT * LIPID_B + PROTEIN_COUNT * PROTEIN_A * ProteinTriangularLattice::mProteinSize );
+    EXPECT_EQ( calcSum( localPtr )
+            ,  static_cast< int > ( LIPID_B_COUNT * LIPID_B
+                                    + PROTEIN_COUNT * PROTEIN_A
+                                    * ProteinTriangularLattice::mProteinSize ) );
 }

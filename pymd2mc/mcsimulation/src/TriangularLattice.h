@@ -19,7 +19,6 @@
 
 // project local
 #include "InputParametersException.h"
-#include "LattExchanger.h"
 #include "types.h"
 
 using namespace std;
@@ -43,6 +42,8 @@ class TriangularLattice
                          , lattIndex rowSize
                          , lattIndex firstTypeParticlesCnt
                          , bool distributeRandomly = true );
+
+        TriangularLattice( const TriangularLattice& );
 
         lattMember &operator[]( lattIndex index ) const;
         lattMember get( int index ) const; // applies helical boundary conditions

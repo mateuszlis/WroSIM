@@ -1,6 +1,6 @@
 include_directories(${BASE_SRC_DIR})
-add_executable (TriangularLatticeTest testUtils.cpp TriangularLatticeTest.cpp)
-add_executable (ProteinTriangularLatticeTest testUtils.cpp ProteinTriangularLatticeTest.cpp)
+add_executable (TriangularLatticeTest testUtils.cpp TriangularLatticeTest.cpp )
+add_executable (ProteinTriangularLatticeTest testUtils.cpp ProteinTriangularLatticeTest.cpp InteractionsTrackerTest.cpp)
 add_executable (ClustersAnalyzerTest ClustersAnalyzerTest.cpp)
 add_executable (MsdEnabledLattExTest testUtils.cpp MsdEnabledLattExTest.cpp)
 add_executable (KawasakiProteinsTest testUtils.cpp KawasakiProteinsTest.cpp )

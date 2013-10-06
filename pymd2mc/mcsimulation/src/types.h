@@ -1,5 +1,8 @@
 #pragma once
 
+#define likely(x)      __builtin_expect(!!(x), 1)
+#define unlikely(x)    __builtin_expect(!!(x), 0)
+
 typedef unsigned char lattMember;
 typedef int lattIndex;
 enum LATTICE_FIELD_NAMES 
