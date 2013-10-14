@@ -107,6 +107,7 @@ TriangularLattice::TriangularLattice( const TriangularLattice &  )
         , mpExchanger( nullptr )
         , selfLattExchanger( true )
         , mNeighb{0, 0, 0, 0, 0, 0}
+        , mNonLipidMembersCount( 0 )
 
 {
     std::cout << "Undesired copy instruction" << std::endl;

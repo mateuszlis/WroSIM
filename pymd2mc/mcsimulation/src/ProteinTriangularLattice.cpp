@@ -16,6 +16,7 @@ ProteinTriangularLattice::ProteinTriangularLattice( lattIndex latticeSize
     else
         distributeProteins();
     mpExchanger->setProteins( mProteins, mProteinCnt );
+    TriangularLattice::mNonLipidMembersCount = 7 * proteinCnt;
 }
 
 void ProteinTriangularLattice::distributeProteinsRandomly()

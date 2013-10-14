@@ -51,6 +51,7 @@ class TriangularLattice
         lattIndex getLatticeSize() const;
         lattIndex getRowSize() const;
         lattMember* getLattice() const { return mpLattice; };
+        lattIndex getNonLipidMembersCount() const { return mNonLipidMembersCount; };
 
         lattIndex simNeighbCount( lattIndex pos );
         void exchangeSites( lattIndex pos1, lattIndex pos2 );
@@ -74,6 +75,7 @@ class TriangularLattice
         LattExchanger* mpExchanger;
         bool selfLattExchanger;
         lattIndex mNeighb[mNeighbCnt];
+        lattIndex mNonLipidMembersCount;
 
         virtual void clearArr();
         virtual void distributeParticlesRandomly( lattIndex firstTypeParticlesCnt );
