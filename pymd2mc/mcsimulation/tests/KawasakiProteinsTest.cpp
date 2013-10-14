@@ -30,7 +30,7 @@ TEST( KawasakiProteins, calcEnergy )
     printLatt( latt->getLattice(), 8, 8 );
     ProteinTriangularLattice* localPtr( latt.get() ); // constructor in line below requires raw ptr
     std::tr1::shared_ptr< KawasakiProteins > simulation( new KawasakiProteins( localPtr, 0, -400, 800 ) );
-    EXPECT_EQ( simulation->calcEnergy(), 7 * -400 + 17 * 800 );
+    EXPECT_DOUBLE_EQ( simulation->calcEnergy(), 18.499995 * -400 + 6.499999 * 800 );
     InteractionsTracker tracker( latt.get(), latt->mProteins, PROTEIN_COUNT );
     testUtils::printLatt( tracker.mpProtInt.get(), 8, 8 );
 }

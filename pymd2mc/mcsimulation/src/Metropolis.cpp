@@ -95,7 +95,7 @@ void Metropolis::performAnalysis( int stepNum )
         for( TriangularLattice::clustersMap::const_iterator it = map.begin() ; it != map.end() ; ++it )
         {
             sum += ( *it ).second * ( *it ).first;
-            ( *mpClusterStream ) << ( *it ).first << "\t" << ( *it ).second << std::endl;
+            ( *mpClusterStream ) << stepNum << "\t" << ( *it ).first << "\t" << ( *it ).second << std::endl;
         }
         cout << sum << " " << map.size()<<  std::endl;
     }
@@ -159,7 +159,7 @@ double Metropolis::calcFirstNeighboursFract()
             simFirstNeighbCount++;
         }
     }
-    return static_cast< double >( simFirstNeighbCount ) / mpLatt->getLatticeSize();
+    return static_cast< double >( simFirstNeighbCount ) / ( mpLatt->getLatticeSize() - mpLatt->getNonLipidMembersCount() );
 }
 
 

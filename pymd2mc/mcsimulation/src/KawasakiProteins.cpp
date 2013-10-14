@@ -41,7 +41,7 @@ void KawasakiProteins::run( int steps )
         {
             for ( int j = 0 ; j < mProteinStepSize ; ++j )
             {
-                proteinStep();
+                //proteinStep();
             }
         }
 
@@ -136,7 +136,7 @@ double KawasakiProteins::calcEnergyDiff( int pos1, int pos2 )
 
 double KawasakiProteins::calcEnergy()
 {
-    unsigned int ABcount( 0 ), ACcount( 0 ), BCcount( 0 );
+    double ABcount( 0 ), ACcount( 0 ), BCcount( 0 );
 
     for ( lattIndex i( 0 ) ; i < mpLatt->getLatticeSize() ; ++i )
     {
@@ -150,23 +150,19 @@ double KawasakiProteins::calcEnergy()
                 {
                     ABcount++;
                 }
-                if ( ( ( *mpLatt )[i] == LIPID_A && ( *mpLatt )[ neighb ] == PROTEIN_A )
-                        || ( ( *mpLatt )[i] == PROTEIN_A && ( *mpLatt )[ neighb ] == LIPID_A ) )
-                {
-                    ACcount++;
-                }
-                if ( ( ( *mpLatt )[i] == LIPID_B && ( *mpLatt )[ neighb ] == PROTEIN_A )
-                        || ( ( *mpLatt )[i] == PROTEIN_A && ( *mpLatt )[ neighb ] == LIPID_B ) )
-                {
-                    BCcount++;
-                }
             }
-
+        }
+        // protein interactions
+        if ( ( *mpLatt )[i] == LIPID_A )
+        {
+            ACcount += ( mpLatt->getExchanger()->getProteinInteraction(i) );
+        }
+        else if ( ( *mpLatt )[i] == LIPID_B )
+        {
+            BCcount += ( mpLatt->getExchanger()->getProteinInteraction(i) );
         }
 
     }
     ABcount /= 2; // each pair was counted twice
-    BCcount /= 2;
-    ACcount /= 2;
     return ABcount * mOmegaAB + ACcount * mOmegaAC + BCcount * mOmegaBC;
 }
