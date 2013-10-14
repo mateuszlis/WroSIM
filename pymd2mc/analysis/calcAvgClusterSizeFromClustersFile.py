@@ -11,7 +11,7 @@ count = 0
 size = 0
 with open( sys.argv[1], 'r' ) as f:
     for line in f.readlines():
-        lineList = line.split()
+        lineList = line.split("\t")
         frameNum = lineList[0]
         if frameNum != lastFrame:
             if count != 0:
